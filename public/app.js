@@ -6,6 +6,10 @@ import { createPatternRenderer, drawBeadGrid } from './pattern-renderer.js';
 import { estimatePatternEffort, getPatternBounds } from './pattern-effort.js';
 import { listBeadingSessions, getBeadingSession, createBeadingSession, findPendingSession, createSessionTimer } from './beading-sessions.js';
 
+import { createHostStudio } from './host-studio.js';
+import { createDifficultyExamples, matchesLibraryFilters } from './difficulty-examples.js';
+import { applyImageStyle } from './image-styles.js';
+
 const $ = id => document.getElementById(id);
  const canvas = $('patternCanvas');
 const patternRenderer = createPatternRenderer(canvas, $('canvasArea'), $('canvasStage'));
@@ -24,6 +28,7 @@ let writeQueue=Promise.resolve(), openingProject=false, generationPromise=null, 
 let originalBlob=null, originalName='', savedOriginalBlob=null, savedOriginalName='';
 let aiEdited=false, savedAiEdited=false, sourceRevision=0, activeDraft=true, libraryMutation=false;
 let sourceTask=0;
+let libraryFilters={levels:[],time:'all'},difficultyExamples=[],hostReturnScreen='library';
 let sessionTimer=null,sessionView=false,sessionBusy=false,recordEntries=[],recordRequest=0;
 
 const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -41,15 +46,17 @@ function updateAvailable() { $('availableInfo').textContent = `${availablePalett
 function syncPaletteOptions() { $('paletteSelect').innerHTML = Object.entries(palettes).map(([id,p]) => `<option value="${escapeHTML(id)}">${escapeHTML(p.name)}</option>`).join(''); $('paletteSelect').value = paletteId; }
 function snapshot() { return { pattern: structuredClone(pattern), done: [...done], paletteId, customPalettes: structuredClone(customPalettes), projectName, isDemo, settings:structuredClone(appliedSettings), sourceBlob:savedSourceBlob, sourceName:savedSourceName, originalBlob:savedOriginalBlob, originalName:savedOriginalName, aiEdited:savedAiEdited }; }
 function pushUndo() { undoStack.push(snapshot()); if (undoStack.length > 15) undoStack.shift(); $('undoBtn').disabled = false; }
-function readSettings(){return {width:+$('gridWidth').value,height:+$('gridHeight').value,maxColors:+$('maxColors').value,keepRatio:$('keepRatio').checked,removeBackground:$('removeBackground').checked,backgroundTolerance:+$('tolerance').value};}
+function readSettings(){return {imageStyle:$('imageStyle').value,shopId:$('buyerShop').value,width:+$('gridWidth').value,height:+$('gridHeight').value,maxColors:+$('maxColors').value,keepRatio:$('keepRatio').checked,removeBackground:$('removeBackground').checked,backgroundTolerance:+$('tolerance').value};}
 function applySettings(settings){
  const value=settings||{};
+ $('imageStyle').value=['original','clean','vivid'].includes(value.imageStyle)?value.imageStyle:'original';syncBuyerShops(value.shopId||'');
  const clamp=(n,min,max,fallback)=>Number.isFinite(+n)?Math.max(min,Math.min(max,Math.round(+n))):fallback;
  setDimensionInputs(clamp(value.width,8,160,pattern.width),clamp(value.height,8,160,pattern.height));
  $('maxColors').value=clamp(value.maxColors,2,64,16);$('maxColorsValue').textContent=$('maxColors').value;
  $('keepRatio').checked=value.keepRatio!==false;$('removeBackground').checked=value.removeBackground!==false;
  $('tolerance').value=clamp(value.backgroundTolerance,5,60,20);$('toleranceValue').textContent=$('tolerance').value;
 }
+function settingsDiffer(){const current=readSettings();return Object.keys(current).some(key=>current[key]!==appliedSettings?.[key]);}
 function markParametersDirty(){if(suppressSaving)return;parametersDirty=true;setSaveStatus(pendingImport?'新图片待生成':'参数已调整 · 保存时应用');}
 function setSaveStatus(text){$('saveState').textContent=text;if($('focusSaveStatus'))$('focusSaveStatus').textContent=text;}
 function beginSourceTask(message){const task=++sourceTask;loadingImage=true;openingProject=false;setSaveStatus(message);updateSourceControls();return task;}
@@ -174,7 +181,7 @@ function nextUnfinished(){
 }
 $('prevColor').onclick=()=>navigateColor(-1);$('nextColor').onclick=()=>navigateColor(1);
 if($('nextUnfinished'))$('nextUnfinished').onclick=nextUnfinished;
-function showAlternatives(code){const original=paletteMap().get(code);const candidates=nearestColors(original.hex,availablePalette().filter(c=>c.code!==code),6);modal('给这颗豆，换个近似色',`<div class="modal-current"><span class="color-swatch" style="background:${original.hex}"></span><div><strong>${escapeHTML(code)}</strong><br><span>当前共 ${counts()[code]} 颗 · ${escapeHTML(palettes[paletteId].name)}</span></div></div><p>按屏幕色差从小到大排列，仅显示已勾选的店铺有货色。</p><div class="alternative-list">${candidates.map((c,i)=>`<button class="alternative" data-alternative="${escapeHTML(c.code)}"><span class="color-swatch" style="background:${c.hex}"></span><span class="alt-info"><strong>${escapeHTML(c.code)} ${i===0?'<span style="font-size:9px;color:#a99bb5;margin-left:8px">最接近</span>':''}</strong><small>${c.hex} · 色差 ΔE ${c.distance.toFixed(1)}</small></span><span class="alt-choose">替换全部 →</span></button>`).join('')||'<div class="empty-list">没有可用替代色，请在店铺库存中启用更多颜色。</div>'}</div><div class="replace-all-note">替换后同步更新图纸和清单，可以撤销。色差越小越接近，实物请对照商家色卡。</div>`,'COLOR MATCH');$('modalBody').querySelectorAll('[data-alternative]').forEach(button=>button.onclick=()=>{const replacement=button.dataset.alternative;pushUndo();const n=counts()[code];pattern.cells=replaceColor(pattern.cells,code,replacement);for(const i of [...done])if(undoStack.at(-1).pattern.cells[i]===code)done.delete(i);if(highlighted===code)highlighted=replacement;updateAll();closeModal();toast(`已将 ${n} 颗 ${code} 替换为 ${replacement}，可撤销。`);});}
+function showAlternatives(code){const original=paletteMap().get(code);const candidates=nearestColors(original.hex,availablePalette().filter(c=>c.code!==code),6);modal('给这颗豆，换个近似色',`<div class="modal-current"><span class="color-swatch" style="background:${original.hex}"></span><div><strong>${escapeHTML(code)}</strong><br><span>当前共 ${counts()[code]} 颗 · ${escapeHTML(palettes[paletteId].name)}</span></div></div><p>按屏幕色差从小到大排列，仅显示当前配色来源中的可用色。</p><div class="alternative-list">${candidates.map((c,i)=>`<button class="alternative" data-alternative="${escapeHTML(c.code)}"><span class="color-swatch" style="background:${c.hex}"></span><span class="alt-info"><strong>${escapeHTML(c.code)} ${i===0?'<span style="font-size:9px;color:#a99bb5;margin-left:8px">最接近</span>':''}</strong><small>${c.hex} · 色差 ΔE ${c.distance.toFixed(1)}</small></span><span class="alt-choose">替换全部 →</span></button>`).join('')||'<div class="empty-list">没有可用替代色，请在东道主补充可用颜色后重新匹配。</div>'}</div><div class="replace-all-note">替换后同步更新图纸和清单，可以撤销。色差越小越接近，实物请对照商家色卡。</div>`,'COLOR MATCH');$('modalBody').querySelectorAll('[data-alternative]').forEach(button=>button.onclick=()=>{const replacement=button.dataset.alternative;pushUndo();const n=counts()[code];pattern.cells=replaceColor(pattern.cells,code,replacement);for(const i of [...done])if(undoStack.at(-1).pattern.cells[i]===code)done.delete(i);if(highlighted===code)highlighted=replacement;updateAll();closeModal();toast(`已将 ${n} 颗 ${code} 替换为 ${replacement}，可撤销。`);});}
 $('undoBtn').onclick=async()=>{
  if(generationPromise)return;
  const old=undoStack.at(-1);if(!old)return;const task=beginSourceTask('正在恢复上一次调整…');
@@ -197,12 +204,12 @@ async function loadImage(file){
   if(task!==sourceTask)return;
   applyPreparedSource(prepared,{commit:false});prepared=null;
   originalBlob=file;originalName=file.name;aiEdited=false;pendingImport=true;parametersDirty=true;
-  setSaveStatus('新图片待生成');showScreen('editor');if($('keepRatio').checked)syncRatio('width');toast('图片已载入，调整参数后点击“生成拼豆图纸”。');
+  $('imageStyle').value='original';setDimensionInputs(52,52);
+  setSaveStatus('新图片待生成');showScreen('editor');if($('keepRatio').checked)syncRatio('width');toast('选择尺寸和风格后，生成图纸。');return true;
  }catch(error){if(task===sourceTask){setSaveStatus('载入未完成 · 当前图纸已保留');toast(error.message||'无法读取这张图片，请更换图片。');}}
  finally{releasePreparedSource(prepared);finishSourceTask(task);}
 }
-$('uploadZone').onclick=()=>$('imageFile').click();$('changeImage').onclick=()=>$('imageFile').click();$('imageFile').onchange=e=>{loadImage(e.target.files[0]);e.target.value='';};
-for(const event of ['dragenter','dragover'])$('uploadZone').addEventListener(event,e=>{e.preventDefault();$('uploadZone').classList.add('dragging');});for(const event of ['dragleave','drop'])$('uploadZone').addEventListener(event,e=>{e.preventDefault();$('uploadZone').classList.remove('dragging');});$('uploadZone').addEventListener('drop',e=>loadImage(e.dataTransfer.files[0]));
+$('imageFile').onchange=e=>{loadImage(e.target.files[0]);e.target.value='';};
 function syncSizePresets(){const width=+$('gridWidth').value,height=+$('gridHeight').value;document.querySelectorAll('[data-size]').forEach(button=>button.classList.toggle('active',width===+button.dataset.size&&height===+button.dataset.size));}
 function setDimensionInputs(width,height){$('gridWidth').value=width;$('gridHeight').value=height;syncSizePresets();}
 function syncRatio(changed){if(!imageSource||!$('keepRatio').checked){syncSizePresets();return;}const ratio=imageSource.width/imageSource.height;const clamp=n=>Math.max(8,Math.min(160,Math.round(n)));let width=+$('gridWidth').value,height=+$('gridHeight').value;const requested=changed==='width'?width:height;if(!Number.isInteger(requested)||requested<8||requested>160){syncSizePresets();return;}if(changed==='width'){height=clamp(width/ratio);width=clamp(height*ratio);}else{width=clamp(height*ratio);height=clamp(width/ratio);}setDimensionInputs(width,height);}
@@ -217,20 +224,25 @@ function updateSourceControls(){
  $('undoBtn').title='撤销上一次图纸调整';
  $('undoBtn').disabled=busy||!undoStack.length;
  for(const id of ['saveProject','startBeading'])$(id).disabled=busy||!pattern;
- for(const id of ['navLibrary','navRecords','libraryNew','openProject','uploadZone','changeImage','loadDemo'])if($(id))$(id).disabled=!!generationPromise||!pattern;
+ $('exportBtn').disabled=busy||pendingImport||!pattern;
+ for(const id of ['navLibrary','navRecords','navHost','libraryNew','openProject','difficultyExamplesBtn'])if($(id))$(id).disabled=!!generationPromise||!pattern;
  const missing=!imageSource&&!isDemo&&!pendingImport;
- for(const id of ['gridWidth','gridHeight','maxColors','keepRatio','removeBackground','tolerance','generateBtn'])$(id).disabled=missing||busy;
- for(const id of ['paletteSelect','inventoryBtn','importPalette','restoreOriginalBtn'])$(id).disabled=busy||!pattern;
+ for(const id of ['gridWidth','gridHeight','maxColors','keepRatio','removeBackground','tolerance','imageStyle','generateBtn'])$(id).disabled=missing||busy;
+ for(const id of ['paletteSelect','buyerShop','applyShopColors','restoreOriginalBtn'])$(id).disabled=busy||!pattern;
  document.querySelectorAll('[data-size]').forEach(b=>b.disabled=missing||busy);
- document.querySelector('.local-note').textContent=missing?'旧图纸未附原图，可直接拼豆；上传原图后可重新调整参数。':'原图随图纸保存到本机仓库，之后可继续调整。';
+ document.body.dataset.pendingImport=String(pendingImport);
+ $('pendingSource').src=pendingImport&&imageSource?imageSource.src:'';
+ if(pendingImport){$('projectName').textContent=sourceName.replace(/\.[^.]+$/,'')||'新图纸';$('projectMeta').textContent='原图预览';}
+ updateShopInfo();
 }
 function generate(){if(generationPromise)return generationPromise;generationPromise=runGeneration().finally(()=>{generationPromise=null;updateSourceControls();});return generationPromise;}
 async function runGeneration(){
  if(loadingImage){toast('原图正在载入，请稍后再生成。');return false;}
  const settings=readSettings(),{width,height}=settings;
  if(!Number.isInteger(width)||!Number.isInteger(height)||width<8||height<8||width>160||height>160){toast('图纸宽高请输入 8–160 的整数。');return false;}
- const available=availablePalette();if(!available.length){toast('至少选择一个店铺有货颜色。');return false;}
- if(!imageSource&&!isDemo){toast('这份旧图纸没有原图，请上传原图后调整参数。');return false;}
+ let selectedShopPalette=null;try{if(settings.shopId)selectedShopPalette=hostStudio.getAvailablePalette(settings.shopId);}catch(error){toast(error.message);return false;}
+ const available=selectedShopPalette?.colors||availablePalette();if(!available.length){toast('当前色卡没有可用颜色，请先在东道主补充颜色。');return false;}
+ if(!imageSource&&!isDemo){toast('这份旧图纸没有原图，可继续拼豆或匹配店家颜色。');return false;}
  const original=imageSource,workingBlob=sourceBlob,workingName=sourceName,newImport=pendingImport;
  const controls=[...document.querySelectorAll('.source-panel button,.source-panel input,.source-panel select,#saveProject,#startBeading,#navLibrary,#openProject,#libraryNew,#aiConfigBtn')].map(el=>[el,el.disabled]);controls.forEach(([el])=>el.disabled=true);
  $('canvasLoading').hidden=false;$('canvasLoading').textContent='正在一颗颗匹配颜色…';
@@ -238,9 +250,10 @@ async function runGeneration(){
  try{
   let next;
   const off=document.createElement('canvas');off.width=width;off.height=height;const c=off.getContext('2d',{willReadFrequently:true});
-  if(original){c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';if(settings.keepRatio){const scale=Math.min(width/original.width,height/original.height),dw=original.width*scale,dh=original.height*scale;c.drawImage(original,(width-dw)/2,(height-dh)/2,dw,dh);}else c.drawImage(original,0,0,width,height);next=generatePattern(c.getImageData(0,0,width,height),width,height,available,{maxColors:settings.maxColors,removeBackground:settings.removeBackground,backgroundTolerance:settings.backgroundTolerance});}
-  else{const demo=makeDemo(width,height,available),m=new Map(available.map(a=>[a.code,a]));demo.cells.forEach((code,i)=>{if(code){c.fillStyle=m.get(code).hex;c.fillRect(i%width,Math.floor(i/width),1,1);}});next=generatePattern(c.getImageData(0,0,width,height),width,height,available,{maxColors:settings.maxColors});}
+  if(original){c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';if(settings.keepRatio){const scale=Math.min(width/original.width,height/original.height),dw=original.width*scale,dh=original.height*scale;c.drawImage(original,(width-dw)/2,(height-dh)/2,dw,dh);}else c.drawImage(original,0,0,width,height);next=generatePattern(applyImageStyle(c.getImageData(0,0,width,height),width,height,settings.imageStyle),width,height,available,{maxColors:settings.maxColors,removeBackground:settings.removeBackground,backgroundTolerance:settings.backgroundTolerance});}
+  else{const demo=makeDemo(width,height,available),m=new Map(available.map(a=>[a.code,a]));demo.cells.forEach((code,i)=>{if(code){c.fillStyle=m.get(code).hex;c.fillRect(i%width,Math.floor(i/width),1,1);}});next=generatePattern(applyImageStyle(c.getImageData(0,0,width,height),width,height,settings.imageStyle),width,height,available,{maxColors:settings.maxColors});}
   if(newImport){currentProjectId=null;currentCreatedAt=null;undoStack=[];$('undoBtn').disabled=true;}else pushUndo();
+  if(selectedShopPalette)registerShopPalette(settings.shopId,selectedShopPalette);
   pattern=next;if(newImport||!currentProjectId)projectName=original?workingName.replace(/\.[^.]+$/,'').slice(0,60)||'我的拼豆图纸':'小狐狸的午后';isDemo=!original;
   savedSourceBlob=workingBlob;savedSourceName=workingName;savedOriginalBlob=originalBlob;savedOriginalName=originalName;savedAiEdited=aiEdited;activeDraft=true;pendingImport=false;parametersDirty=false;appliedSettings=settings;applySettings(settings);
   done=new Set();selected=-1;hovered=-1;highlighted=null;setView('grid');updateAll(true);await persistCurrent();toast(total()?`已保存图纸：${total()} 颗豆，${Object.keys(counts()).length} 种颜色。`:'图纸为空，可关闭“去除纯色背景”后重试。');return true;
@@ -248,21 +261,7 @@ async function runGeneration(){
  finally{controls.forEach(([el,disabled])=>el.disabled=disabled);$('canvasLoading').hidden=true;updateSourceControls();}
 }
 $('generateBtn').onclick=generate;
-$('loadDemo').onclick=async()=>{
- if(!pattern||generationPromise)return;const task=beginSourceTask('正在准备小狐狸示例…');
- try{
-  if(currentProjectId&&!pendingImport)await persistCurrent();if(task!==sourceTask)return;
-  currentProjectId=null;currentCreatedAt=null;undoStack=[];applyPreparedSource({img:null,url:null,blob:null,name:''});
-  originalBlob=savedOriginalBlob=null;originalName=savedOriginalName='';aiEdited=savedAiEdited=false;activeDraft=true;pendingImport=false;parametersDirty=false;isDemo=true;projectName='小狐狸的午后';
-  pattern=makeDemo(52,52,availablePalette().length?availablePalette():activePalette);setDimensionInputs(52,52);appliedSettings=readSettings();done=new Set();highlighted=null;selected=-1;hovered=-1;updateAll(true);showScreen('editor');
-  await persistCurrent();if(task===sourceTask)toast('已新建小狐狸示例图纸。');
- }catch(error){if(task===sourceTask)toast(error.message);}finally{finishSourceTask(task);}
-};
-$('paletteSelect').onchange=()=>{const next=$('paletteSelect').value, oldMap=paletteMap();pushUndo();setPalette(next);const avail=availablePalette();const replacements=new Map();for(const code of Object.keys(counts()))replacements.set(code,nearestColors(oldMap.get(code).hex,avail.length?avail:activePalette,1)[0].code);pattern.cells=pattern.cells.map(c=>c===null?null:replacements.get(c));done=new Set();highlighted=null;updateAll();toast('已按新色卡匹配图纸，数量保持不变。');};
-
-$('inventoryBtn').onclick=()=>{const staged=new Set(exclusions[paletteId]||[]);modal('哪些颜色，店里有货？',`<p>点击色块切换库存。灰色表示缺货；生成图纸与替代色推荐将只使用有货色。</p><div class="inventory-controls"><input id="inventorySearch" placeholder="搜索色号" aria-label="搜索库存色号"><button id="inventoryAll" class="text-button">全部有货</button><button id="inventoryNone" class="text-button">全部缺货</button></div><div id="inventoryGrid" class="inventory-grid"></div><div class="modal-buttons"><button class="button quiet" id="inventoryCancel">取消</button><button class="button primary" id="inventoryApply">保存库存</button></div>`,'YOUR COLOR COLLECTION');function render(){const q=$('inventorySearch').value.trim().toUpperCase();$('inventoryGrid').innerHTML=activePalette.filter(c=>c.code.toUpperCase().includes(q)).map(c=>`<button class="inventory-item ${staged.has(c.code)?'unavailable':''}" data-inventory="${escapeHTML(c.code)}" aria-pressed="${!staged.has(c.code)}" title="${escapeHTML(c.code)} ${staged.has(c.code)?'缺货':'有货'}"><span class="swatch" style="background:${c.hex}"></span><span>${escapeHTML(c.code)}</span></button>`).join('');}$('inventorySearch').oninput=render;$('inventoryGrid').onclick=e=>{const b=e.target.closest('[data-inventory]');if(!b)return;const code=b.dataset.inventory;if(staged.has(code))staged.delete(code);else staged.add(code);render();};$('inventoryAll').onclick=()=>{staged.clear();render();};$('inventoryNone').onclick=()=>{activePalette.forEach(c=>staged.add(c.code));render();};$('inventoryCancel').onclick=closeModal;$('inventoryApply').onclick=()=>{if(staged.size===activePalette.length){toast('请至少保留一种有货颜色。');return;}exclusions[paletteId]=[...staged];updateAvailable();saveSoon();closeModal();toast('库存已保存。重新生成或手动替色后，现有图纸才会改变。');};render();};
-$('importPalette').onclick=()=>{modal('让图纸适配你常买的店',`<p>导入店铺色卡后，网站会用该店的真实色号匹配图片。支持 CSV 或 JSON，最多 1000 色。</p><h3>CSV 格式示例</h3><div class="import-format">code,hex,name\nS01,#FFFFFF,白色\nS02,#242424,黑色\nS03,#E49B60,橘色</div><p>上方 S01 等仅示范文件格式，不是品牌色号。颜色须为六位 HEX，例如 #FFFFFF；色名可省略。</p><div class="modal-buttons"><button id="paletteTemplate" class="button quiet">下载示例模板</button><button id="choosePalette" class="button primary">选择 CSV / JSON</button></div>`,'YOUR PALETTE');$('paletteTemplate').onclick=()=>downloadText('店铺色卡-格式模板.csv','code,hex,name\nS01,#FFFFFF,白色\nS02,#242424,黑色\nS03,#E49B60,橘色','text/csv;charset=utf-8',true);$('choosePalette').onclick=()=>$('paletteFile').click();};
-$('paletteFile').onchange=async e=>{const file=e.target.files[0];e.target.value='';if(!file)return;try{if(file.size>1024*1024)throw new Error('色卡文件请控制在 1 MB 以内。');const imported=parsePalette(await file.text(),file.name);const id='custom-'+Date.now().toString(36);pushUndo();const oldMap=paletteMap();customPalettes[id]=imported;palettes[id]=imported;syncPaletteOptions();setPalette(id);const replacements=new Map(Object.keys(counts()).map(code=>[code,nearestColors(oldMap.get(code).hex,activePalette,1)[0].code]));pattern.cells=pattern.cells.map(c=>c===null?null:replacements.get(c));done=new Set();highlighted=null;updateAll();closeModal();toast(`已导入 ${imported.colors.length} 色，当前图纸已匹配到新色卡。`);}catch(error){toast(error.message);}};
+$('paletteSelect').onchange=()=>{$('buyerShop').value='';updateShopInfo();const next=$('paletteSelect').value, oldMap=paletteMap();pushUndo();setPalette(next);const avail=availablePalette();const replacements=new Map();for(const code of Object.keys(counts()))replacements.set(code,nearestColors(oldMap.get(code).hex,avail.length?avail:activePalette,1)[0].code);pattern.cells=pattern.cells.map(c=>c===null?null:replacements.get(c));done=new Set();highlighted=null;appliedSettings={...appliedSettings,shopId:''};parametersDirty=settingsDiffer();updateAll();toast('已按新色卡匹配图纸，数量保持不变。');};
 
 function downloadBlob(filename,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
 function downloadText(filename,text,type='text/plain;charset=utf-8',bom=false){downloadBlob(filename,new Blob([bom?'\ufeff':'',text],{type}));}
@@ -283,19 +282,21 @@ $('projectFile').onchange=async e=>{
   if(file.size>5*1024*1024)throw new Error('图纸文件请控制在 5 MB 以内。');const data=JSON.parse(await file.text());if(task!==sourceTask)return;validateProject(data);
   if(currentProjectId&&!pendingImport)await persistCurrent();if(task!==sourceTask)return;
   suppressSaving=true;currentProjectId=null;currentCreatedAt=null;applyPreparedSource({img:null,url:null,blob:null,name:''});originalBlob=savedOriginalBlob=null;originalName=savedOriginalName='';aiEdited=savedAiEdited=false;activeDraft=true;pendingImport=false;restoreProject(data);undoStack=[];suppressSaving=false;showScreen('editor');
-  await persistCurrent();if(task===sourceTask)toast('图纸已导入仓库。此文件不含原图，参数重生成需上传原图。');
+  await persistCurrent();if(task===sourceTask)toast('图纸已导入仓库。此文件不含原图，可继续拼豆或匹配店家颜色。');
  }catch(error){if(task===sourceTask){suppressSaving=false;setSaveStatus('打开未完成 · 当前图纸已保留');toast('打开失败：'+error.message);}}finally{finishSourceTask(task);}
 };
 $('sourceInfo').onclick=()=>modal('可追溯的色卡，安心选色',`<p>内置 MARD 291 色和 221 色来自开源社区整理的拼豆色卡数据，保留原有色号与 RGB。显示时会补齐数字位数，例如 H7 → H07。</p><p>这是屏幕参考色卡，并非品牌官方实测标准。显示器、拍摄和实物批次都会影响颜色，替代色的选择请结合商家实物色卡。</p><p><a class="footer-link" href="https://github.com/HansBug/pindou-color-data/tree/main/mard-291-github" target="_blank" rel="noopener">查看原始数据 ↗</a> · <a class="footer-link" href="./palette-LICENSE.txt" target="_blank">MIT 数据许可 ↗</a></p><div class="notice-box">通用版支持导入其他品牌或店铺色卡。不同品牌的同一编号可能代表不同颜色，请确认所选色卡再购买。</div>`,'COLOR DATA');
-$('helpBtn').onclick=()=>modal('从图片，到一颗颗拼好',`<ol><li><b>上传图片：</b>选择 PNG、JPG 或 WEBP。主体清晰、背景简单的图片更适合，透明 PNG 可以直接保留空白区域。</li><li><b>AI 优化（可选）：</b>先在 AI 配置里填写图片编辑接口、模型和密钥。上传照片后可转拼豆插画、简化背景或按文字微调；对比满意后采用。原图会保留，随时可恢复。</li><li><b>调整参数：</b>尺寸决定横纵各有多少颗豆；颜色越少越容易备豆。纯色背景可尝试勾选去除。</li><li><b>选择色卡：</b>内置 MARD 参考色卡，也能导入店铺色卡。库存中关闭缺货颜色，生成时会避开它们。</li><li><b>查看与替色：</b>点击清单色号高亮对应豆子，左右箭头逐颗查看；⇄ 可选择相近色，一键替换并更新数量。</li><li><b>快速定位：</b>X 是列，Y 是行，从左上角 (1,1) 开始。输入坐标直接定位，或点击图纸锁定。聚焦图纸后用方向键移动，空格标记已拼。</li><li><b>计时与记录：</b>开始拼豆会自动计时；手动暂停、返回仓库或切换到后台时暂停。重新打开可继续，离线时间不计入；意外中断恢复最近一次备份。点击“完成”保存耗时和完成日期，可在“拼豆记录”查看。</li><li><b>导出与保存：</b>PNG 图纸适合打印或平板查看，CSV 用于备料与核对。保存到仓库会保留原图、参数和进度，之后可继续编辑。</li></ol><div class="notice-box">放大后显示每格色号；每 10 格有辅助线。普通制图在本机浏览器处理；仅主动使用 AI 时，图片会发送到你配置的服务。图纸仓库保存于此浏览器，含本次导入的原图。开始拼豆进入简洁模式，点击图上豆子或颜色清单可高亮同色。下载的 JSON 备份不含原图。</div>`,'A LITTLE GUIDE');
+$('helpBtn').onclick=()=>modal('从图片，到一颗颗拼好',`<ol><li><b>上传图片：</b>选择 PNG、JPG 或 WEBP。主体清晰、背景简单的图片更适合，透明 PNG 可以直接保留空白区域。</li><li><b>AI 优化（可选）：</b>先在 AI 配置里填写图片编辑接口、模型和密钥。上传照片后可转拼豆插画、简化背景或按文字微调；对比满意后采用。原图会保留，随时可恢复。</li><li><b>调整参数：</b>尺寸决定横纵各有多少颗豆；颜色越少越容易备豆。纯色背景可尝试勾选去除。</li><li><b>选择色卡：</b>内置 MARD 参考色卡，也能选择东道主中的店家色卡，生成时只使用店家标记为可用的颜色。</li><li><b>查看与替色：</b>点击清单色号高亮对应豆子，左右箭头逐颗查看；⇄ 可选择相近色，一键替换并更新数量。</li><li><b>快速定位：</b>X 是列，Y 是行，从左上角 (1,1) 开始。输入坐标直接定位，或点击图纸锁定。聚焦图纸后用方向键移动，空格标记已拼。</li><li><b>计时与记录：</b>开始拼豆会自动计时；手动暂停、返回仓库或切换到后台时暂停。重新打开可继续，离线时间不计入；意外中断恢复最近一次备份。点击“完成”保存耗时和完成日期，可在“拼豆记录”查看。</li><li><b>导出与保存：</b>PNG 图纸适合打印或平板查看，CSV 用于备料与核对。保存到仓库会保留原图、参数和进度，之后可继续编辑。</li></ol><div class="notice-box">放大后显示每格色号；每 10 格有辅助线。普通制图在本机浏览器处理；仅主动使用 AI 时，图片会发送到你配置的服务。图纸仓库保存于此浏览器，含本次导入的原图。开始拼豆进入简洁模式，点击图上豆子或颜色清单可高亮同色。下载的 JSON 备份不含原图。</div>`,'A LITTLE GUIDE');
 
 
 function showScreen(next){
  screen=next;updateSourceControls();document.body.dataset.screen=next;
  $('navLibrary').classList.toggle('nav-active',next==='library');$('navLibrary').setAttribute('aria-current',next==='library'?'page':'false');
  $('navRecords').classList.toggle('nav-active',next==='records');$('navRecords').setAttribute('aria-current',next==='records'?'page':'false');
+ $('navHost').classList.toggle('nav-active',next==='host');$('navHost').setAttribute('aria-current',next==='host'?'page':'false');
  if(next==='library')renderLibrary();
  else if(next==='records')renderRecords();
+ else if(next==='host')hostStudio.render();
  else{
   if(next==='beading'){$('showCodes').checked=true;$('showGrid').checked=true;setView('grid');}
   renderColorList();
@@ -315,11 +316,12 @@ function showScreen(next){
 }
 function renderLibrary(){
  const query=$('librarySearch').value.trim().toLowerCase(),sort=$('librarySort').value;
- const entries=libraryEntries.filter(p=>p.name.toLowerCase().includes(query)).sort(sort==='name'?(a,b)=>a.name.localeCompare(b.name,'zh-CN'):(a,b)=>b.updatedAt.localeCompare(a.updatedAt));
+ const entries=libraryEntries.filter(p=>p.name.toLowerCase().includes(query)&&matchesLibraryFilters(p,libraryFilters)).sort(sort==='name'?(a,b)=>a.name.localeCompare(b.name,'zh-CN'):(a,b)=>b.updatedAt.localeCompare(a.updatedAt));
  $('libraryCount').textContent=libraryEntries.length;$('libraryTotalBeads').textContent=libraryEntries.reduce((n,p)=>n+p.totalBeads,0).toLocaleString();$('libraryInProgress').textContent=recordEntries.filter(p=>p.status==='in_progress').length;
- const newTile=`<button id="libraryNew" class="library-card library-new-card" type="button" data-new-project ${generationPromise||!pattern?'disabled':''}><span class="library-new-icon" aria-hidden="true">＋</span><strong>新建图纸</strong><span>上传图片，开始新的灵感</span></button>`;
+ const newTile=`<button id="libraryNew" class="library-card library-new-card" type="button" data-new-project ${generationPromise||!pattern?'disabled':''}><span class="library-new-icon" aria-hidden="true">＋</span><strong>新建图纸</strong></button>`;
  $('libraryGrid').innerHTML=newTile+entries.map(p=>{const effort=p.effort;const id=escapeHTML(p.id),name=escapeHTML(p.name);return `<article class="library-card library-project-card"><div class="library-preview"><img src="${escapeHTML(p.thumbnail)}" alt="${name}的拼豆图纸" loading="lazy"><button class="delete-project library-trash" data-delete="${id}" type="button" aria-label="删除 ${name}" title="删除图纸"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5M14 11v5"/></svg></button><span class="library-card-badge">${p.width} × ${p.height}</span><div class="library-card-actions"><button class="button quiet library-edit" data-edit="${id}" type="button" aria-label="编辑 ${name}">编辑</button><button class="button primary library-start" data-start="${id}" type="button" aria-label="拼豆 ${name}">拼豆</button></div></div><div class="library-card-body"><h3><button class="library-name" data-rename="${id}" type="button" aria-label="修改名称 ${name}" title="点击修改名称">${name}</button></h3><div class="library-card-meta"><span>${p.totalBeads.toLocaleString()} 颗豆 · ${p.colorCount} 色</span></div><div class="library-estimate" title="按豆数、颜色与零碎色块估算；实际时间因熟练度而异"><span class="difficulty difficulty-${[1,2,3].includes(effort?.level)?effort.level:'unknown'}">${escapeHTML(effort?.difficulty||'待评估')}</span><span>预计 ${escapeHTML(effort?.label?.replace(/^约/,'')||'—')}</span></div></div></article>`;}).join('');
- if(!entries.length&&query)$('libraryGrid').insertAdjacentHTML('beforeend','<div class="library-empty library-search-empty"><h3>没有找到这份图纸</h3><p>试试其他名称，或创建新的图纸。</p></div>');
+ const filtered=libraryFilters.levels.length>0||libraryFilters.time!=='all';$('libraryFilterBtn').setAttribute('aria-pressed',String(filtered));$('libraryFilterBtn').textContent=filtered?'筛选 · 已选':'筛选';
+ if(!entries.length&&(query||filtered))$('libraryGrid').insertAdjacentHTML('beforeend','<div class="library-empty library-search-empty"><h3>没有符合条件的图纸</h3><p>调整名称或筛选条件后重试。</p><button class="button quiet" data-clear-library-filter>清除条件</button></div>');
 }
 function releasePreparedSource(prepared){if(prepared?.url)URL.revokeObjectURL(prepared.url);}
 async function prepareSource(blob,name,task=sourceTask){
@@ -464,6 +466,7 @@ document.querySelector('.brand').onclick=e=>{e.preventDefault();goLibrary();};
 $('librarySearch').oninput=renderLibrary;$('librarySort').onchange=renderLibrary;
 $('libraryGrid').onclick=e=>{
  if(libraryMutation||openingProject||sessionBusy)return;
+ const clear=e.target.closest('[data-clear-library-filter]');if(clear){libraryFilters={levels:[],time:'all'};$('librarySearch').value='';renderLibrary();return;}
  const create=e.target.closest('[data-new-project]'),rename=e.target.closest('[data-rename]'),remove=e.target.closest('[data-delete]'),edit=e.target.closest('[data-edit]'),start=e.target.closest('[data-start]');
  if(create){if(!create.disabled)$('imageFile').click();}else if(rename)showRename(rename.dataset.rename);else if(remove)showDelete(remove.dataset.delete);else if(edit)openSavedProject(edit.dataset.edit,'editor');else if(start)openSavedProject(start.dataset.start,'beading');
 };
@@ -503,12 +506,67 @@ function showDelete(id){
  };
 };
 $('focusClear').onclick=()=>{highlighted=null;$('colorSearch').value='';renderColorList();draw();};
-for(const id of ['gridWidth','gridHeight','maxColors','keepRatio','removeBackground','tolerance'])$(id).addEventListener('change',markParametersDirty);
+for(const id of ['gridWidth','gridHeight','maxColors','keepRatio','removeBackground','tolerance','imageStyle'])$(id).addEventListener('change',markParametersDirty);
 $('gridWidth').addEventListener('input',()=>{syncRatio('width');markParametersDirty();});$('gridHeight').addEventListener('input',()=>{syncRatio('height');markParametersDirty();});
 document.querySelectorAll('[data-size]').forEach(b=>b.addEventListener('click',markParametersDirty));
 window.addEventListener('pagehide',()=>{if(!pendingImport&&!suppressSaving)persistCurrent().catch(()=>{});});
+let hostStorage;try{hostStorage=localStorage;}catch{}
+const hostStudio=createHostStudio({container:$('hostContent'),modal,closeModal,toast,escapeHTML,downloadText,storage:hostStorage,onChange:()=>syncBuyerShops()});
+function syncBuyerShops(wanted=$('buyerShop').value){
+ const shops=hostStudio.listShops();
+ $('buyerShop').innerHTML='<option value="">参考色卡 · 不限店家</option>'+shops.map(shop=>`<option value="${escapeHTML(shop.id)}">${escapeHTML(shop.name)}${shop.isDemo?' · 演示':''}</option>`).join('');
+ $('buyerShop').value=shops.some(shop=>shop.id===wanted)?wanted:'';updateShopInfo();
+}
+function updateShopInfo(){
+ const id=$('buyerShop').value,shop=id?hostStudio.getShop(id):null;
+ $('referencePaletteFields').hidden=!!shop;
+ $('shopPaletteInfo').textContent=shop?`${shop.colors.filter(c=>c.available!==false).length} / ${shop.colors.length} 色可用${shop.isDemo?' · 示例编号':''}`:'';
+ $('availableInfo').hidden=!!shop;
+ $('applyShopColors').hidden=!shop||pendingImport;
+}
+function registerShopPalette(id,shopPalette){
+ const key='custom-host-'+id;customPalettes[key]=structuredClone(shopPalette);palettes[key]=customPalettes[key];exclusions[key]=[];syncPaletteOptions();setPalette(key);
+}
+$('buyerShop').onchange=()=>{if(!$('buyerShop').value&&paletteId.startsWith('custom-host-')){if(pendingImport){setPalette('mard');updateShopInfo();markParametersDirty();}else{$('paletteSelect').value='mard';$('paletteSelect').onchange();}}else{updateShopInfo();markParametersDirty();}};
+$('applyShopColors').onclick=()=>{
+ if(loadingImage||generationPromise||pendingImport||sessionView)return;
+ try{
+  const id=$('buyerShop').value;if(!id)return;const next=hostStudio.getAvailablePalette(id),old=paletteMap();
+  const replacements=new Map(Object.keys(counts()).map(code=>[code,nearestColors(old.get(code).hex,next.colors,1)[0].code]));
+  pushUndo();registerShopPalette(id,next);pattern.cells=pattern.cells.map(code=>code===null?null:replacements.get(code));done=new Set();highlighted=null;
+  appliedSettings={...appliedSettings,shopId:id};parametersDirty=settingsDiffer();updateAll();toast('已匹配店家的可用颜色，可撤销。');
+ }catch(error){toast(error.message);}
+};
+$('navHost').onclick=async()=>{
+ if(loadingImage||generationPromise||sessionBusy)return;
+ hostReturnScreen=screen==='editor'?'editor':'library';
+ try{if(!pendingImport&&!parametersDirty)await persistCurrent();syncBuyerShops();$('returnFromHost').hidden=hostReturnScreen!=='editor';showScreen('host');}catch(error){toast(error.message);}
+};
+$('returnFromHost').onclick=()=>{syncBuyerShops();showScreen(hostReturnScreen);};
+function showLibraryFilters(){
+ modal('筛选图纸',`<form id="libraryFilterForm" class="library-filter-form"><fieldset><legend>难度 · 可多选</legend><div class="filter-options">${['入门','适中','挑战'].map((name,i)=>`<label><input type="checkbox" name="difficulty" value="${i+1}" ${libraryFilters.levels.includes(i+1)?'checked':''}><span class="difficulty difficulty-${i+1}">${name}</span></label>`).join('')}</div></fieldset><fieldset><legend>预计耗时</legend><select id="filterTime" aria-label="筛选预计耗时"><option value="all">不限时间</option><option value="under60">1 小时以内</option><option value="60to180">1–3 小时</option><option value="over180">3 小时以上</option></select><p class="filter-note">按预计耗时范围的中值筛选，实际用时因熟练度而异。</p></fieldset><div class="modal-buttons"><button id="filterReset" type="button" class="button quiet">清除筛选</button><button id="filterApply" class="button primary" type="submit">应用筛选</button></div></form>`,'');
+ $('filterTime').value=libraryFilters.time;
+ $('filterReset').onclick=()=>{libraryFilters={levels:[],time:'all'};renderLibrary();closeModal();};
+ $('libraryFilterForm').onsubmit=e=>{e.preventDefault();libraryFilters={levels:[...$('libraryFilterForm').querySelectorAll('input[name="difficulty"]:checked')].map(input=>+input.value),time:$('filterTime').value};renderLibrary();closeModal();};
+}
+$('libraryFilterBtn').onclick=showLibraryFilters;
+function showDifficultyExamples(){
+ modal('选一张，试试不同难度',`<div class="difficulty-example-grid">${difficultyExamples.map(example=>{const effort=estimatePatternEffort(example.project);return `<article class="difficulty-example-card"><img src="${createThumbnail(example.project)}" alt="${escapeHTML(example.name)}图纸示例"><span class="difficulty difficulty-${effort.level}">${effort.difficulty}</span><h3>${escapeHTML(example.name)}</h3><p>${escapeHTML(example.description)}</p><div class="example-meta">${example.project.width} × ${example.project.height} · ${effort.label}</div><button class="button primary" data-use-example="${example.id}">使用这张图纸</button></article>`;}).join('')}</div>`,'');
+ $('modalBody').querySelectorAll('[data-use-example]').forEach(button=>button.onclick=()=>useDifficultyExample(button.dataset.useExample));
+}
+$('difficultyExamplesBtn').onclick=showDifficultyExamples;
+async function useDifficultyExample(id){
+ if(loadingImage||generationPromise)return;
+ const example=difficultyExamples.find(entry=>entry.id===id);if(!example)return;
+ const project=example.project,c=document.createElement('canvas');c.width=project.width;c.height=project.height;const context=c.getContext('2d'),map=new Map(project.palette.colors.map(color=>[color.code,color.hex]));
+ project.cells.forEach((code,index)=>{if(code!==null){context.fillStyle=map.get(code);context.fillRect(index%project.width,Math.floor(index/project.width),1,1);}});
+ const blob=await new Promise(resolve=>c.toBlob(resolve,'image/png'));if(!blob){toast('示例图片生成失败，请重试。');return;}
+ closeModal();if(!await loadImage(new File([blob],example.name+'.png',{type:'image/png'})))return;
+ $('buyerShop').value='';setPalette('mard');applySettings({...project.settings,width:project.width,height:project.height,imageStyle:'original',shopId:'',removeBackground:false});
+ pendingImport=true;parametersDirty=true;await generate();
+}
 async function init(){updateSourceControls();try{
- const response=await fetch('./palette.json');if(!response.ok)throw new Error('色卡文件读取失败');basePalette=await response.json();palettes={mard:{name:'MARD · 291 色参考色卡',colors:basePalette.colors},mard221:{name:'MARD · 221 色参考色卡',colors:basePalette.colors.filter(c=>c.basic221)}};syncPaletteOptions();setPalette('mard');
+ const response=await fetch('./palette.json');if(!response.ok)throw new Error('色卡文件读取失败');basePalette=await response.json();palettes={mard:{name:'MARD · 291 色参考色卡',colors:basePalette.colors},mard221:{name:'MARD · 221 色参考色卡',colors:basePalette.colors.filter(c=>c.basic221)}};syncPaletteOptions();setPalette('mard');syncBuyerShops();difficultyExamples=createDifficultyExamples(basePalette.colors);
  try{await openLibrary();libraryReady=true;libraryEntries=await listProjects();}catch(error){$('libraryStatus').textContent=error.message+'。可以继续编辑并导出备份，但本机仓库暂不可用。';toast(error.message);}
  let restored=false;if(libraryEntries.length){await openSavedProject([...libraryEntries].sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt))[0].id,'library');restored=!!pattern;}
  if(!restored){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw&&!localStorage.getItem(INITIALIZED_KEY)){restoreProject(JSON.parse(raw));restored=true;}}catch{}}

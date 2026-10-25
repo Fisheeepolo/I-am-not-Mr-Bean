@@ -1002,3 +1002,19 @@ body[data-screen="beading"] .color-navigator button{min-width:24px;min-height:23
 #recordsScreen .records-empty{grid-column:1/-1;display:flex;align-items:center;justify-content:center;min-height:calc(100dvh - 150px);text-align:center}
 #recordsScreen .records-empty p{margin:0;color:#95849f;font-size:15px;letter-spacing:.5px;line-height:1.7}
 @media(max-width:520px){#libraryScreen .library-filters{gap:8px}#libraryScreen .difficulty{font-size:9px;padding:1px 5px}#recordsScreen .records-empty p{font-size:13px}}
+
+#hostScreen{display:none;max-width:1510px;padding:26px 32px 30px}
+body[data-screen="host"] #hostScreen{display:block}
+body[data-screen="host"] #libraryScreen,body[data-screen="host"] #editorScreen,body[data-screen="host"] #recordsScreen,body[data-screen="host"] #saveProject{display:none}
+.host-return{margin:0 0 16px;min-height:28px}
+#referencePaletteFields[hidden],#availableInfo[hidden],#applyShopColors[hidden],.host-return[hidden]{display:none!important}
+.reference-label{display:block;font-size:10px;color:#8e779c;margin-bottom:7px}
+#applyShopColors{margin-top:10px}
+.pending-preview{display:none}
+body[data-screen="editor"][data-pending-import="true"] .pending-preview{display:flex;align-items:center;justify-content:center;min-height:400px;height:calc(100dvh - 250px);padding:24px;background:#f7f3fa}
+.pending-preview img{display:block;max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+body[data-screen="editor"][data-pending-import="true"] .workspace>:not(.workspace-header):not(.pending-preview),body[data-screen="editor"][data-pending-import="true"] .right-column{display:none}
+body[data-screen="editor"][data-pending-import="true"] .studio{grid-template-columns:260px minmax(0,1fr)}
+@media(max-width:700px){#hostScreen{padding:18px 14px 25px}body[data-screen="editor"][data-pending-import="true"] .studio{grid-template-columns:1fr}body[data-screen="editor"][data-pending-import="true"] .pending-preview{min-height:260px;height:360px}}
+
+.pending-preview img{width:100%;height:100%}

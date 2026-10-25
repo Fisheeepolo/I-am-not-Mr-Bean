@@ -1,0 +1,109 @@
+/* Navigation and statistics form one uninterrupted strip at every breakpoint. */
+.topbar{display:flex;flex-wrap:nowrap;align-items:center;gap:22px;height:80px;min-height:80px;padding:0 28px;max-width:100%}
+.topbar>.brand{flex:0 0 auto;grid-area:auto;justify-self:auto}
+.topbar>.topbar-center{display:flex;flex:1 1 auto;align-items:center;justify-content:center;gap:24px;min-width:0;max-width:100%;grid-area:auto}
+.topbar .topbar-center>.topnav{display:flex;flex:0 0 auto;align-items:center;gap:3px;height:auto;margin:0;padding:4px;grid-area:auto;align-self:auto;justify-self:auto}
+.topbar .topbar-center>.topbar-overview{display:flex;flex:0 0 auto;align-items:center;gap:0;margin:0;grid-area:auto;justify-self:auto}
+.topbar .topbar-center .topbar-overview>div{padding:0 13px}
+.topbar .topbar-center .topbar-overview strong{font-size:18px}
+.topbar .topbar-center .topbar-overview small{font-size:9px}
+.topbar>.top-actions{display:flex;flex:0 0 auto;grid-area:auto;align-items:center;justify-self:auto;margin:0 0 0 auto;gap:8px}
+.topbar .topnav .nav-button,.topbar .topnav .text-button{padding:9px 11px;font-size:12px;white-space:nowrap}
+.topbar .top-actions .button{padding:9px 12px;font-size:11px}
+
+/* Saturated difficulty labels remain legible without relying on colour alone. */
+.difficulty,#libraryScreen .difficulty{display:inline-flex;align-items:center;justify-content:center;padding:3px 8px;border-radius:5px;font-size:10px;line-height:1.35;font-weight:650;white-space:nowrap;color:#fff}
+#libraryScreen .library-estimate .difficulty{color:#fff;font-weight:650}
+.difficulty-1,#libraryScreen .difficulty-1{background:#168347;color:#fff}
+.difficulty-2,#libraryScreen .difficulty-2{background:#b75a08;color:#fff}
+.difficulty-3,#libraryScreen .difficulty-3{background:#cd2e68;color:#fff}
+.difficulty-unknown,#libraryScreen .difficulty-unknown{background:#776480;color:#fff}
+#libraryScreen .library-filters{justify-content:flex-start;gap:10px;flex-wrap:nowrap}
+#libraryScreen .library-search{flex:0 1 320px}
+#libraryFilterBtn,#difficultyExamplesBtn{display:inline-flex;align-items:center;justify-content:center;gap:5px;flex:0 0 auto;min-height:40px;height:40px;padding:0 12px;border:1px solid #dfd3e9;border-radius:8px;background:#fff;color:#72548a;font-size:12px;line-height:1.2;white-space:nowrap}
+#libraryFilterBtn:hover,#difficultyExamplesBtn:hover{background:#f3ecfa;border-color:#bfa4d3}
+#libraryFilterBtn[aria-pressed="true"],#libraryFilterBtn.active{color:#fff;background:#8060a4;border-color:#8060a4}
+#libraryScreen #librarySort{margin-left:auto;flex:0 0 auto}
+.library-filter-summary{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:#8a719a;font-size:11px;margin:0 0 13px}
+.library-filter-form fieldset{margin:0 0 21px;padding:0;border:0;min-width:0}
+.library-filter-form legend{font-size:13px;font-weight:600;color:#5e4670;margin-bottom:11px;padding:0}
+.filter-options{display:flex;flex-wrap:wrap;gap:9px}
+.filter-options label{display:flex;align-items:center;gap:7px;padding:9px 11px;min-height:39px;border:1px solid #e1d6e9;border-radius:8px;background:#fcfaff;cursor:pointer}
+.filter-options input{margin:0;flex:0 0 auto}
+.filter-options label:has(input:checked){border-color:#9876b4;box-shadow:0 0 0 1px #9876b4;background:#f3ebfb}
+.filter-time-select,#filterTime{width:100%;min-height:42px;border:1px solid #ded2e8;border-radius:8px;background:#fff;padding:8px 12px;color:#6c527e;font-size:13px}
+.library-filter-form .filter-note{font-size:11px;color:#9a88a6;line-height:1.6}
+.difficulty-example-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;align-items:stretch}
+.difficulty-example-card{min-width:0;display:flex;flex-direction:column;gap:9px;padding:12px;border:1px solid #e5dbea;border-radius:12px;background:#fcfaff}
+.difficulty-example-card>img{display:block;object-fit:contain;image-rendering:pixelated;width:100%;aspect-ratio:1;background:#f3eef8;border-radius:8px}
+.difficulty-example-card h3{font-size:14px;line-height:1.5;margin:0;color:#59426b}
+#modalBody .difficulty-example-card p{font-size:11px;line-height:1.6;color:#8b759a;margin:0}
+.difficulty-example-card .difficulty{align-self:flex-start}
+.difficulty-example-card button{margin-top:auto;width:100%;min-height:37px;font-size:12px}
+.difficulty-example-card .example-meta{font-size:10px;line-height:1.6;color:#8c779c}
+.image-style-section{margin-top:17px}
+#imageStyle{display:block;width:100%;min-height:39px;border:1px solid #dfd3e8;border-radius:8px;padding:9px 10px;background:#fff;color:#6c527d;font-size:12px}
+.style-note{font-size:10px;line-height:1.6;color:#9b88a6;margin:7px 0 0}
+.source-panel #buyerShop{display:block;width:100%;min-width:0;min-height:39px;padding:9px 10px;border:1px solid #dfd3e8;border-radius:8px;background:#fff;color:#6c527d;font-size:12px}
+.source-panel #referencePaletteFields{margin-top:10px}
+.source-panel #shopPaletteInfo{display:block;font-size:10px;line-height:1.65;color:#927b9e;margin-top:7px}
+.source-panel #shopPaletteInfo:empty{display:none}
+.source-panel .source-preview{margin-top:0;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #eee7f2}
+.source-panel .source-preview img{width:44px;height:44px}
+.source-panel .source-preview strong{font-size:11px;line-height:1.5}
+.source-panel .form-section:first-of-type{margin-top:0;padding-top:0;border-top:0}
+
+@media(max-width:1250px){
+ .topbar{gap:17px;padding:0 20px;height:76px;min-height:76px}
+ .topbar .brand{font-size:17px;gap:8px}
+ .topbar>.topbar-center{gap:16px}
+ .topbar .topnav .nav-button,.topbar .topnav .text-button{padding:8px 9px;font-size:11px}
+ .topbar .topbar-center .topbar-overview>div{padding:0 10px}
+ .topbar .topbar-center .topbar-overview strong{font-size:16px}
+ .topbar .topbar-center .topbar-overview small{font-size:8px}
+ .topbar .top-actions .button{font-size:10px;padding:9px 10px}
+ .topbar #helpBtn{display:none}
+}
+@media(max-width:900px){
+ .topbar{gap:11px;padding:0 14px}
+ .topbar .brand{font-size:15px;gap:7px}
+ .topbar>.topbar-center{gap:10px}
+ .topbar .topnav .nav-button{padding:8px 7px;font-size:11px}
+ .topbar .topbar-center .topbar-overview>div{padding:0 8px}
+}
+@media(max-width:820px){
+ .topbar{flex-wrap:wrap;min-height:106px;height:auto;padding:10px 14px 6px;gap:8px 12px}
+ .topbar>.brand{order:1}
+ .topbar>.top-actions{order:2;margin-left:auto}
+ .topbar>.topbar-center{order:3;flex:0 0 100%;width:100%;justify-content:center;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;padding-bottom:4px}
+ .topbar .topbar-center>.topnav{padding:3px;gap:2px}
+ .topbar .topnav .nav-button{padding:7px 8px;font-size:11px}
+ .topbar .topbar-center .topbar-overview>div{padding:0 8px}
+ .topbar .topbar-center .topbar-overview strong{font-size:15px}
+ .topbar .topbar-center .topbar-overview small{font-size:8px}
+ #libraryScreen .library-filters{flex-wrap:wrap;gap:8px}
+ #libraryScreen .library-search{flex:1 1 160px}
+ #libraryScreen #librarySort{margin-left:auto}
+ #libraryFilterBtn,#difficultyExamplesBtn{font-size:11px;padding:0 10px}
+}
+@media(max-width:520px){
+ .topbar{padding:9px 12px 4px;gap:7px 10px}
+ .topbar .brand{font-size:15px}
+ .topbar>.topbar-center{justify-content:flex-start;gap:8px}
+ .topbar .topnav .nav-button{font-size:10px;padding:7px 6px}
+ .topbar .topbar-center .topbar-overview>div{padding:0 6px}
+ .topbar .topbar-center .topbar-overview strong{font-size:13px}
+ .topbar .topbar-center .topbar-overview small{font-size:7px}
+ #libraryScreen .library-search{flex:1 1 calc(100% - 75px)}
+ #libraryFilterBtn{min-width:58px}
+ #difficultyExamplesBtn{height:35px;min-height:35px;padding:0 10px}
+ #libraryScreen #librarySort{height:35px}
+ .difficulty,#libraryScreen .difficulty{padding:2px 6px;font-size:9px}
+ .difficulty-example-grid{grid-template-columns:1fr}
+ .difficulty-example-card{display:grid;grid-template-columns:100px minmax(0,1fr);column-gap:12px;row-gap:6px;padding:11px}
+ .difficulty-example-card>img{grid-column:1;grid-row:1/6;align-self:center}
+ .difficulty-example-card>:not(img){grid-column:2}
+ .difficulty-example-card button{min-height:34px;margin-top:0}
+ .difficulty-example-card h3{font-size:13px}
+ .filter-options{gap:7px}.filter-options label{padding:8px}
+}
