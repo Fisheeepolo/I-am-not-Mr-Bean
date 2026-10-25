@@ -1,0 +1,12 @@
+{
+  "name": "doudou-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "validate": "node scripts/validate-artifact.mjs",
+    "test": "node tests/ai-proxy.test.mjs",
+    "dev": "node scripts/dev-server.mjs"
+  }
+}

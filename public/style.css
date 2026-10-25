@@ -210,3 +210,88 @@ body[data-screen="beading"] .color-navigator button{min-width:27px;min-height:25
  body[data-screen="beading"] .color-list{height:265px}
  body[data-screen="beading"] .color-main strong,body[data-screen="beading"] .color-quantity{font-size:14px}
 }
+
+/* Optional AI preparation and safe library management. */
+.topnav #aiConfigBtn{display:block}
+.ai-entry{grid-column:1/-1;margin-top:17px;padding:14px 12px;border:1px solid #e8def2;border-radius:10px;background:#faf7fd}
+.ai-entry-heading{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+.ai-entry h3{font-size:13px;font-weight:600;color:#6d5388;margin:0}
+.ai-entry p{font-size:12px;color:#9b8ba7;line-height:1.8;margin:6px 0 11px}
+.ai-entry #aiSourceBadge{display:inline-block;font-size:11px;color:#6f8664;background:#edf2e9;border:1px solid #dde7d8;border-radius:5px;padding:2px 6px}
+.ai-optimize-button{width:100%;min-height:39px;padding:9px 6px;font-size:12px;background:#eee6f7;border-color:#e3d6ed;color:#77568f}
+.ai-optimize-button:hover{background:#e4d7f0;border-color:#cdb7de}
+.ai-entry #restoreOriginalBtn{display:block;margin:10px auto 0;font-size:12px;min-height:23px}
+.ai-entry [hidden]{display:none!important}
+dialog{overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+dialog.ai-wide{width:760px;max-height:min(88vh,900px);max-height:min(88dvh,900px)}
+.modal-heading{gap:16px}
+.modal-heading>div{min-width:0}
+.modal-heading .icon-button{flex-shrink:0}
+#modalBody{overflow-wrap:anywhere}
+.ai-config-form{display:grid;gap:17px;margin-top:3px}
+.ai-config-form label{display:grid;gap:7px;color:#675671;font-size:12px;font-weight:500;line-height:1.8;min-width:0}
+.ai-config-form input:not([type="checkbox"]):not([type="radio"]),.ai-config-form select,.rename-form input{width:100%;min-width:0;min-height:41px;padding:10px 12px;border:1px solid #e3d8ec;border-radius:8px;background:#fff;color:#5c4e66;font-size:13px;font-weight:400;line-height:1.6}
+.ai-config-form input::placeholder,.ai-prompt textarea::placeholder,.rename-form input::placeholder{color:#aaa0b2}
+.ai-config-form input:not([type="checkbox"]):not([type="radio"]):focus,.ai-config-form select:focus,.ai-prompt textarea:focus,.rename-form input:focus{border-color:#ac90c7;outline:2px solid #e6dbf0;outline-offset:1px}
+.ai-config-form label:has(input[type="checkbox"]),.ai-config-form label:has(input[type="radio"]){display:flex;gap:8px;align-items:flex-start;font-weight:400}
+.ai-config-form input[type="checkbox"],.ai-config-form input[type="radio"]{flex-shrink:0;margin:4px 0 0;accent-color:var(--purple)}
+.ai-field-help{display:block;font-size:12px;font-weight:400;line-height:1.8;color:#9a89a7;overflow-wrap:anywhere}
+.ai-model-note{font-size:12px;line-height:1.9;padding:12px 14px;border:1px solid #e9e1ef;border-radius:9px;background:#faf7fc;color:#8d799c;overflow-wrap:anywhere}
+#modalBody .ai-model-note p{margin:0}
+.ai-mode-options{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0 18px}
+.ai-mode-options button{flex:1 1 145px;min-height:44px;border:1px solid #e5dbed;border-radius:9px;background:#fff;padding:10px 12px;font-size:12px;line-height:1.7;text-align:center;color:#90799f}
+.ai-mode-options button:hover{background:#faf6fe;border-color:#c8b1da}
+.ai-mode-options button.selected,.ai-mode-options button[aria-pressed="true"]{color:#6f4d8c;background:#eee5f6;border-color:#ae8cc8;box-shadow:inset 0 0 0 1px #ae8cc818}
+.ai-mode-options button strong{display:block;font-size:13px;font-weight:600}
+.ai-mode-options button small{display:block;margin-top:3px;font-size:12px;color:#9e8baa}
+.ai-prompt{display:block;margin:15px 0;color:#695674;font-size:12px;font-weight:500;line-height:1.8}
+.ai-prompt label{display:block;margin-bottom:7px}
+.ai-prompt textarea{display:block;resize:vertical;width:100%;min-width:0;min-height:116px;max-height:330px;margin-top:7px;padding:12px 13px;border:1px solid #e2d7eb;border-radius:9px;background:#fff;color:#62516e;font:400 13px/1.9 'Noto Sans SC',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;outline-offset:3px}
+.ai-send-notice{font-size:12px;line-height:1.9;padding:12px 14px;border-radius:9px;background:#fbf4e9;border:1px solid #f0e4d1;color:#a08866;margin:15px 0;overflow-wrap:anywhere}
+.ai-compare{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:17px 0}
+.ai-compare figure{min-width:0;margin:0;padding:12px;background:#f8f5fa;border:1px solid #e9e0ef;border-radius:11px}
+.ai-compare img{display:block;width:100%;height:240px;object-fit:contain;background-color:white;background-image:linear-gradient(45deg,#f1edf4 25%,transparent 25%),linear-gradient(-45deg,#f1edf4 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#f1edf4 75%),linear-gradient(-45deg,transparent 75%,#f1edf4 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0;border-radius:7px}
+.ai-compare figcaption{margin-top:10px;font-size:12px;line-height:1.7;text-align:center;color:#8a759a}
+.ai-progress{display:flex;gap:12px;align-items:center;padding:22px 18px;background:#f6f0fb;border:1px solid #e8dcef;border-radius:10px;margin:16px 0;font-size:12px;line-height:1.9;color:#8b709d}
+.ai-progress:before{content:'';display:block;width:20px;height:20px;border:2px solid #dfd0eb;border-top-color:#8d6bae;border-radius:50%;flex-shrink:0;animation:ai-loading-spin 1s linear infinite}
+@keyframes ai-loading-spin{to{transform:rotate(360deg)}}
+.ai-result-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin-top:20px}
+.ai-result-actions .button{min-height:41px;white-space:normal;text-align:center;line-height:1.6}
+.ai-error-line{font-size:12px;font-weight:400;line-height:1.8;padding:11px 13px;border-radius:8px;background:#fff2f2;color:#af616b;border:1px solid #f0d9dd;margin:12px 0;overflow-wrap:anywhere}
+.ai-error-line:empty{display:none}
+.library-manage-row{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin:0 19px 16px;padding-top:10px;border-top:1px solid #f0eaf4}
+.library-manage-row button{font-size:12px;line-height:1.6;padding:5px 9px;min-height:31px;border:1px solid transparent;border-radius:6px;background:transparent}
+.library-manage-row .rename-project{color:#9a87aa}
+.library-manage-row .rename-project:hover{background:#f4eef9;border-color:#e6dced;color:#775a90}
+.library-manage-row .delete-project{color:#b28491}
+.library-manage-row .delete-project:hover{background:#fff1f2;border-color:#f0dce0;color:#a35c6b}
+.danger-button{background:#b76a79;border:1px solid #b76a79;color:#fff;border-radius:8px;padding:10px 16px;font-size:12px;font-weight:500;min-height:40px}
+.danger-button:hover{background:#a65868;border-color:#a65868}
+.confirm-project-thumb{display:flex;align-items:center;justify-content:center;margin:10px 0 16px;padding:14px;border:1px solid #eae1f0;border-radius:10px;background:#f8f4fb;overflow:hidden}
+.confirm-project-thumb img{display:block;width:auto;max-width:100%;max-height:150px;object-fit:contain;image-rendering:pixelated;border-radius:4px}
+.rename-form{display:grid;gap:10px;color:#80708e;font-size:12px;line-height:1.8}
+.rename-form label{font-size:12px;color:#695874}
+.rename-form .modal-buttons{margin-top:10px}
+@media(max-width:1350px){.topnav{gap:19px}.topbar{gap:27px}.local-badge{display:none}}
+@media(max-width:760px){
+ .topbar{gap:0 10px}
+ .topnav{gap:clamp(20px,7vw,40px)}
+ .topnav #aiConfigBtn{font-size:13px}
+ .ai-entry{margin-top:15px;padding:14px;grid-column:1/-1}
+ .ai-entry .ai-optimize-button{max-width:100%}
+ dialog.ai-wide{width:calc(100vw - 28px);max-width:calc(100vw - 28px);max-height:90vh;max-height:90dvh;padding:20px}
+ .ai-config-form input:not([type="checkbox"]):not([type="radio"]),.ai-config-form select,.ai-prompt textarea,.rename-form input{font-size:16px}
+ .ai-config-form{gap:15px}
+ .ai-compare{gap:10px}.ai-compare figure{padding:9px}.ai-compare img{height:190px}
+ .library-manage-row{margin:0 13px 13px}
+ .modal-buttons{flex-wrap:wrap}.modal-buttons .button{min-height:40px}
+}
+@media(max-width:480px){
+ .topnav{gap:25px}
+ .ai-compare{grid-template-columns:1fr}.ai-compare img{height:220px}
+ .ai-mode-options{gap:7px}.ai-mode-options button{flex-basis:100%;text-align:left}
+ .ai-result-actions{align-items:stretch}.ai-result-actions .button{flex:1 1 130px}
+ .library-manage-row{margin:0 18px 16px}
+ dialog.ai-wide{padding:18px}
+}
+@media(prefers-reduced-motion:reduce){.ai-progress:before{animation:none}}

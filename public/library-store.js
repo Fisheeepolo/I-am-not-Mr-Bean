@@ -1,15 +1,33 @@
 /** Local-only drawing library. Original images stay in this browser's IndexedDB. */
 const DATABASE_NAME = 'bead-studio-library-v1';
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
 const PROJECT_STORE = 'projects';
 const SUMMARY_STORE = 'summaries';
+const TOMBSTONE_STORE = 'deletedProjects';
 let databasePromise = null;
 
 function storageError(error, action = '保存') {
+  if (error?.name === 'ProjectStateError') return error;
   if (error?.name === 'QuotaExceededError') return new Error('本机仓库空间不足，未能保存。请先导出图纸备份，再释放浏览器存储空间。');
   if (error?.name === 'SecurityError' || error?.name === 'NotAllowedError') return new Error('浏览器禁止了本机存储，请允许此网站保存数据后重试。');
   if (error?.name === 'InvalidStateError' || error?.name === 'VersionError') return new Error('仓库连接已更新，请刷新页面后重试。');
   return new Error(`图纸仓库${action}失败，请重试；当前图纸仍可导出备份。`);
+}
+
+function projectStateError(message, code) {
+  const error = new Error(message);
+  error.name = 'ProjectStateError';
+  error.code = code;
+  return error;
+}
+
+export function normalizeProjectName(value) {
+  if (typeof value !== 'string') throw new Error('请输入图纸名称。');
+  const name = value.trim();
+  if (!name) throw new Error('图纸名称不能为空。');
+  if (name.length > 80) throw new Error('图纸名称不能超过 80 个字符。');
+  if (/[\u0000-\u001f\u007f]/.test(name)) throw new Error('图纸名称不能包含换行或控制字符。');
+  return name;
 }
 
 function validId(id) {
@@ -74,6 +92,7 @@ export function openLibrary() {
       const database = request.result;
       if (!database.objectStoreNames.contains(PROJECT_STORE)) database.createObjectStore(PROJECT_STORE, { keyPath: 'id' });
       if (!database.objectStoreNames.contains(SUMMARY_STORE)) database.createObjectStore(SUMMARY_STORE, { keyPath: 'id' });
+      if (!database.objectStoreNames.contains(TOMBSTONE_STORE)) database.createObjectStore(TOMBSTONE_STORE, { keyPath: 'id' });
     };
     request.onblocked = () => {
       abandoned = true;
@@ -117,7 +136,13 @@ export async function getProject(id) {
     catch (error) { reject(storageError(error, '读取')); return; }
     const request = transaction.objectStore(PROJECT_STORE).get(id);
     let result = null;
-    request.onsuccess = () => { result = request.result || null; };
+    request.onsuccess = () => {
+      result = request.result || null;
+      if (result && !Object.hasOwn(result, 'originalBlob')) {
+        result.originalBlob = result.sourceBlob ?? null;
+        result.originalName = result.sourceName || '';
+      }
+    };
     transaction.oncomplete = () => resolve(result);
     transaction.onabort = () => reject(storageError(transaction.error || request.error, '读取'));
     transaction.onerror = () => {};
@@ -130,6 +155,7 @@ export async function saveProject(input) {
   try {
     validId(input?.id);
     if (input.sourceBlob != null && !(input.sourceBlob instanceof Blob)) throw new Error('原图数据无效，请重新选择图片。');
+    if (input.originalBlob != null && !(input.originalBlob instanceof Blob)) throw new Error('原始照片数据无效，请重新选择图片。');
     // Capture an independent snapshot before waiting for the database to open.
     record = {
       id: input.id,
@@ -139,6 +165,8 @@ export async function saveProject(input) {
       project: JSON.parse(JSON.stringify(input.project)),
       sourceBlob: input.sourceBlob ?? null,
       sourceName: String(input.sourceName || '').slice(0, 300),
+      originalBlob: Object.hasOwn(input, 'originalBlob') ? input.originalBlob ?? null : input.sourceBlob ?? null,
+      originalName: String(Object.hasOwn(input, 'originalName') ? input.originalName || '' : input.sourceName || '').slice(0, 300),
       thumbnail: typeof input.thumbnail === 'string' ? input.thumbnail : ''
     };
     createProjectSummary(record);
@@ -149,24 +177,99 @@ export async function saveProject(input) {
   const database = await openLibrary();
   return new Promise((resolve, reject) => {
     let transaction;
-    try { transaction = database.transaction([PROJECT_STORE, SUMMARY_STORE], 'readwrite'); }
+    try { transaction = database.transaction([PROJECT_STORE, SUMMARY_STORE, TOMBSTONE_STORE], 'readwrite'); }
     catch (error) { reject(storageError(error)); return; }
     const projectStore = transaction.objectStore(PROJECT_STORE);
     const summaryStore = transaction.objectStore(SUMMARY_STORE);
-    const prior = summaryStore.get(record.id);
+    const deleted = transaction.objectStore(TOMBSTONE_STORE).get(record.id);
     let summary, caughtError;
-    prior.onsuccess = () => {
-      try {
-        const proposedCreatedAt = typeof record.createdAt === 'string' && Number.isFinite(Date.parse(record.createdAt)) ? new Date(record.createdAt).toISOString() : record.updatedAt;
-        record.createdAt = prior.result?.createdAt || proposedCreatedAt;
-        summary = createProjectSummary(record);
-        record.name = summary.name;
-        projectStore.put(record);
-        summaryStore.put(summary);
-      } catch (error) { caughtError = error; transaction.abort(); }
+    deleted.onsuccess = () => {
+      if (deleted.result) {
+        caughtError = projectStateError('这份图纸已被删除，不能继续保存。请返回仓库新建图纸。', 'PROJECT_DELETED');
+        transaction.abort();
+        return;
+      }
+      const prior = summaryStore.get(record.id);
+      prior.onsuccess = () => {
+        try {
+          const proposedCreatedAt = typeof record.createdAt === 'string' && Number.isFinite(Date.parse(record.createdAt)) ? new Date(record.createdAt).toISOString() : record.updatedAt;
+          record.createdAt = prior.result?.createdAt || proposedCreatedAt;
+          summary = createProjectSummary(record);
+          record.name = summary.name;
+          projectStore.put(record);
+          summaryStore.put(summary);
+        } catch (error) { caughtError = error; transaction.abort(); }
+      };
     };
     transaction.oncomplete = () => resolve(summary);
-    transaction.onabort = () => reject(storageError(caughtError || transaction.error || prior.error));
+    transaction.onabort = () => reject(storageError(caughtError || transaction.error || deleted.error));
+    transaction.onerror = () => {};
+  });
+}
+
+/** Renames both the full drawing and its card in one transaction. */
+export async function renameProject(id, value) {
+  validId(id);
+  const name = normalizeProjectName(value);
+  const database = await openLibrary();
+  return new Promise((resolve, reject) => {
+    let transaction;
+    try { transaction = database.transaction([PROJECT_STORE, SUMMARY_STORE, TOMBSTONE_STORE], 'readwrite'); }
+    catch (error) { reject(storageError(error, '重命名')); return; }
+    const projects = transaction.objectStore(PROJECT_STORE);
+    const summaries = transaction.objectStore(SUMMARY_STORE);
+    const deleted = transaction.objectStore(TOMBSTONE_STORE).get(id);
+    let summary, caughtError;
+    deleted.onsuccess = () => {
+      if (deleted.result) {
+        caughtError = projectStateError('这份图纸已被删除，无法重命名。', 'PROJECT_DELETED');
+        transaction.abort();
+        return;
+      }
+      const request = projects.get(id);
+      request.onsuccess = () => {
+        const record = request.result;
+        if (!record) {
+          caughtError = projectStateError('这份图纸不存在，无法重命名。', 'PROJECT_NOT_FOUND');
+          transaction.abort();
+          return;
+        }
+        try {
+          record.name = name;
+          record.project.projectName = name;
+          record.updatedAt = new Date().toISOString();
+          summary = createProjectSummary(record);
+          projects.put(record);
+          summaries.put(summary);
+        } catch (error) { caughtError = error; transaction.abort(); }
+      };
+    };
+    transaction.oncomplete = () => resolve(summary);
+    transaction.onabort = () => reject(storageError(caughtError || transaction.error || deleted.error, '重命名'));
+    transaction.onerror = () => {};
+  });
+}
+
+/** Call only after the UI has confirmed deletion. A tombstone rejects stale autosaves. */
+export async function deleteProject(id) {
+  validId(id);
+  const database = await openLibrary();
+  return new Promise((resolve, reject) => {
+    let transaction;
+    try { transaction = database.transaction([PROJECT_STORE, SUMMARY_STORE, TOMBSTONE_STORE], 'readwrite'); }
+    catch (error) { reject(storageError(error, '删除')); return; }
+    const projects = transaction.objectStore(PROJECT_STORE);
+    const summaries = transaction.objectStore(SUMMARY_STORE);
+    const originalCount = projects.count(id);
+    const summaryCount = summaries.count(id);
+    let existed = false;
+    originalCount.onsuccess = () => { existed ||= originalCount.result > 0; };
+    summaryCount.onsuccess = () => { existed ||= summaryCount.result > 0; };
+    transaction.objectStore(TOMBSTONE_STORE).put({ id, deletedAt: new Date().toISOString() });
+    projects.delete(id);
+    summaries.delete(id);
+    transaction.oncomplete = () => resolve(existed);
+    transaction.onabort = () => reject(storageError(transaction.error || originalCount.error || summaryCount.error, '删除'));
     transaction.onerror = () => {};
   });
 }
