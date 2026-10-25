@@ -5,13 +5,13 @@
 <header class="topbar"><a class="brand" href="./"><span class="brand-mark"><i></i><i></i><i></i><i></i></span><span>豆豆工坊<small>BEAD BY BEAD</small></span></a><section class="library-overview topbar-overview" aria-label="仓库概览"><div><strong id="libraryCount">0</strong><small>份图纸</small></div><div><strong id="libraryTotalBeads">0</strong><small>颗拼豆</small></div><div><strong id="libraryInProgress">0</strong><small>份正在拼</small></div></section><nav class="topnav" aria-label="主要导航"><button id="navLibrary" class="nav-button">图纸仓库</button><button id="navRecords" class="nav-button">拼豆记录</button><button id="aiConfigBtn" class="nav-button">AI 配置</button><button id="helpBtn" class="text-button">使用指南 <span>↗</span></button></nav><div class="top-actions"><button id="openProject" class="button quiet">导入图纸</button><button id="saveProject" class="button quiet">保存到仓库</button></div></header>
 <main id="libraryScreen">
 <section class="library-collection" aria-label="已保存的图纸">
-<div class="library-tools"><div class="library-title"><span class="library-kicker">YOUR LITTLE COLLECTION</span><h1>图纸仓库<span class="tiny-spark">✳</span></h1><p>收好每一份灵感，下次接着拼。</p></div><div class="library-filters"><label class="library-search"><span aria-hidden="true">⌕</span><input id="librarySearch" type="search" placeholder="搜索图纸名称" aria-label="搜索仓库图纸"></label><select id="librarySort" aria-label="图纸排序"><option value="updated">最近更新</option><option value="name">按名称排序</option></select></div></div>
+<div class="library-tools"><div class="library-filters"><label class="library-search"><span aria-hidden="true">⌕</span><input id="librarySearch" type="search" placeholder="搜索图纸名称" aria-label="搜索仓库图纸"></label><select id="librarySort" aria-label="图纸排序"><option value="updated">最近更新</option><option value="name">按名称排序</option></select></div></div>
 <p id="libraryStatus" role="status" aria-live="polite"></p><div id="libraryGrid" class="library-grid"><button id="libraryNew" class="library-card library-new-card" type="button" data-new-project><span class="library-new-icon" aria-hidden="true">＋</span><strong>新建图纸</strong><span>上传图片，开始新的灵感</span></button></div></section>
 
 </main>
 <main id="recordsScreen">
 <section class="records-collection" aria-label="拼豆记录仓库">
-<div class="records-tools"><div class="records-title"><h1>拼豆记录</h1><span id="recordCount">0 份记录</span></div><select id="recordFilter" aria-label="筛选拼豆记录"><option value="all">全部记录</option><option value="in_progress">正在进行</option><option value="completed">已经完成</option></select></div>
+
 <p id="recordStatus" role="status" aria-live="polite"></p><div id="recordGrid" class="library-grid records-grid"></div>
 </section>
 </main>
