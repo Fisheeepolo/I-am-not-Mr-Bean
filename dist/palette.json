@@ -1,0 +1,3515 @@
+{
+  "schema": "bead-studio-palette",
+  "id": "mard-291",
+  "title": "MARD 291 色 · 社区参考色卡",
+  "brand": "MARD",
+  "count": 291,
+  "sourceUrl": "https://github.com/HansBug/pindou-color-data/tree/main/mard-291-github",
+  "rawSourceUrl": "https://raw.githubusercontent.com/HansBug/pindou-color-data/main/mard-291-github/colors.json",
+  "upstreamSourceUrl": "https://git.xiongxiao.me/abearxiong/get-colors-from-beans/src/branch/main/get-colors.json",
+  "retrievedAt": "2026-10-25",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 HansBug",
+  "licenseText": "MIT License\n\nCopyright (c) 2026 HansBug\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this data and associated documentation files (the \"Data\"), to deal\nin the Data without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Data, and to permit persons to whom the Data is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Data.\n\nTHE DATA IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE DATA OR THE USE OR OTHER DEALINGS IN THE\nDATA.\n",
+  "notes": [
+    "RGB 为公开源码整理的屏幕参考值，不是品牌官方实测标准。",
+    "同一色号在不同社区来源存在 RGB 差异；本清单保持单一来源的 291 色值，不混合来源。",
+    "展示色号补零（H7 → H07），sourceCode 保留源编号。",
+    "221 色标记按同仓库 mard-221-github 色号集合匹配；基础与扩展仅表示收录集合，不保证店铺库存。",
+    "相近色应按色差计算并允许用户决定，不等于实物完全一致。"
+  ],
+  "colors": [
+    {
+      "code": "A01",
+      "sourceCode": "A1",
+      "hex": "#FAF5CD",
+      "rgb": [
+        250,
+        245,
+        205
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A02",
+      "sourceCode": "A2",
+      "hex": "#FCFED6",
+      "rgb": [
+        252,
+        254,
+        214
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A03",
+      "sourceCode": "A3",
+      "hex": "#FCFF92",
+      "rgb": [
+        252,
+        255,
+        146
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A04",
+      "sourceCode": "A4",
+      "hex": "#F7EC5C",
+      "rgb": [
+        247,
+        236,
+        92
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A05",
+      "sourceCode": "A5",
+      "hex": "#FFE44B",
+      "rgb": [
+        255,
+        228,
+        75
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A06",
+      "sourceCode": "A6",
+      "hex": "#FDA951",
+      "rgb": [
+        253,
+        169,
+        81
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A07",
+      "sourceCode": "A7",
+      "hex": "#FA8C4F",
+      "rgb": [
+        250,
+        140,
+        79
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A08",
+      "sourceCode": "A8",
+      "hex": "#F9E045",
+      "rgb": [
+        249,
+        224,
+        69
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A09",
+      "sourceCode": "A9",
+      "hex": "#F99C5F",
+      "rgb": [
+        249,
+        156,
+        95
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A10",
+      "sourceCode": "A10",
+      "hex": "#F47E36",
+      "rgb": [
+        244,
+        126,
+        54
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A11",
+      "sourceCode": "A11",
+      "hex": "#FEDB99",
+      "rgb": [
+        254,
+        219,
+        153
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A12",
+      "sourceCode": "A12",
+      "hex": "#FDA276",
+      "rgb": [
+        253,
+        162,
+        118
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A13",
+      "sourceCode": "A13",
+      "hex": "#FEC667",
+      "rgb": [
+        254,
+        198,
+        103
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A14",
+      "sourceCode": "A14",
+      "hex": "#F85842",
+      "rgb": [
+        248,
+        88,
+        66
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A15",
+      "sourceCode": "A15",
+      "hex": "#FBF65E",
+      "rgb": [
+        251,
+        246,
+        94
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A16",
+      "sourceCode": "A16",
+      "hex": "#FEFF97",
+      "rgb": [
+        254,
+        255,
+        151
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A17",
+      "sourceCode": "A17",
+      "hex": "#FDE173",
+      "rgb": [
+        253,
+        225,
+        115
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A18",
+      "sourceCode": "A18",
+      "hex": "#FCBF80",
+      "rgb": [
+        252,
+        191,
+        128
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A19",
+      "sourceCode": "A19",
+      "hex": "#FD7E77",
+      "rgb": [
+        253,
+        126,
+        119
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A20",
+      "sourceCode": "A20",
+      "hex": "#F9D66E",
+      "rgb": [
+        249,
+        214,
+        110
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A21",
+      "sourceCode": "A21",
+      "hex": "#FAE393",
+      "rgb": [
+        250,
+        227,
+        147
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A22",
+      "sourceCode": "A22",
+      "hex": "#EDF878",
+      "rgb": [
+        237,
+        248,
+        120
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A23",
+      "sourceCode": "A23",
+      "hex": "#E1C9BD",
+      "rgb": [
+        225,
+        201,
+        189
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A24",
+      "sourceCode": "A24",
+      "hex": "#F3F6A9",
+      "rgb": [
+        243,
+        246,
+        169
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A25",
+      "sourceCode": "A25",
+      "hex": "#FFD785",
+      "rgb": [
+        255,
+        215,
+        133
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "A26",
+      "sourceCode": "A26",
+      "hex": "#FEC832",
+      "rgb": [
+        254,
+        200,
+        50
+      ],
+      "group": "A",
+      "basic221": true
+    },
+    {
+      "code": "B01",
+      "sourceCode": "B1",
+      "hex": "#DFF139",
+      "rgb": [
+        223,
+        241,
+        57
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B02",
+      "sourceCode": "B2",
+      "hex": "#64F343",
+      "rgb": [
+        100,
+        243,
+        67
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B03",
+      "sourceCode": "B3",
+      "hex": "#9FF685",
+      "rgb": [
+        159,
+        246,
+        133
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B04",
+      "sourceCode": "B4",
+      "hex": "#5FDF34",
+      "rgb": [
+        95,
+        223,
+        52
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B05",
+      "sourceCode": "B5",
+      "hex": "#39E158",
+      "rgb": [
+        57,
+        225,
+        88
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B06",
+      "sourceCode": "B6",
+      "hex": "#64E0A4",
+      "rgb": [
+        100,
+        224,
+        164
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B07",
+      "sourceCode": "B7",
+      "hex": "#3FAE7C",
+      "rgb": [
+        63,
+        174,
+        124
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B08",
+      "sourceCode": "B8",
+      "hex": "#1D9E54",
+      "rgb": [
+        29,
+        158,
+        84
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B09",
+      "sourceCode": "B9",
+      "hex": "#2A5037",
+      "rgb": [
+        42,
+        80,
+        55
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B10",
+      "sourceCode": "B10",
+      "hex": "#9AD1BA",
+      "rgb": [
+        154,
+        209,
+        186
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B11",
+      "sourceCode": "B11",
+      "hex": "#627032",
+      "rgb": [
+        98,
+        112,
+        50
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B12",
+      "sourceCode": "B12",
+      "hex": "#1A6E3D",
+      "rgb": [
+        26,
+        110,
+        61
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B13",
+      "sourceCode": "B13",
+      "hex": "#C8E87D",
+      "rgb": [
+        200,
+        232,
+        125
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B14",
+      "sourceCode": "B14",
+      "hex": "#ACE84C",
+      "rgb": [
+        172,
+        232,
+        76
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B15",
+      "sourceCode": "B15",
+      "hex": "#305335",
+      "rgb": [
+        48,
+        83,
+        53
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B16",
+      "sourceCode": "B16",
+      "hex": "#C0ED9C",
+      "rgb": [
+        192,
+        237,
+        156
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B17",
+      "sourceCode": "B17",
+      "hex": "#9EB33E",
+      "rgb": [
+        158,
+        179,
+        62
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B18",
+      "sourceCode": "B18",
+      "hex": "#E6ED4F",
+      "rgb": [
+        230,
+        237,
+        79
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B19",
+      "sourceCode": "B19",
+      "hex": "#26B78E",
+      "rgb": [
+        38,
+        183,
+        142
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B20",
+      "sourceCode": "B20",
+      "hex": "#CAEDCF",
+      "rgb": [
+        202,
+        237,
+        207
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B21",
+      "sourceCode": "B21",
+      "hex": "#176268",
+      "rgb": [
+        23,
+        98,
+        104
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B22",
+      "sourceCode": "B22",
+      "hex": "#0A4241",
+      "rgb": [
+        10,
+        66,
+        65
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B23",
+      "sourceCode": "B23",
+      "hex": "#343B1A",
+      "rgb": [
+        52,
+        59,
+        26
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B24",
+      "sourceCode": "B24",
+      "hex": "#E8FAA6",
+      "rgb": [
+        232,
+        250,
+        166
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B25",
+      "sourceCode": "B25",
+      "hex": "#4E846D",
+      "rgb": [
+        78,
+        132,
+        109
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B26",
+      "sourceCode": "B26",
+      "hex": "#907C35",
+      "rgb": [
+        144,
+        124,
+        53
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B27",
+      "sourceCode": "B27",
+      "hex": "#D0E0AF",
+      "rgb": [
+        208,
+        224,
+        175
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B28",
+      "sourceCode": "B28",
+      "hex": "#9EE5BB",
+      "rgb": [
+        158,
+        229,
+        187
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B29",
+      "sourceCode": "B29",
+      "hex": "#C6DF5F",
+      "rgb": [
+        198,
+        223,
+        95
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B30",
+      "sourceCode": "B30",
+      "hex": "#E3FBB1",
+      "rgb": [
+        227,
+        251,
+        177
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B31",
+      "sourceCode": "B31",
+      "hex": "#B2E694",
+      "rgb": [
+        178,
+        230,
+        148
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "B32",
+      "sourceCode": "B32",
+      "hex": "#92AD60",
+      "rgb": [
+        146,
+        173,
+        96
+      ],
+      "group": "B",
+      "basic221": true
+    },
+    {
+      "code": "C01",
+      "sourceCode": "C1",
+      "hex": "#E8FFE7",
+      "rgb": [
+        232,
+        255,
+        231
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C02",
+      "sourceCode": "C2",
+      "hex": "#ABF8FE",
+      "rgb": [
+        171,
+        248,
+        254
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C03",
+      "sourceCode": "C3",
+      "hex": "#9EE0F8",
+      "rgb": [
+        158,
+        224,
+        248
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C04",
+      "sourceCode": "C4",
+      "hex": "#44CDFB",
+      "rgb": [
+        68,
+        205,
+        251
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C05",
+      "sourceCode": "C5",
+      "hex": "#06ABE3",
+      "rgb": [
+        6,
+        171,
+        227
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C06",
+      "sourceCode": "C6",
+      "hex": "#54A7E9",
+      "rgb": [
+        84,
+        167,
+        233
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C07",
+      "sourceCode": "C7",
+      "hex": "#3977CC",
+      "rgb": [
+        57,
+        119,
+        204
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C08",
+      "sourceCode": "C8",
+      "hex": "#0F52BD",
+      "rgb": [
+        15,
+        82,
+        189
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C09",
+      "sourceCode": "C9",
+      "hex": "#3349C3",
+      "rgb": [
+        51,
+        73,
+        195
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C10",
+      "sourceCode": "C10",
+      "hex": "#3DBBE3",
+      "rgb": [
+        61,
+        187,
+        227
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C11",
+      "sourceCode": "C11",
+      "hex": "#2ADED3",
+      "rgb": [
+        42,
+        222,
+        211
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C12",
+      "sourceCode": "C12",
+      "hex": "#1E334E",
+      "rgb": [
+        30,
+        51,
+        78
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C13",
+      "sourceCode": "C13",
+      "hex": "#CDE7FE",
+      "rgb": [
+        205,
+        231,
+        254
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C14",
+      "sourceCode": "C14",
+      "hex": "#D6FDFC",
+      "rgb": [
+        214,
+        253,
+        252
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C15",
+      "sourceCode": "C15",
+      "hex": "#21C5C4",
+      "rgb": [
+        33,
+        197,
+        196
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C16",
+      "sourceCode": "C16",
+      "hex": "#1858A2",
+      "rgb": [
+        24,
+        88,
+        162
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C17",
+      "sourceCode": "C17",
+      "hex": "#02D1F3",
+      "rgb": [
+        2,
+        209,
+        243
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C18",
+      "sourceCode": "C18",
+      "hex": "#213244",
+      "rgb": [
+        33,
+        50,
+        68
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C19",
+      "sourceCode": "C19",
+      "hex": "#188690",
+      "rgb": [
+        24,
+        134,
+        144
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C20",
+      "sourceCode": "C20",
+      "hex": "#1A70A9",
+      "rgb": [
+        26,
+        112,
+        169
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C21",
+      "sourceCode": "C21",
+      "hex": "#BEDDFC",
+      "rgb": [
+        190,
+        221,
+        252
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C22",
+      "sourceCode": "C22",
+      "hex": "#6BB1BB",
+      "rgb": [
+        107,
+        177,
+        187
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C23",
+      "sourceCode": "C23",
+      "hex": "#C8E2F9",
+      "rgb": [
+        200,
+        226,
+        249
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C24",
+      "sourceCode": "C24",
+      "hex": "#7EC5F9",
+      "rgb": [
+        126,
+        197,
+        249
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C25",
+      "sourceCode": "C25",
+      "hex": "#A9E8E0",
+      "rgb": [
+        169,
+        232,
+        224
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C26",
+      "sourceCode": "C26",
+      "hex": "#42ADD1",
+      "rgb": [
+        66,
+        173,
+        209
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C27",
+      "sourceCode": "C27",
+      "hex": "#D0DEEF",
+      "rgb": [
+        208,
+        222,
+        239
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C28",
+      "sourceCode": "C28",
+      "hex": "#BDCEED",
+      "rgb": [
+        189,
+        206,
+        237
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "C29",
+      "sourceCode": "C29",
+      "hex": "#364A89",
+      "rgb": [
+        54,
+        74,
+        137
+      ],
+      "group": "C",
+      "basic221": true
+    },
+    {
+      "code": "D01",
+      "sourceCode": "D1",
+      "hex": "#ACB7EF",
+      "rgb": [
+        172,
+        183,
+        239
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D02",
+      "sourceCode": "D2",
+      "hex": "#868DD3",
+      "rgb": [
+        134,
+        141,
+        211
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D03",
+      "sourceCode": "D3",
+      "hex": "#3653AF",
+      "rgb": [
+        54,
+        83,
+        175
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D04",
+      "sourceCode": "D4",
+      "hex": "#162C7E",
+      "rgb": [
+        22,
+        44,
+        126
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D05",
+      "sourceCode": "D5",
+      "hex": "#B34EC6",
+      "rgb": [
+        179,
+        78,
+        198
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D06",
+      "sourceCode": "D6",
+      "hex": "#B37BDC",
+      "rgb": [
+        179,
+        123,
+        220
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D07",
+      "sourceCode": "D7",
+      "hex": "#8758A9",
+      "rgb": [
+        135,
+        88,
+        169
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D08",
+      "sourceCode": "D8",
+      "hex": "#E3D2FE",
+      "rgb": [
+        227,
+        210,
+        254
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D09",
+      "sourceCode": "D9",
+      "hex": "#D6BAF5",
+      "rgb": [
+        214,
+        186,
+        245
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D10",
+      "sourceCode": "D10",
+      "hex": "#301A49",
+      "rgb": [
+        48,
+        26,
+        73
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D11",
+      "sourceCode": "D11",
+      "hex": "#BCBAE2",
+      "rgb": [
+        188,
+        186,
+        226
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D12",
+      "sourceCode": "D12",
+      "hex": "#DC99CE",
+      "rgb": [
+        220,
+        153,
+        206
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D13",
+      "sourceCode": "D13",
+      "hex": "#B5038F",
+      "rgb": [
+        181,
+        3,
+        143
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D14",
+      "sourceCode": "D14",
+      "hex": "#882893",
+      "rgb": [
+        136,
+        40,
+        147
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D15",
+      "sourceCode": "D15",
+      "hex": "#2F1E8E",
+      "rgb": [
+        47,
+        30,
+        142
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D16",
+      "sourceCode": "D16",
+      "hex": "#E2E4F0",
+      "rgb": [
+        226,
+        228,
+        240
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D17",
+      "sourceCode": "D17",
+      "hex": "#C7D3F9",
+      "rgb": [
+        199,
+        211,
+        249
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D18",
+      "sourceCode": "D18",
+      "hex": "#9A64B8",
+      "rgb": [
+        154,
+        100,
+        184
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D19",
+      "sourceCode": "D19",
+      "hex": "#D8C2D9",
+      "rgb": [
+        216,
+        194,
+        217
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D20",
+      "sourceCode": "D20",
+      "hex": "#9C34AD",
+      "rgb": [
+        156,
+        52,
+        173
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D21",
+      "sourceCode": "D21",
+      "hex": "#940595",
+      "rgb": [
+        148,
+        5,
+        149
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D22",
+      "sourceCode": "D22",
+      "hex": "#383995",
+      "rgb": [
+        56,
+        57,
+        149
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D23",
+      "sourceCode": "D23",
+      "hex": "#FADBF8",
+      "rgb": [
+        250,
+        219,
+        248
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D24",
+      "sourceCode": "D24",
+      "hex": "#768AE1",
+      "rgb": [
+        118,
+        138,
+        225
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D25",
+      "sourceCode": "D25",
+      "hex": "#4950C2",
+      "rgb": [
+        73,
+        80,
+        194
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "D26",
+      "sourceCode": "D26",
+      "hex": "#D6C6EB",
+      "rgb": [
+        214,
+        198,
+        235
+      ],
+      "group": "D",
+      "basic221": true
+    },
+    {
+      "code": "E01",
+      "sourceCode": "E1",
+      "hex": "#F6D4CB",
+      "rgb": [
+        246,
+        212,
+        203
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E02",
+      "sourceCode": "E2",
+      "hex": "#FCC1DD",
+      "rgb": [
+        252,
+        193,
+        221
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E03",
+      "sourceCode": "E3",
+      "hex": "#F6BDE8",
+      "rgb": [
+        246,
+        189,
+        232
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E04",
+      "sourceCode": "E4",
+      "hex": "#E9639E",
+      "rgb": [
+        233,
+        99,
+        158
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E05",
+      "sourceCode": "E5",
+      "hex": "#F1559F",
+      "rgb": [
+        241,
+        85,
+        159
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E06",
+      "sourceCode": "E6",
+      "hex": "#EC4072",
+      "rgb": [
+        236,
+        64,
+        114
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E07",
+      "sourceCode": "E7",
+      "hex": "#C63674",
+      "rgb": [
+        198,
+        54,
+        116
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E08",
+      "sourceCode": "E8",
+      "hex": "#FDDBE9",
+      "rgb": [
+        253,
+        219,
+        233
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E09",
+      "sourceCode": "E9",
+      "hex": "#E575C7",
+      "rgb": [
+        229,
+        117,
+        199
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E10",
+      "sourceCode": "E10",
+      "hex": "#D33997",
+      "rgb": [
+        211,
+        57,
+        151
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E11",
+      "sourceCode": "E11",
+      "hex": "#F7DAD4",
+      "rgb": [
+        247,
+        218,
+        212
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E12",
+      "sourceCode": "E12",
+      "hex": "#F893BF",
+      "rgb": [
+        248,
+        147,
+        191
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E13",
+      "sourceCode": "E13",
+      "hex": "#B5026A",
+      "rgb": [
+        181,
+        2,
+        106
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E14",
+      "sourceCode": "E14",
+      "hex": "#FAD4BF",
+      "rgb": [
+        250,
+        212,
+        191
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E15",
+      "sourceCode": "E15",
+      "hex": "#F5C9CA",
+      "rgb": [
+        245,
+        201,
+        202
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E16",
+      "sourceCode": "E16",
+      "hex": "#FBF4EC",
+      "rgb": [
+        251,
+        244,
+        236
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E17",
+      "sourceCode": "E17",
+      "hex": "#F7E3EC",
+      "rgb": [
+        247,
+        227,
+        236
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E18",
+      "sourceCode": "E18",
+      "hex": "#FBCBDB",
+      "rgb": [
+        251,
+        203,
+        219
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E19",
+      "sourceCode": "E19",
+      "hex": "#F6BBD1",
+      "rgb": [
+        246,
+        187,
+        209
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E20",
+      "sourceCode": "E20",
+      "hex": "#D7C6CE",
+      "rgb": [
+        215,
+        198,
+        206
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E21",
+      "sourceCode": "E21",
+      "hex": "#C09DA4",
+      "rgb": [
+        192,
+        157,
+        164
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E22",
+      "sourceCode": "E22",
+      "hex": "#B58B9F",
+      "rgb": [
+        181,
+        139,
+        159
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E23",
+      "sourceCode": "E23",
+      "hex": "#937D8A",
+      "rgb": [
+        147,
+        125,
+        138
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "E24",
+      "sourceCode": "E24",
+      "hex": "#DEBEE5",
+      "rgb": [
+        222,
+        190,
+        229
+      ],
+      "group": "E",
+      "basic221": true
+    },
+    {
+      "code": "F01",
+      "sourceCode": "F1",
+      "hex": "#FF9280",
+      "rgb": [
+        255,
+        146,
+        128
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F02",
+      "sourceCode": "F2",
+      "hex": "#F73D48",
+      "rgb": [
+        247,
+        61,
+        72
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F03",
+      "sourceCode": "F3",
+      "hex": "#EF4D3E",
+      "rgb": [
+        239,
+        77,
+        62
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F04",
+      "sourceCode": "F4",
+      "hex": "#F92B40",
+      "rgb": [
+        249,
+        43,
+        64
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F05",
+      "sourceCode": "F5",
+      "hex": "#E30328",
+      "rgb": [
+        227,
+        3,
+        40
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F06",
+      "sourceCode": "F6",
+      "hex": "#913635",
+      "rgb": [
+        145,
+        54,
+        53
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F07",
+      "sourceCode": "F7",
+      "hex": "#911932",
+      "rgb": [
+        145,
+        25,
+        50
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F08",
+      "sourceCode": "F8",
+      "hex": "#BB0126",
+      "rgb": [
+        187,
+        1,
+        38
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F09",
+      "sourceCode": "F9",
+      "hex": "#E0677A",
+      "rgb": [
+        224,
+        103,
+        122
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F10",
+      "sourceCode": "F10",
+      "hex": "#874628",
+      "rgb": [
+        135,
+        70,
+        40
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F11",
+      "sourceCode": "F11",
+      "hex": "#6F321D",
+      "rgb": [
+        111,
+        50,
+        29
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F12",
+      "sourceCode": "F12",
+      "hex": "#F8516D",
+      "rgb": [
+        248,
+        81,
+        109
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F13",
+      "sourceCode": "F13",
+      "hex": "#F45C45",
+      "rgb": [
+        244,
+        92,
+        69
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F14",
+      "sourceCode": "F14",
+      "hex": "#FCADB2",
+      "rgb": [
+        252,
+        173,
+        178
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F15",
+      "sourceCode": "F15",
+      "hex": "#D50527",
+      "rgb": [
+        213,
+        5,
+        39
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F16",
+      "sourceCode": "F16",
+      "hex": "#F8C0A9",
+      "rgb": [
+        248,
+        192,
+        169
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F17",
+      "sourceCode": "F17",
+      "hex": "#E89B7D",
+      "rgb": [
+        232,
+        155,
+        125
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F18",
+      "sourceCode": "F18",
+      "hex": "#D07E4A",
+      "rgb": [
+        208,
+        126,
+        74
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F19",
+      "sourceCode": "F19",
+      "hex": "#BE454A",
+      "rgb": [
+        190,
+        69,
+        74
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F20",
+      "sourceCode": "F20",
+      "hex": "#C69495",
+      "rgb": [
+        198,
+        148,
+        149
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F21",
+      "sourceCode": "F21",
+      "hex": "#F2BBC6",
+      "rgb": [
+        242,
+        187,
+        198
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F22",
+      "sourceCode": "F22",
+      "hex": "#F7C3D0",
+      "rgb": [
+        247,
+        195,
+        208
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F23",
+      "sourceCode": "F23",
+      "hex": "#EC806D",
+      "rgb": [
+        236,
+        128,
+        109
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F24",
+      "sourceCode": "F24",
+      "hex": "#E09DAF",
+      "rgb": [
+        224,
+        157,
+        175
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "F25",
+      "sourceCode": "F25",
+      "hex": "#E84854",
+      "rgb": [
+        232,
+        72,
+        84
+      ],
+      "group": "F",
+      "basic221": true
+    },
+    {
+      "code": "G01",
+      "sourceCode": "G1",
+      "hex": "#FFE4D3",
+      "rgb": [
+        255,
+        228,
+        211
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G02",
+      "sourceCode": "G2",
+      "hex": "#FCC6AC",
+      "rgb": [
+        252,
+        198,
+        172
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G03",
+      "sourceCode": "G3",
+      "hex": "#F1C4A5",
+      "rgb": [
+        241,
+        196,
+        165
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G04",
+      "sourceCode": "G4",
+      "hex": "#DCB387",
+      "rgb": [
+        220,
+        179,
+        135
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G05",
+      "sourceCode": "G5",
+      "hex": "#E7B34E",
+      "rgb": [
+        231,
+        179,
+        78
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G06",
+      "sourceCode": "G6",
+      "hex": "#F3A014",
+      "rgb": [
+        243,
+        160,
+        20
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G07",
+      "sourceCode": "G7",
+      "hex": "#98503A",
+      "rgb": [
+        152,
+        80,
+        58
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G08",
+      "sourceCode": "G8",
+      "hex": "#4B2B1C",
+      "rgb": [
+        75,
+        43,
+        28
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G09",
+      "sourceCode": "G9",
+      "hex": "#E4B685",
+      "rgb": [
+        228,
+        182,
+        133
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G10",
+      "sourceCode": "G10",
+      "hex": "#DA8C42",
+      "rgb": [
+        218,
+        140,
+        66
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G11",
+      "sourceCode": "G11",
+      "hex": "#DAC898",
+      "rgb": [
+        218,
+        200,
+        152
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G12",
+      "sourceCode": "G12",
+      "hex": "#FEC993",
+      "rgb": [
+        254,
+        201,
+        147
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G13",
+      "sourceCode": "G13",
+      "hex": "#B2714B",
+      "rgb": [
+        178,
+        113,
+        75
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G14",
+      "sourceCode": "G14",
+      "hex": "#8B684C",
+      "rgb": [
+        139,
+        104,
+        76
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G15",
+      "sourceCode": "G15",
+      "hex": "#FCF9E0",
+      "rgb": [
+        252,
+        249,
+        224
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G16",
+      "sourceCode": "G16",
+      "hex": "#F2D8C1",
+      "rgb": [
+        242,
+        216,
+        193
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G17",
+      "sourceCode": "G17",
+      "hex": "#79544E",
+      "rgb": [
+        121,
+        84,
+        78
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G18",
+      "sourceCode": "G18",
+      "hex": "#FFE4D6",
+      "rgb": [
+        255,
+        228,
+        214
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G19",
+      "sourceCode": "G19",
+      "hex": "#DD7D41",
+      "rgb": [
+        221,
+        125,
+        65
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G20",
+      "sourceCode": "G20",
+      "hex": "#A5452F",
+      "rgb": [
+        165,
+        69,
+        47
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "G21",
+      "sourceCode": "G21",
+      "hex": "#B38561",
+      "rgb": [
+        179,
+        133,
+        97
+      ],
+      "group": "G",
+      "basic221": true
+    },
+    {
+      "code": "H01",
+      "sourceCode": "H1",
+      "hex": "#FBFBFB",
+      "rgb": [
+        251,
+        251,
+        251
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H02",
+      "sourceCode": "H2",
+      "hex": "#FFFFFF",
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H03",
+      "sourceCode": "H3",
+      "hex": "#B4B4B4",
+      "rgb": [
+        180,
+        180,
+        180
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H04",
+      "sourceCode": "H4",
+      "hex": "#878787",
+      "rgb": [
+        135,
+        135,
+        135
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H05",
+      "sourceCode": "H5",
+      "hex": "#464648",
+      "rgb": [
+        70,
+        70,
+        72
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H06",
+      "sourceCode": "H6",
+      "hex": "#2C2C2C",
+      "rgb": [
+        44,
+        44,
+        44
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H07",
+      "sourceCode": "H7",
+      "hex": "#010101",
+      "rgb": [
+        1,
+        1,
+        1
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H08",
+      "sourceCode": "H8",
+      "hex": "#E7D6DC",
+      "rgb": [
+        231,
+        214,
+        220
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H09",
+      "sourceCode": "H9",
+      "hex": "#EFEDEE",
+      "rgb": [
+        239,
+        237,
+        238
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H10",
+      "sourceCode": "H10",
+      "hex": "#ECEAEB",
+      "rgb": [
+        236,
+        234,
+        235
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H11",
+      "sourceCode": "H11",
+      "hex": "#CDCDCD",
+      "rgb": [
+        205,
+        205,
+        205
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H12",
+      "sourceCode": "H12",
+      "hex": "#FDF6EE",
+      "rgb": [
+        253,
+        246,
+        238
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H13",
+      "sourceCode": "H13",
+      "hex": "#F4EFD1",
+      "rgb": [
+        244,
+        239,
+        209
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H14",
+      "sourceCode": "H14",
+      "hex": "#CED7D4",
+      "rgb": [
+        206,
+        215,
+        212
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H15",
+      "sourceCode": "H15",
+      "hex": "#98A6A6",
+      "rgb": [
+        152,
+        166,
+        166
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H16",
+      "sourceCode": "H16",
+      "hex": "#1B1213",
+      "rgb": [
+        27,
+        18,
+        19
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H17",
+      "sourceCode": "H17",
+      "hex": "#F0EEEF",
+      "rgb": [
+        240,
+        238,
+        239
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H18",
+      "sourceCode": "H18",
+      "hex": "#FCFFF8",
+      "rgb": [
+        252,
+        255,
+        248
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H19",
+      "sourceCode": "H19",
+      "hex": "#F2EEE5",
+      "rgb": [
+        242,
+        238,
+        229
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H20",
+      "sourceCode": "H20",
+      "hex": "#96A09F",
+      "rgb": [
+        150,
+        160,
+        159
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H21",
+      "sourceCode": "H21",
+      "hex": "#FFFBE1",
+      "rgb": [
+        255,
+        251,
+        225
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H22",
+      "sourceCode": "H22",
+      "hex": "#CACADA",
+      "rgb": [
+        202,
+        202,
+        218
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "H23",
+      "sourceCode": "H23",
+      "hex": "#9B9C94",
+      "rgb": [
+        155,
+        156,
+        148
+      ],
+      "group": "H",
+      "basic221": true
+    },
+    {
+      "code": "M01",
+      "sourceCode": "M1",
+      "hex": "#BBC6B6",
+      "rgb": [
+        187,
+        198,
+        182
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M02",
+      "sourceCode": "M2",
+      "hex": "#909994",
+      "rgb": [
+        144,
+        153,
+        148
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M03",
+      "sourceCode": "M3",
+      "hex": "#697E80",
+      "rgb": [
+        105,
+        126,
+        128
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M04",
+      "sourceCode": "M4",
+      "hex": "#E0D4BC",
+      "rgb": [
+        224,
+        212,
+        188
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M05",
+      "sourceCode": "M5",
+      "hex": "#D0CBAE",
+      "rgb": [
+        208,
+        203,
+        174
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M06",
+      "sourceCode": "M6",
+      "hex": "#B0AA86",
+      "rgb": [
+        176,
+        170,
+        134
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M07",
+      "sourceCode": "M7",
+      "hex": "#B0A796",
+      "rgb": [
+        176,
+        167,
+        150
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M08",
+      "sourceCode": "M8",
+      "hex": "#AE8082",
+      "rgb": [
+        174,
+        128,
+        130
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M09",
+      "sourceCode": "M9",
+      "hex": "#A88764",
+      "rgb": [
+        168,
+        135,
+        100
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M10",
+      "sourceCode": "M10",
+      "hex": "#C6B2BB",
+      "rgb": [
+        198,
+        178,
+        187
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M11",
+      "sourceCode": "M11",
+      "hex": "#9D7693",
+      "rgb": [
+        157,
+        118,
+        147
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M12",
+      "sourceCode": "M12",
+      "hex": "#644B51",
+      "rgb": [
+        100,
+        75,
+        81
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M13",
+      "sourceCode": "M13",
+      "hex": "#C79266",
+      "rgb": [
+        199,
+        146,
+        102
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M14",
+      "sourceCode": "M14",
+      "hex": "#C37463",
+      "rgb": [
+        195,
+        116,
+        99
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "M15",
+      "sourceCode": "M15",
+      "hex": "#747D7A",
+      "rgb": [
+        116,
+        125,
+        122
+      ],
+      "group": "M",
+      "basic221": true
+    },
+    {
+      "code": "P01",
+      "sourceCode": "P1",
+      "hex": "#F9F9F9",
+      "rgb": [
+        249,
+        249,
+        249
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P02",
+      "sourceCode": "P2",
+      "hex": "#ABABAB",
+      "rgb": [
+        171,
+        171,
+        171
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P03",
+      "sourceCode": "P3",
+      "hex": "#B6DBAF",
+      "rgb": [
+        182,
+        219,
+        175
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P04",
+      "sourceCode": "P4",
+      "hex": "#FEA2A3",
+      "rgb": [
+        254,
+        162,
+        163
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P05",
+      "sourceCode": "P5",
+      "hex": "#EB903F",
+      "rgb": [
+        235,
+        144,
+        63
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P06",
+      "sourceCode": "P6",
+      "hex": "#63CEA2",
+      "rgb": [
+        99,
+        206,
+        162
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P07",
+      "sourceCode": "P7",
+      "hex": "#E79273",
+      "rgb": [
+        231,
+        146,
+        115
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P08",
+      "sourceCode": "P8",
+      "hex": "#ECDB59",
+      "rgb": [
+        236,
+        219,
+        89
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P09",
+      "sourceCode": "P9",
+      "hex": "#DBD9DA",
+      "rgb": [
+        219,
+        217,
+        218
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P10",
+      "sourceCode": "P10",
+      "hex": "#DBC7EA",
+      "rgb": [
+        219,
+        199,
+        234
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P11",
+      "sourceCode": "P11",
+      "hex": "#F1E9D4",
+      "rgb": [
+        241,
+        233,
+        212
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P12",
+      "sourceCode": "P12",
+      "hex": "#E9EDEE",
+      "rgb": [
+        233,
+        237,
+        238
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P13",
+      "sourceCode": "P13",
+      "hex": "#ADCBF1",
+      "rgb": [
+        173,
+        203,
+        241
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P14",
+      "sourceCode": "P14",
+      "hex": "#337BAD",
+      "rgb": [
+        51,
+        123,
+        173
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P15",
+      "sourceCode": "P15",
+      "hex": "#668575",
+      "rgb": [
+        102,
+        133,
+        117
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P16",
+      "sourceCode": "P16",
+      "hex": "#FDC24E",
+      "rgb": [
+        253,
+        194,
+        78
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P17",
+      "sourceCode": "P17",
+      "hex": "#FDA42E",
+      "rgb": [
+        253,
+        164,
+        46
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P18",
+      "sourceCode": "P18",
+      "hex": "#FEBDA7",
+      "rgb": [
+        254,
+        189,
+        167
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P19",
+      "sourceCode": "P19",
+      "hex": "#FFDEE9",
+      "rgb": [
+        255,
+        222,
+        233
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P20",
+      "sourceCode": "P20",
+      "hex": "#FCBFD1",
+      "rgb": [
+        252,
+        191,
+        209
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P21",
+      "sourceCode": "P21",
+      "hex": "#E8BEC2",
+      "rgb": [
+        232,
+        190,
+        194
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P22",
+      "sourceCode": "P22",
+      "hex": "#DFAAA4",
+      "rgb": [
+        223,
+        170,
+        164
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "P23",
+      "sourceCode": "P23",
+      "hex": "#A3656A",
+      "rgb": [
+        163,
+        101,
+        106
+      ],
+      "group": "P",
+      "basic221": false
+    },
+    {
+      "code": "R01",
+      "sourceCode": "R1",
+      "hex": "#D40E1F",
+      "rgb": [
+        212,
+        14,
+        31
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R02",
+      "sourceCode": "R2",
+      "hex": "#F13484",
+      "rgb": [
+        241,
+        52,
+        132
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R03",
+      "sourceCode": "R3",
+      "hex": "#FB852B",
+      "rgb": [
+        251,
+        133,
+        43
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R04",
+      "sourceCode": "R4",
+      "hex": "#F8ED33",
+      "rgb": [
+        248,
+        237,
+        51
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R05",
+      "sourceCode": "R5",
+      "hex": "#32C958",
+      "rgb": [
+        50,
+        201,
+        88
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R06",
+      "sourceCode": "R6",
+      "hex": "#1EBA93",
+      "rgb": [
+        30,
+        186,
+        147
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R07",
+      "sourceCode": "R7",
+      "hex": "#1D779C",
+      "rgb": [
+        29,
+        119,
+        156
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R08",
+      "sourceCode": "R8",
+      "hex": "#1960C8",
+      "rgb": [
+        25,
+        96,
+        200
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R09",
+      "sourceCode": "R9",
+      "hex": "#945AB1",
+      "rgb": [
+        148,
+        90,
+        177
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R10",
+      "sourceCode": "R10",
+      "hex": "#F8DA54",
+      "rgb": [
+        248,
+        218,
+        84
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R11",
+      "sourceCode": "R11",
+      "hex": "#FCECF7",
+      "rgb": [
+        252,
+        236,
+        247
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R12",
+      "sourceCode": "R12",
+      "hex": "#D8D4D3",
+      "rgb": [
+        216,
+        212,
+        211
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R13",
+      "sourceCode": "R13",
+      "hex": "#56534E",
+      "rgb": [
+        86,
+        83,
+        78
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R14",
+      "sourceCode": "R14",
+      "hex": "#A3E7DC",
+      "rgb": [
+        163,
+        231,
+        220
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R15",
+      "sourceCode": "R15",
+      "hex": "#78CEE7",
+      "rgb": [
+        120,
+        206,
+        231
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R16",
+      "sourceCode": "R16",
+      "hex": "#3FCDCE",
+      "rgb": [
+        63,
+        205,
+        206
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R17",
+      "sourceCode": "R17",
+      "hex": "#4E8379",
+      "rgb": [
+        78,
+        131,
+        121
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R18",
+      "sourceCode": "R18",
+      "hex": "#7DCA9C",
+      "rgb": [
+        125,
+        202,
+        156
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R19",
+      "sourceCode": "R19",
+      "hex": "#C8E664",
+      "rgb": [
+        200,
+        230,
+        100
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R20",
+      "sourceCode": "R20",
+      "hex": "#E3CCBA",
+      "rgb": [
+        227,
+        204,
+        186
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R21",
+      "sourceCode": "R21",
+      "hex": "#A17140",
+      "rgb": [
+        161,
+        113,
+        64
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R22",
+      "sourceCode": "R22",
+      "hex": "#6B372C",
+      "rgb": [
+        107,
+        55,
+        44
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R23",
+      "sourceCode": "R23",
+      "hex": "#F6BB6F",
+      "rgb": [
+        246,
+        187,
+        111
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R24",
+      "sourceCode": "R24",
+      "hex": "#F3C6C0",
+      "rgb": [
+        243,
+        198,
+        192
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R25",
+      "sourceCode": "R25",
+      "hex": "#C76A62",
+      "rgb": [
+        199,
+        106,
+        98
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R26",
+      "sourceCode": "R26",
+      "hex": "#D093BC",
+      "rgb": [
+        208,
+        147,
+        188
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R27",
+      "sourceCode": "R27",
+      "hex": "#E58EAE",
+      "rgb": [
+        229,
+        142,
+        174
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "R28",
+      "sourceCode": "R28",
+      "hex": "#9F85CF",
+      "rgb": [
+        159,
+        133,
+        207
+      ],
+      "group": "R",
+      "basic221": false
+    },
+    {
+      "code": "T01",
+      "sourceCode": "T1",
+      "hex": "#FCFDFF",
+      "rgb": [
+        252,
+        253,
+        255
+      ],
+      "group": "T",
+      "basic221": false
+    },
+    {
+      "code": "Y01",
+      "sourceCode": "Y1",
+      "hex": "#FF6FB7",
+      "rgb": [
+        255,
+        111,
+        183
+      ],
+      "group": "Y",
+      "basic221": false
+    },
+    {
+      "code": "Y02",
+      "sourceCode": "Y2",
+      "hex": "#FDB583",
+      "rgb": [
+        253,
+        181,
+        131
+      ],
+      "group": "Y",
+      "basic221": false
+    },
+    {
+      "code": "Y03",
+      "sourceCode": "Y3",
+      "hex": "#D8FCA4",
+      "rgb": [
+        216,
+        252,
+        164
+      ],
+      "group": "Y",
+      "basic221": false
+    },
+    {
+      "code": "Y04",
+      "sourceCode": "Y4",
+      "hex": "#91DAFB",
+      "rgb": [
+        145,
+        218,
+        251
+      ],
+      "group": "Y",
+      "basic221": false
+    },
+    {
+      "code": "Y05",
+      "sourceCode": "Y5",
+      "hex": "#E987EA",
+      "rgb": [
+        233,
+        135,
+        234
+      ],
+      "group": "Y",
+      "basic221": false
+    },
+    {
+      "code": "ZG01",
+      "sourceCode": "ZG1",
+      "hex": "#DAABB3",
+      "rgb": [
+        218,
+        171,
+        179
+      ],
+      "group": "ZG",
+      "basic221": false
+    },
+    {
+      "code": "ZG02",
+      "sourceCode": "ZG2",
+      "hex": "#D6AA87",
+      "rgb": [
+        214,
+        170,
+        135
+      ],
+      "group": "ZG",
+      "basic221": false
+    },
+    {
+      "code": "ZG03",
+      "sourceCode": "ZG3",
+      "hex": "#C1BD8D",
+      "rgb": [
+        193,
+        189,
+        141
+      ],
+      "group": "ZG",
+      "basic221": false
+    },
+    {
+      "code": "ZG04",
+      "sourceCode": "ZG4",
+      "hex": "#96B69F",
+      "rgb": [
+        150,
+        182,
+        159
+      ],
+      "group": "ZG",
+      "basic221": false
+    },
+    {
+      "code": "ZG05",
+      "sourceCode": "ZG5",
+      "hex": "#849DC6",
+      "rgb": [
+        132,
+        157,
+        198
+      ],
+      "group": "ZG",
+      "basic221": false
+    },
+    {
+      "code": "ZG06",
+      "sourceCode": "ZG6",
+      "hex": "#94BFE2",
+      "rgb": [
+        148,
+        191,
+        226
+      ],
+      "group": "ZG",
+      "basic221": false
+    },
+    {
+      "code": "ZG07",
+      "sourceCode": "ZG7",
+      "hex": "#E2A9D2",
+      "rgb": [
+        226,
+        169,
+        210
+      ],
+      "group": "ZG",
+      "basic221": false
+    },
+    {
+      "code": "ZG08",
+      "sourceCode": "ZG8",
+      "hex": "#AB91C0",
+      "rgb": [
+        171,
+        145,
+        192
+      ],
+      "group": "ZG",
+      "basic221": false
+    },
+    {
+      "code": "Q01",
+      "sourceCode": "Q1",
+      "hex": "#F2A5E8",
+      "rgb": [
+        242,
+        165,
+        232
+      ],
+      "group": "Q",
+      "basic221": false
+    },
+    {
+      "code": "Q02",
+      "sourceCode": "Q2",
+      "hex": "#E9EC91",
+      "rgb": [
+        233,
+        236,
+        145
+      ],
+      "group": "Q",
+      "basic221": false
+    },
+    {
+      "code": "Q03",
+      "sourceCode": "Q3",
+      "hex": "#FFFF00",
+      "rgb": [
+        255,
+        255,
+        0
+      ],
+      "group": "Q",
+      "basic221": false
+    },
+    {
+      "code": "Q04",
+      "sourceCode": "Q4",
+      "hex": "#FFEBFA",
+      "rgb": [
+        255,
+        235,
+        250
+      ],
+      "group": "Q",
+      "basic221": false
+    },
+    {
+      "code": "Q05",
+      "sourceCode": "Q5",
+      "hex": "#76CEDE",
+      "rgb": [
+        118,
+        206,
+        222
+      ],
+      "group": "Q",
+      "basic221": false
+    }
+  ]
+}
