@@ -9,6 +9,43 @@ export function rulerLabelStep(cellSize) {
   return cellSize >= 24 ? 1 : Math.max(10, Math.ceil(26 / (cellSize * 10)) * 10);
 }
 
+/** Draw paired light/dark cell edges on physical pixels, including exported paper. */
+export function drawBeadGrid(context, { columns, rows, cellSize, left = 0, top = 0 }, frame = {}) {
+  const scale = frame.scale || 1, pixel = 1 / scale;
+  const offsetX = frame.x || 0, offsetY = frame.y || 0;
+  const right = left + columns * cellSize, bottom = top + rows * cellSize;
+  const clipLeft = Math.max(left, frame.x ?? left), clipTop = Math.max(top, frame.y ?? top);
+  const clipRight = Math.min(right, frame.width == null ? right : offsetX + frame.width);
+  const clipBottom = Math.min(bottom, frame.height == null ? bottom : offsetY + frame.height);
+  const firstCol = Math.max(0, Math.ceil((clipLeft - left) / cellSize));
+  const lastCol = Math.min(columns, Math.floor((clipRight - left) / cellSize));
+  const firstRow = Math.max(0, Math.ceil((clipTop - top) / cellSize));
+  const lastRow = Math.min(rows, Math.floor((clipBottom - top) / cellSize));
+  const snapX = x => offsetX + Math.round((x - offsetX) * scale) / scale;
+  const snapY = y => offsetY + Math.round((y - offsetY) * scale) / scale;
+  // At a tiny overview, a second edge would consume most of each bead. Readable
+  // zoom levels get a light side on dark colors and a dark side on light colors.
+  const paired = cellSize * scale >= 6;
+  function lines(color, shift, width, major = false) {
+    context.fillStyle = color; context.beginPath();
+    for (let col = firstCol; col <= lastCol; col++) {
+      if (major && (col === 0 || col === columns || col % 10)) continue;
+      context.rect(snapX(left + col * cellSize) + shift, snapY(clipTop), width, snapY(clipBottom) - snapY(clipTop));
+    }
+    for (let row = firstRow; row <= lastRow; row++) {
+      if (major && (row === 0 || row === rows || row % 10)) continue;
+      context.rect(snapX(clipLeft), snapY(top + row * cellSize) + shift, snapX(clipRight) - snapX(clipLeft), width);
+    }
+    context.fill();
+  }
+  if (paired) lines('#ffffffb8', -pixel, pixel);
+  lines(paired ? '#50425b9e' : '#65597070', 0, pixel);
+  const majorPixels = Math.max(1, Math.round(1.25 * scale));
+  const majorShift = -Math.floor(majorPixels / 2) * pixel;
+  if (paired) lines('#ffffffb8', majorShift - pixel, (majorPixels + 2) * pixel, true);
+  lines('#a85e87', majorShift, majorPixels * pixel, true);
+}
+
 /** Pure geometry, shared by the renderer and regression tests. End indices are inclusive. */
 export function computePatternViewport({ columns, rows, cellSize, ruler = 23, viewportX = 0, viewportY = 0, viewportWidth, viewportHeight, dpr = 1, overscan = 40 }) {
   if (![columns, rows, cellSize, ruler, viewportWidth, viewportHeight].every(Number.isFinite)
@@ -106,16 +143,9 @@ export function createPatternRenderer(canvas, area, stage) {
   }
 
   function grid(context, state, frame) {
-    const { pattern, cellSize: size, ruler, view } = state;
+    const { pattern, cellSize, ruler, view } = state;
     if (!state.showGrid || view !== 'grid') return;
-    const left = ruler, top = ruler, right = ruler + pattern.width * size, bottom = ruler + pattern.height * size;
-    context.lineWidth = .45; context.strokeStyle = '#86808e2b'; context.beginPath();
-    for (let col = frame.startColumn; col <= frame.endColumn + 1; col++) { const x = ruler + col * size; context.moveTo(x, Math.max(top, frame.y)); context.lineTo(x, Math.min(bottom, frame.y + frame.height)); }
-    for (let row = frame.startRow; row <= frame.endRow + 1; row++) { const y = ruler + row * size; context.moveTo(Math.max(left, frame.x), y); context.lineTo(Math.min(right, frame.x + frame.width), y); }
-    context.stroke(); context.strokeStyle = '#b690a7a0'; context.lineWidth = 1; context.beginPath();
-    for (let col = Math.max(10, Math.ceil(frame.startColumn / 10) * 10); col <= frame.endColumn + 1 && col < pattern.width; col += 10) { const x = ruler + col * size; context.moveTo(x, Math.max(top, frame.y)); context.lineTo(x, Math.min(bottom, frame.y + frame.height)); }
-    for (let row = Math.max(10, Math.ceil(frame.startRow / 10) * 10); row <= frame.endRow + 1 && row < pattern.height; row += 10) { const y = ruler + row * size; context.moveTo(Math.max(left, frame.x), y); context.lineTo(Math.min(right, frame.x + frame.width), y); }
-    context.stroke();
+    drawBeadGrid(context, { columns: pattern.width, rows: pattern.height, cellSize, left: ruler, top: ruler }, frame);
   }
 
   function paintBase(state, frame) {

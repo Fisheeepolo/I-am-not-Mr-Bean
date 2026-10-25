@@ -1,10 +1,51 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { computePatternViewport, createPatternRenderer, rulerLabelStep } from '../public/pattern-renderer.js';
+import { computePatternViewport, createPatternRenderer, drawBeadGrid, rulerLabelStep } from '../public/pattern-renderer.js';
 import { makeDemo } from '../public/engine.js';
 
 const palette = JSON.parse(await readFile(new URL('../public/palette.json', import.meta.url), 'utf8')).colors;
 const baseArgs = { columns: 160, rows: 160, cellSize: 42, ruler: 23, viewportWidth: 800, viewportHeight: 600, dpr: 2 };
+
+// Sample the renderer's actual rectangle paths with source-over compositing.
+// Boundary pixels must remain visible on pale and dark beads; centers stay unpainted.
+function gridRecording() {
+  let path = [];
+  return { fills: [], beginPath() { path = []; }, rect(...rect) { path.push(rect); },
+    fill() { this.fills.push({ color: this.fillStyle, rects: path }); } };
+}
+function rgb(hex) { return [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)); }
+function sampleGrid(recording, x, y, background) {
+  let result = rgb(background);
+  for (const fill of recording.fills) if (fill.rects.some(([left, top, width, height]) => x >= left && x < left + width && y >= top && y < top + height)) {
+    const opacity = fill.color.length === 9 ? parseInt(fill.color.slice(7, 9), 16) / 255 : 1;
+    result = rgb(fill.color).map((v, i) => v * opacity + result[i] * (1 - opacity));
+  }
+  return result;
+}
+function luminance(rgb) {
+  const channels = rgb.map(v => v / 255).map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4);
+  return channels[0] * .2126 + channels[1] * .7152 + channels[2] * .0722;
+}
+function contrastRatio(a, b) { const x = luminance(a), y = luminance(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); }
+for (const scale of [1, 1.25, 2]) for (const size of [9.37, 24, 42]) {
+  const recorded = gridRecording();
+  const frame = { x: 8.3, y: 11.4, width: 520, height: 420, scale };
+  drawBeadGrid(recorded, { columns: 25, rows: 25, cellSize: size, left: 23, top: 31 }, frame);
+  for (const fill of recorded.fills) for (const [x, y, width, height] of fill.rects) {
+    for (const value of [(x - frame.x) * scale, (y - frame.y) * scale, width * scale, height * scale]) {
+      assert(Math.abs(value - Math.round(value)) < 1e-8, 'Grid edges align to physical pixels, including fractional zoom and scroll');
+    }
+  }
+  const boundary = frame.x + Math.round((23 + 3 * size - frame.x) * scale) / scale;
+  const sampleY = 31 + 3.5 * size;
+  for (const background of ['#ffffff', '#000000', '#888888', '#4b2b1c', '#d5724a', '#f5e39c']) {
+    const a = sampleGrid(recorded, boundary - .5 / scale, sampleY, background);
+    const b = sampleGrid(recorded, boundary + .5 / scale, sampleY, background);
+    assert(Math.max(contrastRatio(a, rgb(background)), contrastRatio(b, rgb(background))) >= 1.7, `A small-cell boundary remains visible on ${background}`);
+    assert.deepEqual(sampleGrid(recorded, 23 + 3.5 * size, sampleY, background), rgb(background), 'Grid does not obscure the bead center or its code');
+  }
+}
+console.log('PASS small-grid contrast across light/dark beads; pixel-aligned fractional zoom; bead centers remain clear');
 
 assert.equal(rulerLabelStep(1.3), 20);
 assert.equal(rulerLabelStep(.9), 30);
@@ -91,12 +132,14 @@ assert(canvas.width < 1800 && canvas.height < 1400);
 const initialDimensions = canvases.map(c => c.dimensionWrites);
 const baseContext = canvases[1].getContext('2d');
 const originalBaseText = baseContext.calls.fillText || 0, originalBaseRects = baseContext.calls.fillRect || 0;
+const originalBaseFills = baseContext.calls.fill || 0;
 for (let i = 0; i < 8; i++) renderer.render({ ...state, hovered: i });
 assert.equal(callbacks.size, 1, 'Rapid hover updates are coalesced into one animation frame');
 flush();
 assert.deepEqual(canvases.map(c => c.dimensionWrites), initialDimensions, 'Hover must not resize either bitmap');
 assert.equal(baseContext.calls.fillText || 0, originalBaseText, 'Hover reuses the cached base text');
 assert.equal(baseContext.calls.fillRect || 0, originalBaseRects, 'Hover reuses the cached base beads');
+assert.equal(baseContext.calls.fill || 0, originalBaseFills, 'Hover reuses the cached grid paths');
 assert.equal(canvas.getContext('2d').calls.drawImage, 2, 'One visible base copy per presented frame');
 console.log('PASS hover rendering: one scheduled frame, no dimension resets and no bead/code redraw');
 
