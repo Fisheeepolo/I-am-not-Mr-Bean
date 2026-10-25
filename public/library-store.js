@@ -1,3 +1,5 @@
+import { estimatePatternEffort } from './pattern-effort.js';
+
 /** Local-only drawing library. Original images stay in this browser's IndexedDB. */
 const DATABASE_NAME = 'bead-studio-library-v1';
 const DATABASE_VERSION = 2;
@@ -70,6 +72,7 @@ export function createProjectSummary(record) {
     height: project.height,
     totalBeads,
     colorCount: used.size,
+    effort: estimatePatternEffort(project),
     doneCount: new Set(completed).size,
     thumbnail: typeof record.thumbnail === 'string' ? record.thumbnail : '',
     paletteName: String(project.palette.name || '自定义色卡'),
@@ -116,11 +119,28 @@ export async function listProjects() {
   const database = await openLibrary();
   return new Promise((resolve, reject) => {
     let transaction;
-    try { transaction = database.transaction(SUMMARY_STORE, 'readonly'); }
+    try { transaction = database.transaction([SUMMARY_STORE, PROJECT_STORE], 'readwrite'); }
     catch (error) { reject(storageError(error, '读取')); return; }
     const request = transaction.objectStore(SUMMARY_STORE).getAll();
     let summaries = [];
-    request.onsuccess = () => { summaries = request.result; };
+    request.onsuccess = () => {
+      summaries = request.result;
+      // Enrich old lightweight cards without rewriting their full drawing,
+      // original image, name, timestamps, or progress. Invalid old data stays
+      // readable as-is and can still be exported or repaired by its owner.
+      summaries.forEach((summary, index) => {
+        if (summary.effort?.version === 1) return;
+        const original = transaction.objectStore(PROJECT_STORE).get(summary.id);
+        original.onsuccess = () => {
+          if (!original.result?.project) return;
+          try {
+            const enriched = { ...summary, effort: estimatePatternEffort(original.result.project) };
+            transaction.objectStore(SUMMARY_STORE).put(enriched);
+            summaries[index] = enriched;
+          } catch { /* Do not erase incomplete historical records. */ }
+        };
+      });
+    };
     transaction.oncomplete = () => resolve(summaries.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)) || a.id.localeCompare(b.id)));
     transaction.onabort = () => reject(storageError(transaction.error || request.error, '读取'));
     transaction.onerror = () => {};

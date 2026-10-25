@@ -3,6 +3,8 @@ import { parsePalette } from './palette-import.js';
 import { openLibrary, listProjects, getProject, saveProject as storeProject, renameProject, deleteProject, normalizeProjectName, newProjectId } from './library-store.js';
 import { installAI } from './ai-workflow.js';
 import { createPatternRenderer, drawBeadGrid } from './pattern-renderer.js';
+import { estimatePatternEffort, getPatternBounds } from './pattern-effort.js';
+import { listBeadingSessions, getBeadingSession, createBeadingSession, findPendingSession, createSessionTimer } from './beading-sessions.js';
 
 const $ = id => document.getElementById(id);
  const canvas = $('patternCanvas');
@@ -22,6 +24,7 @@ let writeQueue=Promise.resolve(), openingProject=false, generationPromise=null, 
 let originalBlob=null, originalName='', savedOriginalBlob=null, savedOriginalName='';
 let aiEdited=false, savedAiEdited=false, sourceRevision=0, activeDraft=true, libraryMutation=false;
 let sourceTask=0;
+let sessionTimer=null,sessionView=false,sessionBusy=false,recordEntries=[],recordRequest=0;
 
 const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const paletteMap = () => new Map(activePalette.map(c => [c.code, c]));
@@ -51,11 +54,18 @@ function markParametersDirty(){if(suppressSaving)return;parametersDirty=true;set
 function setSaveStatus(text){$('saveState').textContent=text;if($('focusSaveStatus'))$('focusSaveStatus').textContent=text;}
 function beginSourceTask(message){const task=++sourceTask;loadingImage=true;openingProject=false;setSaveStatus(message);updateSourceControls();return task;}
 function finishSourceTask(task){if(task!==sourceTask)return;loadingImage=false;openingProject=false;updateSourceControls();}
-function saveSoon(){if(suppressSaving||!libraryReady||pendingImport||libraryMutation||!activeDraft)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>persistCurrent().catch(()=>{}),350);}
+function saveSoon(){if(sessionView){if(!suppressSaving&&!sessionReadOnly())sessionTimer?.setDone([...done]).catch(sessionError);return;}if(suppressSaving||!libraryReady||pendingImport||libraryMutation||!activeDraft)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>persistCurrent().catch(()=>{}),350);}
 function serializable() { return { format:'bead-studio', version:1, width:pattern.width, height:pattern.height, cells:pattern.cells, palette: {name:palettes[paletteId].name, colors:activePalette}, paletteId, customPalettes, projectName, isDemo, aiEdited:savedAiEdited, done:[...done], exclusions, settings:appliedSettings||readSettings(), savedAt:new Date().toISOString() }; }
-function createThumbnail(){const size=320,c=document.createElement('canvas');c.width=size;c.height=size;const g=c.getContext('2d');g.fillStyle='#faf8fc';g.fillRect(0,0,size,size);const unit=Math.min((size-40)/pattern.width,(size-40)/pattern.height),left=(size-pattern.width*unit)/2,top=(size-pattern.height*unit)/2,m=paletteMap();pattern.cells.forEach((code,i)=>{if(code!==null){g.fillStyle=m.get(code).hex;g.fillRect(left+i%pattern.width*unit,top+Math.floor(i/pattern.width)*unit,unit+.1,unit+.1);}});return c.toDataURL('image/png');}
+function createThumbnail(data=serializable()){
+ const size=320,c=document.createElement('canvas');c.width=size;c.height=size;const g=c.getContext('2d');g.fillStyle='#faf8fc';g.fillRect(0,0,size,size);
+ const bounds=getPatternBounds(data);if(!bounds)return c.toDataURL('image/png');
+ const unit=Math.min((size-22)/bounds.width,(size-22)/bounds.height),left=(size-bounds.width*unit)/2,top=(size-bounds.height*unit)/2;
+ const map=new Map(data.palette.colors.map(color=>[color.code,color]));
+ data.cells.forEach((code,i)=>{if(code!==null){g.fillStyle=map.get(code)?.hex||'#aaa';g.fillRect(left+(i%data.width-bounds.minX)*unit,top+(Math.floor(i/data.width)-bounds.minY)*unit,unit+.1,unit+.1);}});return c.toDataURL('image/png');
+}
 function persistCurrent(notify=false){
  clearTimeout(saveTimer);
+ if(sessionView){if(suppressSaving||sessionReadOnly())return Promise.resolve(false);return sessionTimer.setDone([...done]).then(()=>sessionTimer.flush()).then(()=>true);}
  if(suppressSaving||!pattern||libraryMutation||!activeDraft)return Promise.resolve(false);
  if(!libraryReady){setSaveStatus('仓库不可用 · 请导出备份');if(notify)toast('当前浏览器无法保存仓库，请先导出图纸备份。');return Promise.reject(new Error('仓库不可用'));}
  if(pendingImport){if(notify)toast('请先生成新图片的图纸。');return Promise.resolve(false);}
@@ -96,7 +106,7 @@ function restoreProject(data) {
 }
 
 function updateAll(fit=false) { if(!pattern) return; pattern.counts=counts(); $('projectName').textContent=projectName;if($('focusProjectName'))$('focusProjectName').textContent=projectName;if($('focusSummary'))$('focusSummary').textContent=`${pattern.width} × ${pattern.height} · ${total()} 颗 · ${Object.keys(counts()).length} 色`; $('projectMeta').textContent=`${pattern.width} × ${pattern.height} · ${isDemo?'原创示例':palettes[paletteId].name}`; $('statSize').textContent=`${pattern.width} × ${pattern.height}`; $('statTotal').textContent=total().toLocaleString(); $('statColors').textContent=Object.keys(pattern.counts).length+' 色'; $('totalBeads').textContent=total().toLocaleString(); $('colorCountBadge').textContent=Object.keys(pattern.counts).length+' 色'; $('colInput').max=pattern.width; $('rowInput').max=pattern.height; $('colInput').value=Math.min(+$('colInput').value||1,pattern.width); $('rowInput').value=Math.min(+$('rowInput').value||1,pattern.height); updateProgress(); renderColorList(); updateSelected(); if(fit) fitCanvas(); else draw(); saveSoon(); }
-function updateProgress(){ const n=total(); $('statProgress').textContent=(n?Math.round(done.size/n*100):0)+'%'; }
+function updateProgress(){ if($('statProgress'))$('statProgress').textContent=(total()?Math.round(done.size/total()*100):0)+'%'; }
 function fitCanvas(){ if(!pattern) return; const area=$('canvasArea');if(!area.clientWidth||!area.clientHeight)return; fitSize=Math.min((area.clientWidth-96)/pattern.width,(area.clientHeight-96)/pattern.height); fitSize=Math.max(1,Math.min(18,fitSize)); cellSize=fitSize; ruler=23; area.scrollLeft=0;area.scrollTop=0;draw(); }
 function contrast(hex){ const [r,g,b]=hexToRgb(hex);return r*.299+g*.587+b*.114>150?'#302b33':'#ffffff'; }
 function draw(){
@@ -119,7 +129,7 @@ function selectCell(index,scroll=true){
  selected=index;hovered=-1;const col=index%pattern.width,row=Math.floor(index/pattern.width);
  $('colInput').value=col+1;$('rowInput').value=row+1;updateSelected();updateColorNav();draw();if(scroll)scrollToCell(index);
 }
-function updateSelected(index=selected){if(index<0){$('selectedCode').textContent='选择一颗豆';$('selectedCoords').textContent='点击图纸查看色号与位置';$('selectedSwatch').style.background='#e5ddec';$('markDone').disabled=true;$('markDone').classList.remove('done');return;}const code=pattern.cells[index],color=paletteMap().get(code);$('selectedCode').textContent=code||'空白格';$('selectedCoords').textContent=`第 ${index%pattern.width+1} 列 · 第 ${Math.floor(index/pattern.width)+1} 行${done.has(index)?' · 已拼':''}`;$('selectedSwatch').style.background=color?.hex||'#fff';$('markDone').disabled=index!==selected||code===null;$('markDone').classList.toggle('done',done.has(index));}
+function updateSelected(index=selected){if(index<0){$('selectedCode').textContent='选择一颗豆';$('selectedCoords').textContent='点击图纸查看色号与位置';$('selectedSwatch').style.background='#e5ddec';$('markDone').disabled=true;$('markDone').classList.remove('done');return;}const code=pattern.cells[index],color=paletteMap().get(code);$('selectedCode').textContent=code||'空白格';$('selectedCoords').textContent=`第 ${index%pattern.width+1} 列 · 第 ${Math.floor(index/pattern.width)+1} 行${done.has(index)?' · 已拼':''}`;$('selectedSwatch').style.background=color?.hex||'#fff';$('markDone').disabled=index!==selected||code===null||sessionReadOnly();$('markDone').classList.toggle('done',done.has(index));}
 $('locateForm').onsubmit=e=>{e.preventDefault();if(!pattern)return;const col=+$('colInput').value,row=+$('rowInput').value;if(!Number.isInteger(col)||!Number.isInteger(row)||col<1||row<1||col>pattern.width||row>pattern.height){toast(`请输入 1–${pattern.width} 列、1–${pattern.height} 行。`);return;}selectCell((row-1)*pattern.width+col-1);canvas.focus({preventScroll:true});};
 canvas.addEventListener('keydown',e=>{
  if(!pattern)return;
@@ -133,7 +143,7 @@ canvas.addEventListener('keydown',e=>{
  else if(e.key.toLowerCase()==='n'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();nextUnfinished();}
  else if(e.key==='Escape'){highlighted=null;renderColorList();draw();}
 });
-function markSelected(){if(selected<0||pattern.cells[selected]===null)return;if(done.has(selected))done.delete(selected);else done.add(selected);updateSelected();updateProgress();updateColorNav();draw();saveSoon();}
+function markSelected(){if(sessionReadOnly())return;if(selected<0||pattern.cells[selected]===null)return;if(done.has(selected))done.delete(selected);else done.add(selected);updateSelected();updateProgress();updateColorNav();draw();saveSoon();}
 $('markDone').onclick=markSelected;
 function viewAnchor(){const area=$('canvasArea'),r=area.getBoundingClientRect();return selected>=0?selected:hitTest({clientX:r.left+area.clientWidth/2,clientY:r.top+area.clientHeight/2});}
 function zoom(factor){const old=cellSize,anchor=viewAnchor();cellSize=Math.max(Math.min(3,fitSize),Math.min(42,cellSize*factor));if(cellSize===old)return;hovered=-1;draw();if(anchor>=0)scrollToCell(anchor);}
@@ -141,7 +151,7 @@ $('zoomIn').onclick=()=>zoom(1.4);$('zoomOut').onclick=()=>zoom(1/1.4);$('fitBtn
 if($('readableZoom'))$('readableZoom').onclick=()=>{const anchor=viewAnchor();cellSize=Math.max(24,cellSize);$('showCodes').checked=true;setView('grid');if(anchor>=0)scrollToCell(anchor);toast('已放大显示每格色号，可拖动滚动条查看图纸。');};
 function setView(next){view=next;$('gridView').classList.toggle('active',next==='grid');$('beadView').classList.toggle('active',next==='bead');$('showCodes').disabled=next==='bead';$('showGrid').disabled=next==='bead';draw();}
 $('gridView').onclick=()=>setView('grid');$('beadView').onclick=()=>setView('bead');
-function renderColorList(){const map=paletteMap(), query=$('colorSearch').value.trim().toUpperCase();const items=Object.entries(counts()).sort((a,b)=>b[1]-a[1]);$('colorList').innerHTML=items.filter(([code])=>code.toUpperCase().includes(query)).map(([code,n])=>{const color=map.get(code);return `<div class="color-row ${highlighted===code?'active':''}"><button class="color-main" data-code="${escapeHTML(code)}" aria-pressed="${highlighted===code}" title="高亮 ${escapeHTML(code)}"><span class="color-swatch" style="background:${color.hex}"></span><span><strong>${escapeHTML(code)}</strong><small>${color.hex}</small></span></button><span class="color-quantity">${n}</span><button class="replace-button" data-replace="${escapeHTML(code)}" aria-label="替换 ${escapeHTML(code)}，查看相近色">⇄</button></div>`;}).join('')||'<div class="empty-list">没有找到这个色号</div>';$('clearHighlight').hidden=!highlighted;updateColorNav();}
+function renderColorList(){const map=paletteMap(), query=$('colorSearch').value.trim().toUpperCase();const items=Object.entries(counts()).sort((a,b)=>b[1]-a[1]);$('colorList').innerHTML=items.filter(([code])=>code.toUpperCase().includes(query)).map(([code,n])=>{const color=map.get(code);return `<div class="color-row ${highlighted===code?'active':''}"><button class="color-main" data-code="${escapeHTML(code)}" aria-pressed="${highlighted===code}" title="高亮 ${escapeHTML(code)}"><span class="color-swatch" style="background:${color.hex}"></span><span class="color-label"><strong>${escapeHTML(code)}</strong></span><span class="color-quantity">${n} 颗</span></button><button class="replace-button" data-replace="${escapeHTML(code)}" aria-label="替换 ${escapeHTML(code)}，查看相近色">⇄</button></div>`;}).join('')||'<div class="empty-list">没有找到这个色号</div>';$('clearHighlight').hidden=!highlighted;updateColorNav();}
 $('colorSearch').oninput=renderColorList;$('colorList').onclick=e=>{const main=e.target.closest('[data-code]'),replace=e.target.closest('[data-replace]');if(main){highlighted=highlighted===main.dataset.code?null:main.dataset.code;renderColorList();draw();if(highlighted) navigateColor(1,true);}if(replace)showAlternatives(replace.dataset.replace);};
 $('clearHighlight').onclick=()=>{highlighted=null;$('colorSearch').value='';renderColorList();draw();};
 function positionsFor(code){
@@ -198,7 +208,7 @@ function setDimensionInputs(width,height){$('gridWidth').value=width;$('gridHeig
 function syncRatio(changed){if(!imageSource||!$('keepRatio').checked){syncSizePresets();return;}const ratio=imageSource.width/imageSource.height;const clamp=n=>Math.max(8,Math.min(160,Math.round(n)));let width=+$('gridWidth').value,height=+$('gridHeight').value;const requested=changed==='width'?width:height;if(!Number.isInteger(requested)||requested<8||requested>160){syncSizePresets();return;}if(changed==='width'){height=clamp(width/ratio);width=clamp(height*ratio);}else{width=clamp(height*ratio);height=clamp(width/ratio);}setDimensionInputs(width,height);}
 $('gridWidth').onchange=()=>syncRatio('width');$('gridHeight').onchange=()=>syncRatio('height');$('keepRatio').onchange=()=>syncRatio('width');document.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>{setDimensionInputs(+b.dataset.size,+b.dataset.size);syncRatio('width');});$('maxColors').oninput=()=>$('maxColorsValue').textContent=$('maxColors').value;$('tolerance').oninput=()=>$('toleranceValue').textContent=$('tolerance').value;
 function updateSourceControls(){
- const busy=loadingImage||!!generationPromise;
+ const busy=loadingImage||!!generationPromise||sessionBusy;
  $('aiOptimizeBtn').disabled=!sourceBlob||busy;
  $('aiOptimizeBtn').textContent=loadingImage?'正在载入图片…':sourceBlob?'✦ 优化这张图片':'先上传图片，再用 AI 优化';
  $('restoreOriginalBtn').hidden=!aiEdited||!originalBlob;
@@ -207,7 +217,7 @@ function updateSourceControls(){
  $('undoBtn').title='撤销上一次图纸调整';
  $('undoBtn').disabled=busy||!undoStack.length;
  for(const id of ['saveProject','startBeading'])$(id).disabled=busy||!pattern;
- for(const id of ['navLibrary','libraryNew','openProject','uploadZone','changeImage','loadDemo'])$(id).disabled=!!generationPromise||!pattern;
+ for(const id of ['navLibrary','navRecords','libraryNew','openProject','uploadZone','changeImage','loadDemo'])if($(id))$(id).disabled=!!generationPromise||!pattern;
  const missing=!imageSource&&!isDemo&&!pendingImport;
  for(const id of ['gridWidth','gridHeight','maxColors','keepRatio','removeBackground','tolerance','generateBtn'])$(id).disabled=missing||busy;
  for(const id of ['paletteSelect','inventoryBtn','importPalette','restoreOriginalBtn'])$(id).disabled=busy||!pattern;
@@ -277,13 +287,15 @@ $('projectFile').onchange=async e=>{
  }catch(error){if(task===sourceTask){suppressSaving=false;setSaveStatus('打开未完成 · 当前图纸已保留');toast('打开失败：'+error.message);}}finally{finishSourceTask(task);}
 };
 $('sourceInfo').onclick=()=>modal('可追溯的色卡，安心选色',`<p>内置 MARD 291 色和 221 色来自开源社区整理的拼豆色卡数据，保留原有色号与 RGB。显示时会补齐数字位数，例如 H7 → H07。</p><p>这是屏幕参考色卡，并非品牌官方实测标准。显示器、拍摄和实物批次都会影响颜色，替代色的选择请结合商家实物色卡。</p><p><a class="footer-link" href="https://github.com/HansBug/pindou-color-data/tree/main/mard-291-github" target="_blank" rel="noopener">查看原始数据 ↗</a> · <a class="footer-link" href="./palette-LICENSE.txt" target="_blank">MIT 数据许可 ↗</a></p><div class="notice-box">通用版支持导入其他品牌或店铺色卡。不同品牌的同一编号可能代表不同颜色，请确认所选色卡再购买。</div>`,'COLOR DATA');
-$('helpBtn').onclick=()=>modal('从图片，到一颗颗拼好',`<ol><li><b>上传图片：</b>选择 PNG、JPG 或 WEBP。主体清晰、背景简单的图片更适合，透明 PNG 可以直接保留空白区域。</li><li><b>AI 优化（可选）：</b>先在 AI 配置里填写图片编辑接口、模型和密钥。上传照片后可转拼豆插画、简化背景或按文字微调；对比满意后采用。原图会保留，随时可恢复。</li><li><b>调整参数：</b>尺寸决定横纵各有多少颗豆；颜色越少越容易备豆。纯色背景可尝试勾选去除。</li><li><b>选择色卡：</b>内置 MARD 参考色卡，也能导入店铺色卡。库存中关闭缺货颜色，生成时会避开它们。</li><li><b>查看与替色：</b>点击清单色号高亮对应豆子，左右箭头逐颗查看；⇄ 可选择相近色，一键替换并更新数量。</li><li><b>快速定位：</b>X 是列，Y 是行，从左上角 (1,1) 开始。输入坐标直接定位，或点击图纸锁定。聚焦图纸后用方向键移动，空格标记已拼。</li><li><b>导出与保存：</b>PNG 图纸适合打印或平板查看，CSV 用于备料与核对。保存到仓库会保留原图、参数和进度，之后可继续编辑。</li></ol><div class="notice-box">放大后显示每格色号；每 10 格有辅助线。普通制图在本机浏览器处理；仅主动使用 AI 时，图片会发送到你配置的服务。图纸仓库保存于此浏览器，含本次导入的原图。开始拼豆进入简洁模式，点击图上豆子或颜色清单可高亮同色。下载的 JSON 备份不含原图。</div>`,'A LITTLE GUIDE');
+$('helpBtn').onclick=()=>modal('从图片，到一颗颗拼好',`<ol><li><b>上传图片：</b>选择 PNG、JPG 或 WEBP。主体清晰、背景简单的图片更适合，透明 PNG 可以直接保留空白区域。</li><li><b>AI 优化（可选）：</b>先在 AI 配置里填写图片编辑接口、模型和密钥。上传照片后可转拼豆插画、简化背景或按文字微调；对比满意后采用。原图会保留，随时可恢复。</li><li><b>调整参数：</b>尺寸决定横纵各有多少颗豆；颜色越少越容易备豆。纯色背景可尝试勾选去除。</li><li><b>选择色卡：</b>内置 MARD 参考色卡，也能导入店铺色卡。库存中关闭缺货颜色，生成时会避开它们。</li><li><b>查看与替色：</b>点击清单色号高亮对应豆子，左右箭头逐颗查看；⇄ 可选择相近色，一键替换并更新数量。</li><li><b>快速定位：</b>X 是列，Y 是行，从左上角 (1,1) 开始。输入坐标直接定位，或点击图纸锁定。聚焦图纸后用方向键移动，空格标记已拼。</li><li><b>计时与记录：</b>开始拼豆会自动计时；手动暂停、返回仓库或切换到后台时暂停。重新打开可继续，离线时间不计入；意外中断恢复最近一次备份。点击“完成”保存耗时和完成日期，可在“拼豆记录”查看。</li><li><b>导出与保存：</b>PNG 图纸适合打印或平板查看，CSV 用于备料与核对。保存到仓库会保留原图、参数和进度，之后可继续编辑。</li></ol><div class="notice-box">放大后显示每格色号；每 10 格有辅助线。普通制图在本机浏览器处理；仅主动使用 AI 时，图片会发送到你配置的服务。图纸仓库保存于此浏览器，含本次导入的原图。开始拼豆进入简洁模式，点击图上豆子或颜色清单可高亮同色。下载的 JSON 备份不含原图。</div>`,'A LITTLE GUIDE');
 
 
 function showScreen(next){
  screen=next;updateSourceControls();document.body.dataset.screen=next;
  $('navLibrary').classList.toggle('nav-active',next==='library');$('navLibrary').setAttribute('aria-current',next==='library'?'page':'false');
+ $('navRecords').classList.toggle('nav-active',next==='records');$('navRecords').setAttribute('aria-current',next==='records'?'page':'false');
  if(next==='library')renderLibrary();
+ else if(next==='records')renderRecords();
  else{
   if(next==='beading'){$('showCodes').checked=true;$('showGrid').checked=true;setView('grid');}
   renderColorList();
@@ -304,9 +316,9 @@ function showScreen(next){
 function renderLibrary(){
  const query=$('librarySearch').value.trim().toLowerCase(),sort=$('librarySort').value;
  const entries=libraryEntries.filter(p=>p.name.toLowerCase().includes(query)).sort(sort==='name'?(a,b)=>a.name.localeCompare(b.name,'zh-CN'):(a,b)=>b.updatedAt.localeCompare(a.updatedAt));
- $('libraryCount').textContent=libraryEntries.length;$('libraryTotalBeads').textContent=libraryEntries.reduce((n,p)=>n+p.totalBeads,0).toLocaleString();$('libraryInProgress').textContent=libraryEntries.filter(p=>p.doneCount>0&&p.doneCount<p.totalBeads).length;
+ $('libraryCount').textContent=libraryEntries.length;$('libraryTotalBeads').textContent=libraryEntries.reduce((n,p)=>n+p.totalBeads,0).toLocaleString();$('libraryInProgress').textContent=recordEntries.filter(p=>p.status==='in_progress').length;
  const newTile=`<button id="libraryNew" class="library-card library-new-card" type="button" data-new-project ${generationPromise||!pattern?'disabled':''}><span class="library-new-icon" aria-hidden="true">＋</span><strong>新建图纸</strong><span>上传图片，开始新的灵感</span></button>`;
- $('libraryGrid').innerHTML=newTile+entries.map(p=>{const percent=p.totalBeads?Math.round(p.doneCount/p.totalBeads*100):0;const id=escapeHTML(p.id),name=escapeHTML(p.name);return `<article class="library-card library-project-card"><div class="library-preview"><img src="${escapeHTML(p.thumbnail)}" alt="${name}的拼豆图纸" loading="lazy"><button class="delete-project library-trash" data-delete="${id}" type="button" aria-label="删除 ${name}" title="删除图纸"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5M14 11v5"/></svg></button><span class="library-card-badge">${p.width} × ${p.height}</span><div class="library-card-actions"><button class="button quiet library-edit" data-edit="${id}" type="button" aria-label="编辑 ${name}">编辑</button><button class="button primary library-start" data-start="${id}" type="button" aria-label="拼豆 ${name}">拼豆</button></div></div><div class="library-card-body"><h3><button class="library-name" data-rename="${id}" type="button" aria-label="修改名称 ${name}" title="点击修改名称">${name}</button></h3><div class="library-card-meta"><span>${p.totalBeads.toLocaleString()} 颗豆 · ${p.colorCount} 色</span><span>${p.doneCount?`${percent}% 已完成`:'等待开拼'}</span></div><div class="library-card-progress" role="progressbar" aria-label="${name}的拼豆进度" aria-valuenow="${percent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${percent}%"></span></div></div></article>`;}).join('');
+ $('libraryGrid').innerHTML=newTile+entries.map(p=>{const effort=p.effort;const id=escapeHTML(p.id),name=escapeHTML(p.name);return `<article class="library-card library-project-card"><div class="library-preview"><img src="${escapeHTML(p.thumbnail)}" alt="${name}的拼豆图纸" loading="lazy"><button class="delete-project library-trash" data-delete="${id}" type="button" aria-label="删除 ${name}" title="删除图纸"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5M14 11v5"/></svg></button><span class="library-card-badge">${p.width} × ${p.height}</span><div class="library-card-actions"><button class="button quiet library-edit" data-edit="${id}" type="button" aria-label="编辑 ${name}">编辑</button><button class="button primary library-start" data-start="${id}" type="button" aria-label="拼豆 ${name}">拼豆</button></div></div><div class="library-card-body"><h3><button class="library-name" data-rename="${id}" type="button" aria-label="修改名称 ${name}" title="点击修改名称">${name}</button></h3><div class="library-card-meta"><span>${p.totalBeads.toLocaleString()} 颗豆 · ${p.colorCount} 色</span></div><div class="library-estimate" title="按豆数、颜色与零碎色块估算；实际时间因熟练度而异"><span>${escapeHTML(effort?.difficulty||'待评估')}</span><span>预计 ${escapeHTML(effort?.label?.replace(/^约/,'')||'—')}</span></div></div></article>`;}).join('');
  if(!entries.length&&query)$('libraryGrid').insertAdjacentHTML('beforeend','<div class="library-empty library-search-empty"><h3>没有找到这份图纸</h3><p>试试其他名称，或创建新的图纸。</p></div>');
 }
 function releasePreparedSource(prepared){if(prepared?.url)URL.revokeObjectURL(prepared.url);}
@@ -362,19 +374,96 @@ async function openSavedProject(id,next='editor'){
   prepared=await prepareSource(record.sourceBlob,record.sourceName,task);if(!prepared)return false;
   // Do not replace any current drawing state until the complete new source can be read.
   suppressSaving=true;pendingImport=false;parametersDirty=false;restoreProject(record.project);currentProjectId=record.id;currentCreatedAt=record.createdAt;applyPreparedSource(prepared);prepared=null;
-  originalBlob=savedOriginalBlob=record.originalBlob;originalName=savedOriginalName=record.originalName;aiEdited=savedAiEdited=!!record.project.aiEdited;activeDraft=true;undoStack=[];$('colorSearch').value='';suppressSaving=false;setSaveStatus('已保存到本机仓库');showScreen(next);return true;
+  originalBlob=savedOriginalBlob=record.originalBlob;originalName=savedOriginalName=record.originalName;aiEdited=savedAiEdited=!!record.project.aiEdited;activeDraft=true;undoStack=[];$('colorSearch').value='';suppressSaving=false;setSaveStatus('已保存到本机仓库');showScreen(next==='beading'?'editor':next);if(next==='beading'){finishSourceTask(task);return await startBeading();}return true;
  }catch(e){if(task===sourceTask){suppressSaving=false;setSaveStatus('打开未完成 · 当前图纸已保留');toast(e.message);}return false;}
  finally{releasePreparedSource(prepared);finishSourceTask(task);}
 }
 async function ensureGenerated(){if(loadingImage){toast('原图正在载入，请稍后。');return false;}if(parametersDirty&&!pendingImport&&!imageSource&&!isDemo){applySettings(appliedSettings);parametersDirty=false;toast('此旧图纸未附原图，已保留原有参数，可继续拼豆。');}if(pendingImport||parametersDirty)return await generate();return !!pattern;}
-async function goLibrary(){if(!(await ensureGenerated()))return;try{await persistCurrent();showScreen('library');}catch{}}
-async function startBeading(){if(!(await ensureGenerated()))return;activeDraft=true;if(!total()){toast('图纸还没有豆子，请调整参数后重新生成。');return;}try{await persistCurrent();highlighted=null;$('colorSearch').value='';showScreen('beading');}catch{}}
-$('navLibrary').onclick=goLibrary;$('focusLibrary').onclick=goLibrary;
-$('exitBeading').onclick=()=>showScreen('editor');$('startBeading').onclick=startBeading;
+function sessionError(error){const message=error?.message||'拼豆记录保存失败，请重试。';if($('timerState'))$('timerState').textContent=message;if($('recordStatus'))$('recordStatus').textContent=message;toast(message);}
+function sessionReadOnly(){const record=sessionTimer?.current();return sessionView&&(!record||record.status==='completed'||record.lockedElsewhere);}
+function elapsedLabel(ms){const seconds=Math.floor(Math.max(0,Number(ms)||0)/1000);return [Math.floor(seconds/3600),Math.floor(seconds/60)%60,seconds%60].map(n=>String(n).padStart(2,'0')).join(':');}
+function recordDate(value){const date=new Date(value);return Number.isNaN(date.getTime())?'—':date.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});}
+function renderTimer(record=sessionTimer?.current()){
+ if(!$('beadingTimer'))return;
+ $('beadingTimer').textContent=elapsedLabel(record?.elapsedMs);
+ const completed=record?.status==='completed';
+ $('timerState').textContent=!record?'尚未开始':completed?'已完成 · '+recordDate(record.completedAt):record.lockedElsewhere?'其他页面正在拼这份图纸':record.running?'计时中':'已暂停';
+ $('pauseTimer').textContent=record?.running?'暂停':'继续';$('pauseTimer').hidden=completed;
+ $('pauseTimer').disabled=sessionBusy||!record;$('completeBeading').disabled=sessionBusy||!record||completed||record.lockedElsewhere;
+ $('completeBeading').textContent=completed?'已完成':'完成';
+ if(sessionView)updateSelected();
+}
+function timer(){return sessionTimer||(sessionTimer=createSessionTimer({onChange:renderTimer,onError:sessionError}));}
+async function refreshRecords(){
+ const request=++recordRequest;
+ try{const entries=await listBeadingSessions();if(request!==recordRequest)return;recordEntries=entries;$('libraryInProgress').textContent=entries.filter(r=>r.status==='in_progress').length;$('recordStatus').textContent='';renderRecords();}
+ catch(error){if(request===recordRequest)sessionError(error);}
+}
+function renderRecords(){
+ const filter=$('recordFilter').value,entries=recordEntries.filter(r=>filter==='all'||r.status===filter).sort((a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt)));
+ $('recordCount').textContent=recordEntries.length+' 份记录';
+ $('recordGrid').innerHTML=entries.map(record=>{
+  const complete=record.status==='completed',id=escapeHTML(record.id),name=escapeHTML(record.name);
+  return `<article class="library-card library-project-card record-card ${complete?'is-completed':'is-progress'}"><div class="library-preview record-preview"><img src="${escapeHTML(record.thumbnail)}" alt="${name}的拼豆记录"><span class="record-status ${complete?'completed':'in-progress'}">${complete?'已完成':'进行中'}</span><span class="library-card-badge">${record.width} × ${record.height}</span><div class="library-card-actions record-actions"><button class="button ${complete?'quiet':'primary'}" data-record="${id}">${complete?'查看图纸':'继续拼豆'}</button></div></div><div class="library-card-body"><h3 class="record-name" title="${name}">${name}</h3><div class="record-meta"><span>${record.totalBeads.toLocaleString()} 颗 · ${record.colorCount} 色</span><strong>${elapsedLabel(record.elapsedMs)}</strong></div><div class="record-meta"><span>${complete?'完成':'开始'} ${recordDate(complete?record.completedAt:record.startedAt)}</span></div></div></article>`;
+ }).join('')||'<div class="library-empty"><h3>还没有'+(filter==='completed'?'已完成的':filter==='in_progress'?'进行中的':'')+'拼豆记录</h3><p>从图纸仓库选择“拼豆”即可开始。</p></div>';
+}
+async function showBeadingRecord(record,autoStart=true){
+ validateProject(record.project);clearTimeout(saveTimer);
+ await timer().open(record.id,{autoStart:record.status!=='completed'&&autoStart});
+ const restored=timer().current();if(!restored)throw new Error('无法打开拼豆记录，请重试。');
+ suppressSaving=true;sessionView=true;activeDraft=false;pendingImport=false;parametersDirty=false;
+ restoreProject(restored.project);currentProjectId=restored.projectId;currentCreatedAt=null;
+ applyPreparedSource({img:null,url:null,blob:null,name:''});originalBlob=savedOriginalBlob=null;originalName=savedOriginalName='';aiEdited=savedAiEdited=false;
+ undoStack=[];$('colorSearch').value='';suppressSaving=false;
+ $('focusLibrary').textContent='回到记录';$('exitBeading').textContent='← 返回图纸';
+ setSaveStatus('记录自动保存');showScreen('beading');renderTimer();
+ if(restored.lockedElsewhere)toast('这份记录正在另一个页面打开；请在另一页返回记录仓库或关闭后再继续。');
+}
+async function leaveBeadingRecord(){
+ if(!sessionView)return;
+ if(!sessionReadOnly())await timer().setDone([...done]);
+ await timer().detach();sessionView=false;activeDraft=false;currentProjectId=null;currentCreatedAt=null;clearTimeout(saveTimer);
+}
+async function goLibrary(){
+ if(sessionBusy)return;
+ try{if(sessionView)await leaveBeadingRecord();else{if(!(await ensureGenerated()))return;await persistCurrent();}await refreshRecords();showScreen('library');}catch(error){sessionError(error);}
+}
+async function goRecords(){
+ if(sessionBusy)return;
+ try{if(sessionView)await leaveBeadingRecord();else{if(!(await ensureGenerated()))return;await persistCurrent();}await refreshRecords();showScreen('records');}catch(error){sessionError(error);}
+}
+async function startBeading(){
+ if(sessionBusy)return false;
+ sessionBusy=true;updateSourceControls();
+ try{
+  if(!(await ensureGenerated()))return false;
+  if(!total()){toast('图纸还没有豆子，请调整参数后重新生成。');return false;}
+  activeDraft=true;await persistCurrent();
+  const project=structuredClone(serializable());
+  let record=await findPendingSession(currentProjectId,project);
+  if(!record)record=await createBeadingSession({projectId:currentProjectId,name:projectName,thumbnail:createThumbnail(),width:pattern.width,height:pattern.height,totalBeads:total(),colorCount:Object.keys(counts()).length,project:{...project,done:[]}});
+  await showBeadingRecord(record);return true;
+ }catch(error){sessionError(error);return false;}finally{sessionBusy=false;updateSourceControls();renderTimer();}
+}
+async function openRecord(id){
+ if(sessionBusy)return false;sessionBusy=true;
+ try{const record=await getBeadingSession(id);if(!record)throw new Error('找不到这份拼豆记录。');await showBeadingRecord(record);return true;}
+ catch(error){sessionError(error);return false;}finally{sessionBusy=false;renderTimer();}
+}
+$('navLibrary').onclick=goLibrary;$('navRecords').onclick=goRecords;$('focusLibrary').onclick=goRecords;
+$('recordFilter').onchange=renderRecords;$('recordGrid').onclick=e=>{const button=e.target.closest('[data-record]');if(button)openRecord(button.dataset.record);};
+$('exitBeading').onclick=async()=>{if(sessionBusy)return;const id=timer().current()?.projectId;try{await leaveBeadingRecord();if(!id||!await openSavedProject(id,'editor')){await refreshRecords();showScreen('library');}}catch(error){sessionError(error);}};
+$('pauseTimer').onclick=async()=>{if(sessionBusy)return;sessionBusy=true;renderTimer();try{if(timer().current()?.running)await timer().pause();else await timer().resume();}catch(error){sessionError(error);}finally{sessionBusy=false;renderTimer();}};
+$('completeBeading').onclick=async()=>{
+ if(sessionBusy||sessionReadOnly())return;sessionBusy=true;renderTimer();
+ try{await timer().setDone([...done]);await timer().complete();await leaveBeadingRecord();await refreshRecords();showScreen('records');toast('已完成，累计耗时和完成时间已保存。');}
+ catch(error){sessionError(error);}finally{sessionBusy=false;renderTimer();}
+};
+$('startBeading').onclick=startBeading;
 document.querySelector('.brand').onclick=e=>{e.preventDefault();goLibrary();};
 $('librarySearch').oninput=renderLibrary;$('librarySort').onchange=renderLibrary;
 $('libraryGrid').onclick=e=>{
- if(libraryMutation||openingProject)return;
+ if(libraryMutation||openingProject||sessionBusy)return;
  const create=e.target.closest('[data-new-project]'),rename=e.target.closest('[data-rename]'),remove=e.target.closest('[data-delete]'),edit=e.target.closest('[data-edit]'),start=e.target.closest('[data-start]');
  if(create){if(!create.disabled)$('imageFile').click();}else if(rename)showRename(rename.dataset.rename);else if(remove)showDelete(remove.dataset.delete);else if(edit)openSavedProject(edit.dataset.edit,'editor');else if(start)openSavedProject(start.dataset.start,'beading');
 };
@@ -398,7 +487,7 @@ function showRename(id){
 }
 function showDelete(id){
  const entry=libraryEntries.find(p=>p.id===id);if(!entry)return;
- modal('确认删除这份图纸？',`<div class="confirm-project-thumb"><img src="${escapeHTML(entry.thumbnail)}" alt="待删除图纸预览"><div><strong>${escapeHTML(entry.name)}</strong><p>${entry.width} × ${entry.height} · ${entry.totalBeads.toLocaleString()} 颗豆</p></div></div><p>将从本机仓库删除这份图纸、保存的图片、参数和拼豆进度。此操作无法撤销，请确认名称后再删除。</p><p id="deleteError" class="ai-error-line" role="alert" hidden></p><div class="modal-buttons"><button class="button quiet" id="deleteCancel" autofocus>取消，保留图纸</button><button class="button danger-button" id="deleteConfirm">确认删除</button></div>`,'DELETE DRAWING');
+ modal('确认删除这份图纸？',`<div class="confirm-project-thumb"><img src="${escapeHTML(entry.thumbnail)}" alt="待删除图纸预览"><div><strong>${escapeHTML(entry.name)}</strong><p>${entry.width} × ${entry.height} · ${entry.totalBeads.toLocaleString()} 颗豆</p></div></div><p>将从本机仓库删除这份图纸、保存的图片、参数和拼豆进度。此操作无法撤销，请确认名称后再删除。已有的拼豆记录会保留。</p><p id="deleteError" class="ai-error-line" role="alert" hidden></p><div class="modal-buttons"><button class="button quiet" id="deleteCancel" autofocus>取消，保留图纸</button><button class="button danger-button" id="deleteConfirm">确认删除</button></div>`,'DELETE DRAWING');
  $('deleteCancel').onclick=closeModal;$('deleteCancel').focus();
  $('deleteConfirm').onclick=async()=>{
   if(libraryMutation)return;libraryMutation=true;clearTimeout(saveTimer);$('deleteConfirm').disabled=true;
@@ -424,7 +513,7 @@ async function init(){updateSourceControls();try{
  let restored=false;if(libraryEntries.length){await openSavedProject([...libraryEntries].sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt))[0].id,'library');restored=!!pattern;}
  if(!restored){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw&&!localStorage.getItem(INITIALIZED_KEY)){restoreProject(JSON.parse(raw));restored=true;}}catch{}}
  if(!restored){try{activeDraft=!localStorage.getItem(INITIALIZED_KEY);}catch{}pattern=makeDemo(52,52,activePalette);appliedSettings=readSettings();updateAll(true);}
- suppressSaving=false;if(!currentProjectId&&libraryReady&&activeDraft)await persistCurrent();$('canvasLoading').hidden=true;showScreen('library');
- let resizeTimer;new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(screen!=='library'&&Math.abs(cellSize-fitSize)<.1)fitCanvas();},100);}).observe($('canvasArea'));
+ suppressSaving=false;if(!currentProjectId&&libraryReady&&activeDraft)await persistCurrent();await refreshRecords();$('canvasLoading').hidden=true;showScreen('library');
+ let resizeTimer;new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if((screen==='editor'||screen==='beading')&&Math.abs(cellSize-fitSize)<.1)fitCanvas();},100);}).observe($('canvasArea'));
 }catch(e){$('canvasLoading').textContent='载入失败，请刷新页面重试。';$('libraryStatus').textContent='载入失败：'+e.message;toast(e.message);}}
 init();
