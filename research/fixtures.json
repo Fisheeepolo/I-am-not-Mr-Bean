@@ -1,0 +1,196 @@
+[
+  {
+    "id": "rare-eyes",
+    "title": "小面积眼睛与近似肤色",
+    "split": "development",
+    "sourceWidth": 192,
+    "sourceHeight": 192,
+    "width": 48,
+    "height": 48,
+    "source": "data/rare-eyes.rgba",
+    "png": "data/rare-eyes.png",
+    "sha256": "c53f7acd4961bf19695c7b1a887fe11897a0bdc056542c08e975d46c3e50864e",
+    "markers": [
+      {
+        "x": 16,
+        "y": 20,
+        "hex": "#201C24",
+        "name": "eye"
+      },
+      {
+        "x": 31,
+        "y": 20,
+        "hex": "#201C24",
+        "name": "eye"
+      }
+    ],
+    "note": "Original procedural fixture; no AI"
+  },
+  {
+    "id": "heldout-face",
+    "title": "保留组：另一尺寸的人脸",
+    "split": "heldout",
+    "sourceWidth": 256,
+    "sourceHeight": 256,
+    "width": 64,
+    "height": 64,
+    "source": "data/heldout-face.rgba",
+    "png": "data/heldout-face.png",
+    "sha256": "9528b2c7fbefa50b2e1085453ecfbfa06332b32841a0817853f37139bf872cf6",
+    "markers": [
+      {
+        "x": 22,
+        "y": 27,
+        "hex": "#201C24",
+        "name": "eye"
+      },
+      {
+        "x": 41,
+        "y": 27,
+        "hex": "#201C24",
+        "name": "eye"
+      }
+    ],
+    "note": "Original procedural fixture; no AI"
+  },
+  {
+    "id": "noisy-flat",
+    "title": "低对比杂点与连续轮廓",
+    "split": "development",
+    "sourceWidth": 192,
+    "sourceHeight": 192,
+    "width": 48,
+    "height": 48,
+    "source": "data/noisy-flat.rgba",
+    "png": "data/noisy-flat.png",
+    "sha256": "acc9dcac300a52feac63777f96b49c5341b2be8063e624c97b56fa48cd3c5bf7",
+    "markers": [],
+    "note": "Original procedural fixture; no AI"
+  },
+  {
+    "id": "heldout-noise",
+    "title": "保留组：平涂与纹理",
+    "split": "heldout",
+    "sourceWidth": 256,
+    "sourceHeight": 256,
+    "width": 64,
+    "height": 64,
+    "source": "data/heldout-noise.rgba",
+    "png": "data/heldout-noise.png",
+    "sha256": "c080f9eb390fbcbb86951b4e6879009dd9ac75d331b0f6aa72fe1ca632846503",
+    "markers": [],
+    "note": "Original procedural fixture; no AI"
+  },
+  {
+    "id": "thin-lines",
+    "title": "细线、网格与圆弧",
+    "split": "development",
+    "sourceWidth": 192,
+    "sourceHeight": 192,
+    "width": 48,
+    "height": 48,
+    "source": "data/thin-lines.rgba",
+    "png": "data/thin-lines.png",
+    "sha256": "303cffec456cc97255021baf77bb357d18b17377e7869b4b3ce2cb1e7d81f680",
+    "markers": [],
+    "note": "Original procedural fixture; no AI"
+  },
+  {
+    "id": "gradient",
+    "title": "平滑渐变",
+    "split": "development",
+    "sourceWidth": 192,
+    "sourceHeight": 192,
+    "width": 48,
+    "height": 48,
+    "source": "data/gradient.rgba",
+    "png": "data/gradient.png",
+    "sha256": "8cf261e42572ba929fb8ab31ba999cc5079a07a2e06bac873a306c17e1533400",
+    "markers": [],
+    "note": "Original procedural fixture; no AI"
+  },
+  {
+    "id": "transparent",
+    "title": "透明底与斜向轮廓",
+    "split": "development",
+    "sourceWidth": 192,
+    "sourceHeight": 192,
+    "width": 48,
+    "height": 48,
+    "source": "data/transparent.rgba",
+    "png": "data/transparent.png",
+    "sha256": "f0627f9697174b1270e59824d4c08603854a24a26a374fcbd7ebce0efff486af",
+    "markers": [],
+    "note": "Original procedural fixture; no AI"
+  },
+  {
+    "id": "pixel-icon",
+    "title": "现成像素画无损输入",
+    "split": "development",
+    "sourceWidth": 96,
+    "sourceHeight": 96,
+    "width": 96,
+    "height": 96,
+    "source": "data/pixel-icon.rgba",
+    "png": "data/pixel-icon.png",
+    "sha256": "2b0ea4c6598972a6c2ee4888710606d3e74d96cec9da104cbb82216c39970562",
+    "markers": [],
+    "note": "Original procedural fixture; no AI"
+  },
+  {
+    "id": "heldout-landscape",
+    "title": "保留组：平涂风景",
+    "split": "heldout",
+    "sourceWidth": 256,
+    "sourceHeight": 192,
+    "width": 64,
+    "height": 48,
+    "source": "data/heldout-landscape.rgba",
+    "png": "data/heldout-landscape.png",
+    "sha256": "dcafe67dbba33168db2536177f09960437f85fcbf27dbf7303ef1a6159389561",
+    "markers": [],
+    "note": "Original procedural fixture; no AI"
+  },
+  {
+    "id": "photo-astronaut",
+    "title": "真实照片：宇航员",
+    "split": "development",
+    "sourceWidth": 320,
+    "sourceHeight": 320,
+    "width": 64,
+    "height": 64,
+    "source": "data/photo-astronaut.rgba",
+    "png": "data/photo-astronaut.png",
+    "sha256": "cc9862cc2ea5c50b9c935e3b7436a4fa6d75e9b4a2f028a8ccdf4def5139d4b5",
+    "markers": [],
+    "note": "NASA; public domain / no known copyright restrictions; official scikit-image v0.25.2 data"
+  },
+  {
+    "id": "photo-chelsea",
+    "title": "保留组：猫咪照片",
+    "split": "heldout",
+    "sourceWidth": 320,
+    "sourceHeight": 213,
+    "width": 64,
+    "height": 43,
+    "source": "data/photo-chelsea.rgba",
+    "png": "data/photo-chelsea.png",
+    "sha256": "451abd7d74daf3a805c3094e1cd18c27ee7eb1e9208ca1258e3e1ce596dd7817",
+    "markers": [],
+    "note": "Stefan van der Walt; CC0; official scikit-image v0.25.2 data"
+  },
+  {
+    "id": "photo-rocket",
+    "title": "保留组：火箭照片",
+    "split": "heldout",
+    "sourceWidth": 320,
+    "sourceHeight": 214,
+    "width": 64,
+    "height": 43,
+    "source": "data/photo-rocket.rgba",
+    "png": "data/photo-rocket.png",
+    "sha256": "00fb709c134e363abf331fa359ad417e043a4ca7baa256bfaf1e3ab512b94559",
+    "markers": [],
+    "note": "SpaceX; public domain; official scikit-image v0.25.2 data"
+  }
+]

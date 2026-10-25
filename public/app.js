@@ -1,3 +1,4 @@
+import {sampleImageForPattern} from './image-sampling.js';
 import { generatePattern, makeDemo, nearestColors, countCells, replaceColor, hexToRgb } from './engine.js';
 import { parsePalette } from './palette-import.js';
 import { openLibrary, listProjects, getProject, saveProject as storeProject, renameProject, deleteProject, normalizeProjectName, newProjectId } from './library-store.js';
@@ -46,9 +47,10 @@ function updateAvailable() { $('availableInfo').textContent = `${availablePalett
 function syncPaletteOptions() { $('paletteSelect').innerHTML = Object.entries(palettes).map(([id,p]) => `<option value="${escapeHTML(id)}">${escapeHTML(p.name)}</option>`).join(''); $('paletteSelect').value = paletteId; }
 function snapshot() { return { pattern: structuredClone(pattern), done: [...done], paletteId, customPalettes: structuredClone(customPalettes), projectName, isDemo, settings:structuredClone(appliedSettings), sourceBlob:savedSourceBlob, sourceName:savedSourceName, originalBlob:savedOriginalBlob, originalName:savedOriginalName, aiEdited:savedAiEdited }; }
 function pushUndo() { undoStack.push(snapshot()); if (undoStack.length > 15) undoStack.shift(); $('undoBtn').disabled = false; }
-function readSettings(){return {imageStyle:$('imageStyle').value,shopId:$('buyerShop').value,width:+$('gridWidth').value,height:+$('gridHeight').value,maxColors:+$('maxColors').value,keepRatio:$('keepRatio').checked,removeBackground:$('removeBackground').checked,backgroundTolerance:+$('tolerance').value};}
+function readSettings(){return {optimizationMode:$('optimizationMode').value,imageStyle:$('imageStyle').value,shopId:$('buyerShop').value,width:+$('gridWidth').value,height:+$('gridHeight').value,maxColors:+$('maxColors').value,keepRatio:$('keepRatio').checked,removeBackground:$('removeBackground').checked,backgroundTolerance:+$('tolerance').value};}
 function applySettings(settings){
  const value=settings||{};
+ $('optimizationMode').value=['detail','balanced','easy'].includes(value.optimizationMode)?value.optimizationMode:'balanced';
  $('imageStyle').value=['original','clean','vivid'].includes(value.imageStyle)?value.imageStyle:'original';syncBuyerShops(value.shopId||'');
  const clamp=(n,min,max,fallback)=>Number.isFinite(+n)?Math.max(min,Math.min(max,Math.round(+n))):fallback;
  setDimensionInputs(clamp(value.width,8,160,pattern.width),clamp(value.height,8,160,pattern.height));
@@ -62,7 +64,7 @@ function setSaveStatus(text){$('saveState').textContent=text;if($('focusSaveStat
 function beginSourceTask(message){const task=++sourceTask;loadingImage=true;openingProject=false;setSaveStatus(message);updateSourceControls();return task;}
 function finishSourceTask(task){if(task!==sourceTask)return;loadingImage=false;openingProject=false;updateSourceControls();}
 function saveSoon(){if(sessionView){if(!suppressSaving&&!sessionReadOnly())sessionTimer?.setDone([...done]).catch(sessionError);return;}if(suppressSaving||!libraryReady||pendingImport||libraryMutation||!activeDraft)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>persistCurrent().catch(()=>{}),350);}
-function serializable() { return { format:'bead-studio', version:1, width:pattern.width, height:pattern.height, cells:pattern.cells, palette: {name:palettes[paletteId].name, colors:activePalette}, paletteId, customPalettes, projectName, isDemo, aiEdited:savedAiEdited, done:[...done], exclusions, settings:appliedSettings||readSettings(), savedAt:new Date().toISOString() }; }
+function serializable() { return { format:'bead-studio', version:1, algorithm:pattern.algorithm||'legacy', width:pattern.width, height:pattern.height, cells:pattern.cells, palette: {name:palettes[paletteId].name, colors:activePalette}, paletteId, customPalettes, projectName, isDemo, aiEdited:savedAiEdited, done:[...done], exclusions, settings:appliedSettings||readSettings(), savedAt:new Date().toISOString() }; }
 function createThumbnail(data=serializable()){
  const size=320,c=document.createElement('canvas');c.width=size;c.height=size;const g=c.getContext('2d');g.fillStyle='#faf8fc';g.fillRect(0,0,size,size);
  const bounds=getPatternBounds(data);if(!bounds)return c.toDataURL('image/png');
@@ -104,7 +106,7 @@ function restoreProject(data) {
   while(Object.hasOwn(palettes,id)) id=root+'-'+suffix++;
   customPalettes[id]=p; palettes[id]=p;
  }
- syncPaletteOptions(); setPalette(id); pattern={width:data.width,height:data.height,cells:[...data.cells]}; projectName=String(data.projectName||'我的拼豆图纸').slice(0,80); isDemo=!!data.isDemo; done=new Set(data.done||[]); exclusions={};
+ syncPaletteOptions(); setPalette(id); pattern={width:data.width,height:data.height,cells:[...data.cells],algorithm:data.algorithm==='local-structure-v2'?data.algorithm:'legacy'}; projectName=String(data.projectName||'我的拼豆图纸').slice(0,80); isDemo=!!data.isDemo; done=new Set(data.done||[]); exclusions={};
  if(data.exclusions && typeof data.exclusions==='object') for(const [key,value] of Object.entries(data.exclusions)) {
   const restoredKey=key===data.paletteId?id:key;
   if(Object.hasOwn(palettes,restoredKey) && Array.isArray(value)) exclusions[restoredKey]=value.filter(c=>palettes[restoredKey].colors.some(p=>p.code===c));
@@ -204,7 +206,7 @@ async function loadImage(file){
   if(task!==sourceTask)return;
   applyPreparedSource(prepared,{commit:false});prepared=null;
   originalBlob=file;originalName=file.name;aiEdited=false;pendingImport=true;parametersDirty=true;
-  $('imageStyle').value='original';setDimensionInputs(52,52);
+  $('imageStyle').value='original';$('optimizationMode').value='balanced';setDimensionInputs(52,52);
   setSaveStatus('新图片待生成');showScreen('editor');if($('keepRatio').checked)syncRatio('width');toast('选择尺寸和风格后，生成图纸。');return true;
  }catch(error){if(task===sourceTask){setSaveStatus('载入未完成 · 当前图纸已保留');toast(error.message||'无法读取这张图片，请更换图片。');}}
  finally{releasePreparedSource(prepared);finishSourceTask(task);}
@@ -227,7 +229,7 @@ function updateSourceControls(){
  $('exportBtn').disabled=busy||pendingImport||!pattern;
  for(const id of ['navLibrary','navRecords','navHost','libraryNew','openProject','difficultyExamplesBtn'])if($(id))$(id).disabled=!!generationPromise||!pattern;
  const missing=!imageSource&&!isDemo&&!pendingImport;
- for(const id of ['gridWidth','gridHeight','maxColors','keepRatio','removeBackground','tolerance','imageStyle','generateBtn'])$(id).disabled=missing||busy;
+ for(const id of ['gridWidth','gridHeight','maxColors','keepRatio','removeBackground','tolerance','imageStyle','optimizationMode','generateBtn'])$(id).disabled=missing||busy;
  for(const id of ['paletteSelect','buyerShop','applyShopColors','restoreOriginalBtn'])$(id).disabled=busy||!pattern;
  document.querySelectorAll('[data-size]').forEach(b=>b.disabled=missing||busy);
  document.body.dataset.pendingImport=String(pendingImport);
@@ -250,8 +252,20 @@ async function runGeneration(){
  try{
   let next;
   const off=document.createElement('canvas');off.width=width;off.height=height;const c=off.getContext('2d',{willReadFrequently:true});
-  if(original){c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';if(settings.keepRatio){const scale=Math.min(width/original.width,height/original.height),dw=original.width*scale,dh=original.height*scale;c.drawImage(original,(width-dw)/2,(height-dh)/2,dw,dh);}else c.drawImage(original,0,0,width,height);next=generatePattern(applyImageStyle(c.getImageData(0,0,width,height),width,height,settings.imageStyle),width,height,available,{maxColors:settings.maxColors,removeBackground:settings.removeBackground,backgroundTolerance:settings.backgroundTolerance});}
-  else{const demo=makeDemo(width,height,available),m=new Map(available.map(a=>[a.code,a]));demo.cells.forEach((code,i)=>{if(code){c.fillStyle=m.get(code).hex;c.fillRect(i%width,Math.floor(i/width),1,1);}});next=generatePattern(applyImageStyle(c.getImageData(0,0,width,height),width,height,settings.imageStyle),width,height,available,{maxColors:settings.maxColors});}
+  const conversionOptions={maxColors:settings.maxColors,optimizationMode:settings.optimizationMode};
+  if(original){
+   // Retain up to four source samples per target axis before local processing.
+   // Avoid inventing interpolation shades when enlarging native pixel art.
+   const factor=Math.min(4,Math.max(1,Math.max(original.width/width,original.height/height)));
+   off.width=Math.round(width*factor);off.height=Math.round(height*factor);
+   c.imageSmoothingEnabled=original.width>off.width||original.height>off.height;c.imageSmoothingQuality='high';
+   if(settings.keepRatio){const scale=Math.min(off.width/original.width,off.height/original.height),dw=original.width*scale,dh=original.height*scale;c.drawImage(original,(off.width-dw)/2,(off.height-dh)/2,dw,dh);}else c.drawImage(original,0,0,off.width,off.height);
+   const sampled=sampleImageForPattern(c.getImageData(0,0,off.width,off.height),off.width,off.height,width,height,conversionOptions);
+   next=generatePattern(applyImageStyle(sampled,width,height,settings.imageStyle),width,height,available,{...conversionOptions,removeBackground:settings.removeBackground,backgroundTolerance:settings.backgroundTolerance});
+  }else{
+   const demo=makeDemo(width,height,available),m=new Map(available.map(a=>[a.code,a]));demo.cells.forEach((code,i)=>{if(code){c.fillStyle=m.get(code).hex;c.fillRect(i%width,Math.floor(i/width),1,1);}});
+   next=generatePattern(applyImageStyle(c.getImageData(0,0,width,height),width,height,settings.imageStyle),width,height,available,conversionOptions);
+  }
   if(newImport){currentProjectId=null;currentCreatedAt=null;undoStack=[];$('undoBtn').disabled=true;}else pushUndo();
   if(selectedShopPalette)registerShopPalette(settings.shopId,selectedShopPalette);
   pattern=next;if(newImport||!currentProjectId)projectName=original?workingName.replace(/\.[^.]+$/,'').slice(0,60)||'我的拼豆图纸':'小狐狸的午后';isDemo=!original;
@@ -506,7 +520,7 @@ function showDelete(id){
  };
 };
 $('focusClear').onclick=()=>{highlighted=null;$('colorSearch').value='';renderColorList();draw();};
-for(const id of ['gridWidth','gridHeight','maxColors','keepRatio','removeBackground','tolerance','imageStyle'])$(id).addEventListener('change',markParametersDirty);
+for(const id of ['gridWidth','gridHeight','maxColors','keepRatio','removeBackground','tolerance','imageStyle','optimizationMode'])$(id).addEventListener('change',markParametersDirty);
 $('gridWidth').addEventListener('input',()=>{syncRatio('width');markParametersDirty();});$('gridHeight').addEventListener('input',()=>{syncRatio('height');markParametersDirty();});
 document.querySelectorAll('[data-size]').forEach(b=>b.addEventListener('click',markParametersDirty));
 window.addEventListener('pagehide',()=>{if(!pendingImport&&!suppressSaving)persistCurrent().catch(()=>{});});

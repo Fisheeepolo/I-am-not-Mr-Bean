@@ -1,24 +1,7 @@
-/* Browser-local image conversion. Colours are compared in CIE L*a*b*. */
-export function hexToRgb(hex) {
-  const value = String(hex).replace(/^#/, '');
-  if (!/^(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)) throw new Error('无效的颜色值');
-  const full = value.length === 3 ? [...value].map(c => c + c).join('') : value;
-  return [0, 2, 4].map(i => parseInt(full.slice(i, i + 2), 16));
-}
+import {hexToRgb,rgbToLab,labDistanceSq} from './color-utils.js';
+import {optimizePatternColors} from './pattern-optimizer.js';
+export {hexToRgb,rgbToLab} from './color-utils.js';
 
-export function rgbToLab(rgb) {
-  const [r, g, b] = rgb.map(c => {
-    const v = Math.max(0, Math.min(255, c)) / 255;
-    return v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4;
-  });
-  const f = v => v > .008856451679 ? Math.cbrt(v) : 7.787037037 * v + 16 / 116;
-  const x = f((.4124564 * r + .3575761 * g + .1804375 * b) / .95047);
-  const y = f(.2126729 * r + .7151522 * g + .072175 * b);
-  const z = f((.0193339 * r + .119192 * g + .9503041 * b) / 1.08883);
-  return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
-}
-
-const labDistanceSq = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
 export const deltaE = (a, b) => Math.sqrt(labDistanceSq(rgbToLab(a), rgbToLab(b)));
 
 export function nearestColors(hex, palette, limit = 5) {
@@ -41,8 +24,8 @@ export function generatePattern(imageData, width, height, palette, options = {})
   const data = imageData.data || imageData;
   if (!data || data.length !== width * height * 4) throw new Error('图片像素尺寸不匹配');
   if (!palette?.length) throw new Error('至少需要一种可用颜色');
-  const colors = palette.map(c => ({ ...c, lab: rgbToLab(hexToRgb(c.hex)) }));
-  const maxColors = Math.max(1, Math.min(colors.length, Math.floor(Number(options.maxColors) || 24)));
+
+  const maxColors = Math.max(1, Math.min(palette.length, Math.floor(Number(options.maxColors) || 24)));
   const alphaThreshold = options.alphaThreshold ?? 100;
   const n = width * height;
   const skip = new Uint8Array(n);
@@ -82,34 +65,11 @@ export function generatePattern(imageData, width, height, palette, options = {})
     }
   }
 
-  function nearest(lab, candidates) {
-    let best = candidates[0], distance = Infinity;
-    for (const candidate of candidates) {
-      const d = labDistanceSq(lab, candidate.lab);
-      if (d < distance) { best = candidate; distance = d; }
-    }
-    return best.code;
-  }
-  const cache = new Map();
-  let cells = labs.map((lab, i) => {
-    if (skip[i]) return null;
-    const key = `${data[i * 4]},${data[i * 4 + 1]},${data[i * 4 + 2]},${data[i * 4 + 3]}`;
-    if (!cache.has(key)) cache.set(key, nearest(lab, colors));
-    return cache.get(key);
-  });
-  const firstCounts = countCells(cells);
-  if (Object.keys(firstCounts).length > maxColors) {
-    const selectedCodes = new Set(Object.entries(firstCounts).sort((a, b) => b[1] - a[1]).slice(0, maxColors).map(([code]) => code));
-    const selected = colors.filter(c => selectedCodes.has(c.code));
-    cache.clear();
-    cells = cells.map((code, i) => {
-      if (code === null || selectedCodes.has(code)) return code;
-      const key = `${data[i * 4]},${data[i * 4 + 1]},${data[i * 4 + 2]},${data[i * 4 + 3]}`;
-      if (!cache.has(key)) cache.set(key, nearest(labs[i], selected));
-      return cache.get(key);
-    });
-  }
-  return { width, height, cells, counts: countCells(cells) };
+  // Geometry/background is fixed before colour optimization. The optimizer
+  // may change bead colours but never fills a transparent or removed cell.
+  const visibleLabs = labs.map((lab,i)=>skip[i]?null:lab);
+  const result = optimizePatternColors(visibleLabs,width,height,palette,{...options,maxColors});
+  return {width,height,...result,algorithm:'local-structure-v2'};
 }
 
 export function makeDemo(width = 52, height = 52, palette = []) {
