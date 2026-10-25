@@ -1,3 +1,4 @@
+import {segmentBackground} from './background-segmentation.js';
 import {hexToRgb,rgbToLab,labDistanceSq} from './color-utils.js';
 import {optimizePatternColors} from './pattern-optimizer.js';
 export {hexToRgb,rgbToLab} from './color-utils.js';
@@ -21,11 +22,12 @@ export const replaceColor = (cells, from, to) => cells.map(code => code === from
 
 export function generatePattern(imageData, width, height, palette, options = {}) {
   if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1 || width * height > 1_000_000) throw new Error('图纸尺寸无效');
-  const data = imageData.data || imageData;
+  let data = imageData.data || imageData;
   if (!data || data.length !== width * height * 4) throw new Error('图片像素尺寸不匹配');
   if (!palette?.length) throw new Error('至少需要一种可用颜色');
 
   const maxColors = Math.max(1, Math.min(palette.length, Math.floor(Number(options.maxColors) || 24)));
+  if(options.removeBackground === true)data=segmentBackground({data},width,height,{mode:'edge',tolerance:options.backgroundTolerance??20,contentBounds:options.contentBounds}).data;
   const alphaThreshold = options.alphaThreshold ?? 100;
   const n = width * height;
   const skip = new Uint8Array(n);
@@ -37,39 +39,11 @@ export function generatePattern(imageData, width, height, palette, options = {})
     labs[i] = rgbToLab([data[p], data[p + 1], data[p + 2]].map(c => c * alpha + 255 * (1 - alpha)));
   }
 
-  if (options.removeBackground) {
-    const cornerIndices = [...new Set([0, width - 1, (height - 1) * width, n - 1])];
-    const corners = cornerIndices.filter(i => labs[i]).map(i => labs[i]);
-    if (corners.length >= 2) {
-      // The best-supported corner colour is the background reference. Flood fill
-      // never crosses foreground pixels and therefore preserves enclosed whites.
-      const toleranceSq = Math.max(0, Number(options.backgroundTolerance ?? 28)) ** 2;
-      const reference = corners.map(lab => ({ lab, votes: corners.filter(c => labDistanceSq(lab, c) <= toleranceSq).length }))
-        .sort((a, b) => b.votes - a.votes)[0];
-      const background = reference.lab;
-      const visited = new Uint8Array(n);
-      const queue = new Int32Array(n);
-      let head = 0, tail = 0;
-      const visit = i => {
-        if (visited[i]) return;
-        visited[i] = 1;
-        if (!labs[i] || (reference.votes >= 2 && labDistanceSq(labs[i], background) <= toleranceSq)) { skip[i] = 1; queue[tail++] = i; }
-      };
-      for (let x = 0; x < width; x++) { visit(x); visit((height - 1) * width + x); }
-      for (let y = 0; y < height; y++) { visit(y * width); visit(y * width + width - 1); }
-      while (head < tail) {
-        const i = queue[head++], x = i % width, y = Math.floor(i / width);
-        if (x > 0) visit(i - 1); if (x + 1 < width) visit(i + 1);
-        if (y > 0) visit(i - width); if (y + 1 < height) visit(i + width);
-      }
-    }
-  }
-
   // Geometry/background is fixed before colour optimization. The optimizer
   // may change bead colours but never fills a transparent or removed cell.
   const visibleLabs = labs.map((lab,i)=>skip[i]?null:lab);
   const result = optimizePatternColors(visibleLabs,width,height,palette,{...options,maxColors});
-  return {width,height,...result,algorithm:'local-structure-v2'};
+  return {width,height,...result,algorithm:'local-structure-v3'};
 }
 
 export function makeDemo(width = 52, height = 52, palette = []) {

@@ -1,0 +1,344 @@
+{
+  "protocol": "white-mask-v2-2026-10-26",
+  "timestamp": "2026-10-25T16:20:18.659Z",
+  "sourceHashes": {
+    "baseline-v2-engine.js": "2e60dfca7ed4b1f5be7fb5b584a2a303e0052a2d8acaa62a9305a69fab27be70",
+    "../../public/pattern-pipeline.js": "76f46dec35ddbe5f9e09731bee0fd97219e028c8ee3f0eefec3e1595ed347938",
+    "../../public/background-segmentation.js": "90145b7ac5d6b35aad64fc5339f6a0d3eaf95e517df77acd202a84266dccce5f",
+    "../../public/image-sampling.js": "efa5a5ddd532c6e0e8885f3969433b8fdf82f4e04b8f85545a87e4699d5d7723",
+    "../../public/engine.js": "823b5b044cb9e25b328de9154a8515aa69635501b0e6ed0d6ad94245c3680360",
+    "../../public/pattern-optimizer.js": "ad854e583f1d83e65d1ae6721d7b762bb38913da17034e74a6fb475245e1ebd6",
+    "../../public/color-utils.js": "388735d3636e2312649e3c344e919a023eb10d0e67fd1302c9bfb224d654c042",
+    "fixtures.json": "0ed1f97b0de00abbca0e2d5e3221dc42283b517e2ff5f4b3f96ef59e0c6dd6ff"
+  },
+  "regression": {
+    "v2-20": {
+      "cases": 12,
+      "foreground": 15199,
+      "whiteForeground": 13965,
+      "background": 18337,
+      "deletedForeground": 12565,
+      "deletedWhite": 12398,
+      "retainedBackground": 2837,
+      "retained": 5471,
+      "whiteDeletionRate": 0.8877909058360186,
+      "foregroundDeletionRate": 0.8266991249424305,
+      "backgroundRetentionRate": 0.1547145116431259,
+      "medianMsMean": 2.1112583333333106,
+      "reasons": {
+        "v2-no-diagnostic": 12
+      }
+    },
+    "v2-60": {
+      "cases": 12,
+      "foreground": 15199,
+      "whiteForeground": 13965,
+      "background": 18337,
+      "deletedForeground": 13002,
+      "deletedWhite": 12465,
+      "retainedBackground": 0,
+      "retained": 2197,
+      "whiteDeletionRate": 0.8925886143931256,
+      "foregroundDeletionRate": 0.8554510165142444,
+      "backgroundRetentionRate": 0,
+      "medianMsMean": 2.039491666666693,
+      "reasons": {
+        "v2-no-diagnostic": 12
+      }
+    },
+    "v3-preserve": {
+      "cases": 12,
+      "foreground": 15199,
+      "whiteForeground": 13965,
+      "background": 18337,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 16690,
+      "retained": 31889,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.9101816000436277,
+      "medianMsMean": 3.474450000000035,
+      "reasons": {
+        "preserve-mode": 12
+      }
+    },
+    "v3-edge-5": {
+      "cases": 12,
+      "foreground": 15199,
+      "whiteForeground": 13965,
+      "background": 18337,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 5379,
+      "retained": 20578,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.2933413317336533,
+      "medianMsMean": 12.742241666666667,
+      "reasons": {
+        "edge-background": 6,
+        "uncertain-boundary": 2,
+        "existing-alpha": 2,
+        "uniform-image": 2
+      }
+    },
+    "v3-edge-20": {
+      "cases": 12,
+      "foreground": 15199,
+      "whiteForeground": 13965,
+      "background": 18337,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 5379,
+      "retained": 20578,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.2933413317336533,
+      "medianMsMean": 11.985333333333308,
+      "reasons": {
+        "edge-background": 6,
+        "uncertain-boundary": 2,
+        "existing-alpha": 2,
+        "uniform-image": 2
+      }
+    },
+    "v3-edge-60": {
+      "cases": 12,
+      "foreground": 15199,
+      "whiteForeground": 13965,
+      "background": 18337,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 5379,
+      "retained": 20578,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.2933413317336533,
+      "medianMsMean": 11.472591666666679,
+      "reasons": {
+        "edge-background": 6,
+        "uncertain-boundary": 2,
+        "existing-alpha": 2,
+        "uniform-image": 2
+      }
+    }
+  },
+  "regressionNonAmbiguous": {
+    "v2-20": {
+      "cases": 10,
+      "foreground": 11993,
+      "whiteForeground": 10759,
+      "background": 16935,
+      "deletedForeground": 9359,
+      "deletedWhite": 9192,
+      "retainedBackground": 2837,
+      "retained": 5471,
+      "whiteDeletionRate": 0.8543544939120736,
+      "foregroundDeletionRate": 0.780371883598766,
+      "backgroundRetentionRate": 0.16752288160614112,
+      "medianMsMean": 2.2816899999999634,
+      "reasons": {
+        "v2-no-diagnostic": 10
+      }
+    },
+    "v2-60": {
+      "cases": 10,
+      "foreground": 11993,
+      "whiteForeground": 10759,
+      "background": 16935,
+      "deletedForeground": 9796,
+      "deletedWhite": 9259,
+      "retainedBackground": 0,
+      "retained": 2197,
+      "whiteDeletionRate": 0.8605818384608235,
+      "foregroundDeletionRate": 0.8168098057200034,
+      "backgroundRetentionRate": 0,
+      "medianMsMean": 2.177950000000034,
+      "reasons": {
+        "v2-no-diagnostic": 10
+      }
+    },
+    "v3-preserve": {
+      "cases": 10,
+      "foreground": 11993,
+      "whiteForeground": 10759,
+      "background": 16935,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 15288,
+      "retained": 27281,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.9027457927369353,
+      "medianMsMean": 3.7434900000000395,
+      "reasons": {
+        "preserve-mode": 10
+      }
+    },
+    "v3-edge-5": {
+      "cases": 10,
+      "foreground": 11993,
+      "whiteForeground": 10759,
+      "background": 16935,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 3977,
+      "retained": 15970,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.23483909064068498,
+      "medianMsMean": 14.023060000000005,
+      "reasons": {
+        "edge-background": 6,
+        "uncertain-boundary": 2,
+        "existing-alpha": 2
+      }
+    },
+    "v3-edge-20": {
+      "cases": 10,
+      "foreground": 11993,
+      "whiteForeground": 10759,
+      "background": 16935,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 3977,
+      "retained": 15970,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.23483909064068498,
+      "medianMsMean": 13.192429999999977,
+      "reasons": {
+        "edge-background": 6,
+        "uncertain-boundary": 2,
+        "existing-alpha": 2
+      }
+    },
+    "v3-edge-60": {
+      "cases": 10,
+      "foreground": 11993,
+      "whiteForeground": 10759,
+      "background": 16935,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 3977,
+      "retained": 15970,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.23483909064068498,
+      "medianMsMean": 12.614210000000014,
+      "reasons": {
+        "edge-background": 6,
+        "uncertain-boundary": 2,
+        "existing-alpha": 2
+      }
+    }
+  },
+  "heldout": {
+    "v2-20": {
+      "cases": 4,
+      "foreground": 428,
+      "whiteForeground": 352,
+      "background": 412,
+      "deletedForeground": 294,
+      "deletedWhite": 288,
+      "retainedBackground": 22,
+      "retained": 156,
+      "whiteDeletionRate": 0.8181818181818182,
+      "foregroundDeletionRate": 0.6869158878504673,
+      "backgroundRetentionRate": 0.05339805825242718,
+      "medianMsMean": 0.6669249999999973,
+      "reasons": {
+        "v2-no-diagnostic": 4
+      }
+    },
+    "v2-60": {
+      "cases": 4,
+      "foreground": 428,
+      "whiteForeground": 352,
+      "background": 412,
+      "deletedForeground": 343,
+      "deletedWhite": 307,
+      "retainedBackground": 0,
+      "retained": 85,
+      "whiteDeletionRate": 0.8721590909090909,
+      "foregroundDeletionRate": 0.8014018691588785,
+      "backgroundRetentionRate": 0,
+      "medianMsMean": 0.4626249999999992,
+      "reasons": {
+        "v2-no-diagnostic": 4
+      }
+    },
+    "v3-preserve": {
+      "cases": 4,
+      "foreground": 428,
+      "whiteForeground": 352,
+      "background": 412,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 324,
+      "retained": 752,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.7864077669902912,
+      "medianMsMean": 0.7439500000000034,
+      "reasons": {
+        "preserve-mode": 4
+      }
+    },
+    "v3-edge-5": {
+      "cases": 4,
+      "foreground": 428,
+      "whiteForeground": 352,
+      "background": 412,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 20,
+      "retained": 448,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.04854368932038835,
+      "medianMsMean": 1.8497500000000038,
+      "reasons": {
+        "edge-background": 3,
+        "existing-alpha": 1
+      }
+    },
+    "v3-edge-20": {
+      "cases": 4,
+      "foreground": 428,
+      "whiteForeground": 352,
+      "background": 412,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 20,
+      "retained": 448,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.04854368932038835,
+      "medianMsMean": 1.7584749999999971,
+      "reasons": {
+        "edge-background": 3,
+        "existing-alpha": 1
+      }
+    },
+    "v3-edge-60": {
+      "cases": 4,
+      "foreground": 428,
+      "whiteForeground": 352,
+      "background": 412,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 20,
+      "retained": 448,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.04854368932038835,
+      "medianMsMean": 1.8452000000000055,
+      "reasons": {
+        "edge-background": 3,
+        "existing-alpha": 1
+      }
+    }
+  }
+}

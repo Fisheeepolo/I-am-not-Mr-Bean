@@ -1,0 +1,347 @@
+{
+  "protocol": "white-mask-v1-2026-10-26",
+  "timestamp": "2026-10-25T16:13:23.405Z",
+  "sourceHashes": {
+    "baseline-v2-engine.js": "2e60dfca7ed4b1f5be7fb5b584a2a303e0052a2d8acaa62a9305a69fab27be70",
+    "../../public/pattern-pipeline.js": "76f46dec35ddbe5f9e09731bee0fd97219e028c8ee3f0eefec3e1595ed347938",
+    "../../public/background-segmentation.js": "ff5237f3038b69b5d552f76e88643771e5d4873024f4a451191810056fcfa055",
+    "../../public/image-sampling.js": "efa5a5ddd532c6e0e8885f3969433b8fdf82f4e04b8f85545a87e4699d5d7723",
+    "../../public/engine.js": "5c250bb7203b4f8d63823b17ef60761bfc142e0f141bd643c65a2087ced7a713",
+    "../../public/pattern-optimizer.js": "ad854e583f1d83e65d1ae6721d7b762bb38913da17034e74a6fb475245e1ebd6",
+    "../../public/color-utils.js": "388735d3636e2312649e3c344e919a023eb10d0e67fd1302c9bfb224d654c042",
+    "fixtures.json": "aed25c67cc8025f1c8ad490177c89884badaa6129bbc39b7fc38c46af973e6cf"
+  },
+  "development": {
+    "v2-20": {
+      "cases": 7,
+      "foreground": 8331,
+      "whiteForeground": 7413,
+      "background": 7797,
+      "deletedForeground": 6023,
+      "deletedWhite": 5920,
+      "retainedBackground": 8,
+      "retained": 2316,
+      "whiteDeletionRate": 0.7985970592202887,
+      "foregroundDeletionRate": 0.7229624294802545,
+      "backgroundRetentionRate": 0.0010260356547390022,
+      "medianMsMean": 2.207199999999967,
+      "reasons": {
+        "v2-no-diagnostic": 7
+      }
+    },
+    "v2-60": {
+      "cases": 7,
+      "foreground": 8331,
+      "whiteForeground": 7413,
+      "background": 7797,
+      "deletedForeground": 6200,
+      "deletedWhite": 5924,
+      "retainedBackground": 0,
+      "retained": 2131,
+      "whiteDeletionRate": 0.79913665182787,
+      "foregroundDeletionRate": 0.7442083783459369,
+      "backgroundRetentionRate": 0,
+      "medianMsMean": 2.0000857142856967,
+      "reasons": {
+        "v2-no-diagnostic": 7
+      }
+    },
+    "v3-preserve": {
+      "cases": 7,
+      "foreground": 8331,
+      "whiteForeground": 7413,
+      "background": 7797,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 7045,
+      "retained": 15376,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.9035526484545338,
+      "medianMsMean": 3.50142857142858,
+      "reasons": {
+        "preserve-mode": 7
+      }
+    },
+    "v3-edge-5": {
+      "cases": 7,
+      "foreground": 8331,
+      "whiteForeground": 7413,
+      "background": 7797,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 2676,
+      "retained": 11007,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.34320892651019624,
+      "medianMsMean": 11.225842857142839,
+      "reasons": {
+        "edge-background": 3,
+        "uncertain-boundary": 1,
+        "existing-alpha": 1,
+        "uniform-image": 2
+      }
+    },
+    "v3-edge-20": {
+      "cases": 7,
+      "foreground": 8331,
+      "whiteForeground": 7413,
+      "background": 7797,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 2676,
+      "retained": 11007,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.34320892651019624,
+      "medianMsMean": 10.102314285714296,
+      "reasons": {
+        "edge-background": 3,
+        "uncertain-boundary": 1,
+        "existing-alpha": 1,
+        "uniform-image": 2
+      }
+    },
+    "v3-edge-60": {
+      "cases": 7,
+      "foreground": 8331,
+      "whiteForeground": 7413,
+      "background": 7797,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 2676,
+      "retained": 11007,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.34320892651019624,
+      "medianMsMean": 9.805128571428545,
+      "reasons": {
+        "edge-background": 3,
+        "uncertain-boundary": 1,
+        "existing-alpha": 1,
+        "uniform-image": 2
+      }
+    }
+  },
+  "developmentNonAmbiguous": {
+    "v2-20": {
+      "cases": 5,
+      "foreground": 5125,
+      "whiteForeground": 4207,
+      "background": 6395,
+      "deletedForeground": 2817,
+      "deletedWhite": 2714,
+      "retainedBackground": 8,
+      "retained": 2316,
+      "whiteDeletionRate": 0.6451152840503922,
+      "foregroundDeletionRate": 0.5496585365853659,
+      "backgroundRetentionRate": 0.0012509773260359655,
+      "medianMsMean": 2.4437999999999747,
+      "reasons": {
+        "v2-no-diagnostic": 5
+      }
+    },
+    "v2-60": {
+      "cases": 5,
+      "foreground": 5125,
+      "whiteForeground": 4207,
+      "background": 6395,
+      "deletedForeground": 2994,
+      "deletedWhite": 2718,
+      "retainedBackground": 0,
+      "retained": 2131,
+      "whiteDeletionRate": 0.6460660803422866,
+      "foregroundDeletionRate": 0.5841951219512195,
+      "backgroundRetentionRate": 0,
+      "medianMsMean": 2.312719999999996,
+      "reasons": {
+        "v2-no-diagnostic": 5
+      }
+    },
+    "v3-preserve": {
+      "cases": 5,
+      "foreground": 5125,
+      "whiteForeground": 4207,
+      "background": 6395,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 5643,
+      "retained": 10768,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.8824081313526192,
+      "medianMsMean": 4.06138,
+      "reasons": {
+        "preserve-mode": 5
+      }
+    },
+    "v3-edge-5": {
+      "cases": 5,
+      "foreground": 5125,
+      "whiteForeground": 4207,
+      "background": 6395,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 1274,
+      "retained": 6399,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.19921813917122752,
+      "medianMsMean": 12.887919999999998,
+      "reasons": {
+        "edge-background": 3,
+        "uncertain-boundary": 1,
+        "existing-alpha": 1
+      }
+    },
+    "v3-edge-20": {
+      "cases": 5,
+      "foreground": 5125,
+      "whiteForeground": 4207,
+      "background": 6395,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 1274,
+      "retained": 6399,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.19921813917122752,
+      "medianMsMean": 11.785400000000005,
+      "reasons": {
+        "edge-background": 3,
+        "uncertain-boundary": 1,
+        "existing-alpha": 1
+      }
+    },
+    "v3-edge-60": {
+      "cases": 5,
+      "foreground": 5125,
+      "whiteForeground": 4207,
+      "background": 6395,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 1274,
+      "retained": 6399,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.19921813917122752,
+      "medianMsMean": 11.53271999999996,
+      "reasons": {
+        "edge-background": 3,
+        "uncertain-boundary": 1,
+        "existing-alpha": 1
+      }
+    }
+  },
+  "heldout": {
+    "v2-20": {
+      "cases": 5,
+      "foreground": 6868,
+      "whiteForeground": 6552,
+      "background": 10540,
+      "deletedForeground": 6542,
+      "deletedWhite": 6478,
+      "retainedBackground": 2829,
+      "retained": 3155,
+      "whiteDeletionRate": 0.9887057387057387,
+      "foregroundDeletionRate": 0.9525334886429819,
+      "backgroundRetentionRate": 0.2684060721062619,
+      "medianMsMean": 2.799359999999986,
+      "reasons": {
+        "v2-no-diagnostic": 5
+      }
+    },
+    "v2-60": {
+      "cases": 5,
+      "foreground": 6868,
+      "whiteForeground": 6552,
+      "background": 10540,
+      "deletedForeground": 6802,
+      "deletedWhite": 6541,
+      "retainedBackground": 0,
+      "retained": 66,
+      "whiteDeletionRate": 0.9983211233211233,
+      "foregroundDeletionRate": 0.9903902154921375,
+      "backgroundRetentionRate": 0,
+      "medianMsMean": 2.778999999999982,
+      "reasons": {
+        "v2-no-diagnostic": 5
+      }
+    },
+    "v3-preserve": {
+      "cases": 5,
+      "foreground": 6868,
+      "whiteForeground": 6552,
+      "background": 10540,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 9645,
+      "retained": 16513,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.9150853889943074,
+      "medianMsMean": 4.189959999999994,
+      "reasons": {
+        "preserve-mode": 5
+      }
+    },
+    "v3-edge-5": {
+      "cases": 5,
+      "foreground": 6868,
+      "whiteForeground": 6552,
+      "background": 10540,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 2892,
+      "retained": 9760,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.27438330170777986,
+      "medianMsMean": 18.719520000000024,
+      "reasons": {
+        "edge-background": 3,
+        "existing-alpha": 1,
+        "uncertain-boundary": 1
+      }
+    },
+    "v3-edge-20": {
+      "cases": 5,
+      "foreground": 6868,
+      "whiteForeground": 6552,
+      "background": 10540,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 2892,
+      "retained": 9760,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.27438330170777986,
+      "medianMsMean": 16.253119999999978,
+      "reasons": {
+        "edge-background": 3,
+        "existing-alpha": 1,
+        "uncertain-boundary": 1
+      }
+    },
+    "v3-edge-60": {
+      "cases": 5,
+      "foreground": 6868,
+      "whiteForeground": 6552,
+      "background": 10540,
+      "deletedForeground": 0,
+      "deletedWhite": 0,
+      "retainedBackground": 2892,
+      "retained": 9760,
+      "whiteDeletionRate": 0,
+      "foregroundDeletionRate": 0,
+      "backgroundRetentionRate": 0.27438330170777986,
+      "medianMsMean": 15.39990000000006,
+      "reasons": {
+        "edge-background": 3,
+        "existing-alpha": 1,
+        "uncertain-boundary": 1
+      }
+    }
+  }
+}

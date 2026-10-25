@@ -107,3 +107,5 @@
  .difficulty-example-card h3{font-size:13px}
  .filter-options{gap:7px}.filter-options label{padding:8px}
 }
+
+.background-status{font-size:12px;line-height:1.6;color:#756487;margin:0 0 12px}.background-status[hidden]{display:none}

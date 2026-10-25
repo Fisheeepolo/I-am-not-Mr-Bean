@@ -82,11 +82,11 @@ export function computePatternViewport({ columns, rows, cellSize, ruler = 23, vi
   };
 }
 
-function contrast(hex) {
+function brightness(hex) {
   const value = String(hex).replace('#', '');
   const full = value.length === 3 ? [...value].map(c => c + c).join('') : value;
   const r = parseInt(full.slice(0, 2), 16), g = parseInt(full.slice(2, 4), 16), b = parseInt(full.slice(4, 6), 16);
-  return r * .299 + g * .587 + b * .114 > 150 ? '#302b33' : '#ffffff';
+  return r * .299 + g * .587 + b * .114;
 }
 
 function doneFingerprint(done) {
@@ -139,7 +139,10 @@ export function createPatternRenderer(canvas, area, stage) {
   function updateStyles(palette) {
     if (stylePalette === palette) return;
     stylePalette = palette;
-    styles = new Map(palette.map(color => [color.code, { hex: color.hex, text: contrast(color.hex) }]));
+    styles = new Map(palette.map(color => {
+      const light = brightness(color.hex);
+      return [color.code, { hex: color.hex, text: light > 150 ? '#302b33' : '#ffffff', outline: light > 220 ? '#aeb5bf' : null }];
+    }));
   }
 
   function grid(context, state, frame) {
@@ -156,13 +159,16 @@ export function createPatternRenderer(canvas, area, stage) {
     base.globalAlpha = 1; base.fillStyle = '#ffffff'; base.fillRect(frame.x, frame.y, frame.width, frame.height);
     base.textAlign = 'center'; base.textBaseline = 'middle';
     for (let row = frame.startRow; row <= frame.endRow; row++) for (let col = frame.startColumn; col <= frame.endColumn; col++) {
-      const index = row * pattern.width + col, code = pattern.cells[index];
-      if (code == null) continue;
-      const color = styles.get(code) || { hex: '#ccc', text: '#302b33' }, x = ruler + col * size, y = ruler + row * size;
+      const index = row * pattern.width + col, code = pattern.cells[index], x = ruler + col * size, y = ruler + row * size;
+      // Empty squares have their own neutral paper tint. White is a real bead
+      // colour and must remain distinguishable even when codes are zoomed out.
+      if (code == null) { base.globalAlpha = 1; base.fillStyle = '#eef0f3'; base.fillRect(x, y, size + .2, size + .2); continue; }
+      const color = styles.get(code) || { hex: '#ccc', text: '#302b33' };
       base.globalAlpha = highlighted && code !== highlighted ? .12 : 1;
       base.fillStyle = color.hex;
       if (view === 'bead') {
         base.beginPath(); base.arc(x + size / 2, y + size / 2, size * .46, 0, Math.PI * 2); base.fill();
+        if (color.outline) { base.strokeStyle = color.outline; base.lineWidth = Math.max(.65, Math.min(1.2, size * .03)); base.stroke(); }
         base.fillStyle = '#ffffffaa'; base.beginPath(); base.arc(x + size / 2, y + size / 2, size * .14, 0, Math.PI * 2); base.fill();
       } else {
         base.fillRect(x, y, size + .2, size + .2);

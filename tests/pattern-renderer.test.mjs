@@ -90,9 +90,10 @@ const callbacks = new Map(); let nextFrame = 1;
 const canvases = [];
 function context() {
   const calls = Object.create(null);
-  const ctx = new Proxy({ calls }, { get(target, name) {
+  const events = [];
+  const ctx = new Proxy({ calls, events }, { get(target, name) {
     if (name in target) return target[name];
-    return (..._args) => { calls[name] = (calls[name] || 0) + 1; };
+    return (...args) => { calls[name] = (calls[name] || 0) + 1; events.push({ name, args, fill: target.fillStyle, stroke: target.strokeStyle, alpha: target.globalAlpha }); };
   } });
   return ctx;
 }
@@ -164,9 +165,32 @@ const afterHighlight = baseContext.calls.fillRect || 0;
 assert(afterHighlight > beforeDone);
 renderer.render({ ...state, palette: [...palette] }); flush();
 assert((baseContext.calls.fillRect || 0) > afterHighlight, 'Changed palette invalidates colors');
+const largeVisibleBitmap = { width: canvas.width, height: canvas.height, rgbaMiBPerCanvas: +(canvas.width * canvas.height * 4 / 1048576).toFixed(2) };
+
+area.scrollLeft = 0; area.scrollTop = 0;
+const whiteState = { ...state, pattern: { width: 2, height: 2, cells: [null, 'W', 'K', 'W'] },
+  palette: [{ code: 'W', hex: '#ffffff' }, { code: 'K', hex: '#111111' }], cellSize: 24,
+  showGrid: false, showCodes: false, done: new Set(), highlighted: null };
+let eventStart = baseContext.events.length;
+renderer.render(whiteState); flush();
+let events = baseContext.events.slice(eventStart);
+assert(events.some(event => event.name === 'fillRect' && event.fill === '#eef0f3' && event.args[0] === 23 && event.args[1] === 23), 'Null is a tinted square even when codes and grid are off');
+assert(events.some(event => event.name === 'fillRect' && event.fill === '#ffffff' && event.args[0] === 47 && event.args[1] === 23), 'White bead keeps its actual white fill');
+assert(!events.some(event => event.name === 'fillText' && event.args[0] === 'W'), 'Codes remain optional');
+eventStart = baseContext.events.length;
+renderer.render({ ...whiteState, showCodes: true, highlighted: 'K' }); flush();
+events = baseContext.events.slice(eventStart);
+assert.equal(events.filter(event => event.name === 'fillText' && event.args[0] === 'W' && event.fill === '#302b33').length, 2, 'Every real white bead has a dark readable code');
+assert(events.some(event => event.name === 'fillRect' && event.fill === '#eef0f3' && event.alpha === 1), 'Highlighting never fades the empty-cell tint');
+eventStart = baseContext.events.length;
+renderer.render({ ...whiteState, view: 'bead' }); flush();
+events = baseContext.events.slice(eventStart);
+assert.equal(events.filter(event => event.name === 'stroke' && event.stroke === '#aeb5bf').length, 2, 'White bead circles have visible edges in the finished preview');
+assert(canvas.width <= 188 && canvas.height <= 188, 'White/empty differentiation still uses only the bounded visible bitmap');
+console.log('PASS empty-cell tint vs true white bead; dark white-bead codes; pale-bead preview outlines; bounded bitmap');
 renderer.destroy(); assert.equal(area.events.scroll, undefined);
 console.log(JSON.stringify({ fixture: '160×160 makeDemo with actual MARD 291 palette', measurement: 'Counting contexts, not browser FPS',
-  visibleBitmap: { width: canvas.width, height: canvas.height, rgbaMiBPerCanvas: +(canvas.width * canvas.height * 4 / 1048576).toFixed(2) },
+  visibleBitmap: largeVisibleBitmap,
   scrolledBaseCalls: { fillRect: afterScrollRects - originalBaseRects, fillText: afterScrollText - originalBaseText },
   fullOldBitmapMiB: 698.53 }, null, 2));
 console.log('All pattern renderer tests passed.');
