@@ -94,6 +94,7 @@ export function installAI({ getSource, adoptSource, modal, closeModal, toast, es
   const body = $('modalBody');
   let config = readConfig();
   let apiKey = '';
+  let apiKeyOrigin = '';
   let active = null;
   let sequence = 0;
 
@@ -114,7 +115,7 @@ export function installAI({ getSource, adoptSource, modal, closeModal, toast, es
   }
   function begin(source = null) {
     clearSession();
-    active = { id: `ai-${++sequence}`, source, sourceURL: '', resultURL: '', resultBlob: null, urls: new Set(), controller: null, requestId: 0, mode: MODES[0].id, prompt: MODES[0].prompt, stage: '' };
+    active = { id: `ai-${++sequence}`, source, sourceURL: '', resultURL: '', resultBlob: null, urls: new Set(), controller: null, requestId: 0, mode: MODES[0].id, prompt: MODES[0].prompt, prompts: Object.fromEntries(MODES.map(mode => [mode.id, mode.prompt])), stage: '' };
     return active;
   }
   function makeURL(session, blob) { const url = URL.createObjectURL(blob); session.urls.add(url); return url; }
@@ -134,39 +135,49 @@ export function installAI({ getSource, adoptSource, modal, closeModal, toast, es
   function sourceURL(session) { if (!session.sourceURL) session.sourceURL = makeURL(session, session.source.blob); return session.sourceURL; }
 
   function renderConfig(session, returnToOptimize = false, message = '') {
-    render(session, '连接你的 AI 服务', `<p>接入支持图片编辑的 AI 服务，用来简化照片、去除杂背景或调整细节。保存配置不会发起调用。</p>
+    render(session, '连接你的 AI 服务', `<p class="ai-dialog-intro">填写服务地址、图片编辑模型和密钥。保存配置不会发起调用。</p>
       <form id="aiConfigForm" class="ai-config-form">
-      <div><button type="button" id="aiOfficialPreset" class="button lavender">使用官方接口预设</button></div>
-      <label>服务地址<input id="aiEndpoint" type="url" autocomplete="off" spellcheck="false" placeholder="https://你的服务地址/v1" value="${escape(config.endpoint)}" maxlength="2048"><span class="ai-field-help">可填写 Base URL 或完整的 /images/edits 地址，保存时会自动补全。</span></label>
-      <div class="ai-model-note"><strong>实际发送目标</strong><div id="aiSendTarget"></div></div>
+      <div class="ai-config-preset ai-span-full"><span>使用 OpenAI？可以快速填入地址和模型。</span><button type="button" id="aiOfficialPreset" class="button lavender">使用官方接口预设</button></div>
+      <label class="ai-span-full">服务地址<input id="aiEndpoint" type="url" autocomplete="off" spellcheck="false" placeholder="https://你的服务地址/v1" value="${escape(config.endpoint)}" maxlength="2048"><span class="ai-field-help">支持 Base URL 或完整的 /images/edits 地址。</span></label>
+      <div class="ai-target-line ai-span-full"><strong>实际发送至</strong><span id="aiSendTarget"></span></div>
       <label>图片编辑模型<input id="aiModel" type="text" autocomplete="off" spellcheck="false" placeholder="填写服务提供的图片编辑模型" value="${escape(config.model)}" maxlength="160"><span class="ai-field-help">需要支持以图片为输入进行编辑。官方预设为 ${escape(OFFICIAL_MODEL)}；其他服务请使用其提供的模型名称。</span></label>
-      <label>请求格式<select id="aiTransport"><option value="multipart" ${config.transport === 'multipart' ? 'selected' : ''}>标准图片编辑接口（multipart）</option><option value="json" ${config.transport === 'json' ? 'selected' : ''}>兼容接口（JSON / Base64 图片）</option></select><span class="ai-field-help">通常使用标准格式；只有服务说明要求 JSON 时再切换。两种格式都使用 /images/edits。</span></label>
-      <label>API Key<input id="aiApiKey" type="password" autocomplete="new-password" spellcheck="false" placeholder="${apiKey ? '本次页面已设置，留空继续使用' : '填写你的 API Key'}"><span id="aiKeyState" class="ai-field-help">${apiKey ? '本次页面已有密钥，输入框不会回填。留空继续使用，输入新密钥可替换。' : '密钥仅保留在当前页面内存中，刷新后需要重新填写。'}</span></label>
-      <div><button type="button" id="aiClearKey" class="text-button">清除本次密钥</button></div>
-      <div class="ai-model-note">服务地址、模型和请求格式会保存在本机浏览器。API Key 不会写入仓库或浏览器存储；仅在发起处理时随图片经本站接口转发至你配置的服务。服务可能按用量收费。</div>
+      <label>API Key<input id="aiApiKey" type="password" autocomplete="new-password" spellcheck="false" maxlength="4096" placeholder="${apiKey ? '本次已设置，留空继续使用' : '填写你的 API Key'}"><span id="aiKeyState" class="ai-field-help">${apiKey ? '本次已为此服务设置密钥。留空保留，填写新密钥可替换。' : '密钥仅用于当前页面，刷新后需要重新填写。'}</span></label>
+      <div class="ai-key-actions ai-span-full"><span>更换服务域名时，需要重新填写该服务的密钥。</span><button type="button" id="aiClearKey" class="text-button">清除本次密钥</button></div>
+      <details class="ai-advanced ai-span-full" ${config.transport === 'json' ? 'open' : ''}><summary>兼容选项 <span>大多数服务无需调整</span></summary><label>请求格式<select id="aiTransport"><option value="multipart" ${config.transport === 'multipart' ? 'selected' : ''}>标准图片编辑接口（multipart）</option><option value="json" ${config.transport === 'json' ? 'selected' : ''}>兼容接口（JSON / Base64 图片）</option></select><span class="ai-field-help">只有服务说明要求 JSON 时再切换，两种格式都使用 /images/edits。</span></label></details>
+      <div class="ai-model-note ai-span-full">地址和模型保存在本机，密钥不会写入仓库或浏览器存储。开始优化时，图片与密钥经本站转发至你指定的服务；服务可能按用量收费。</div>
       ${errorLine(message)}
-      <div class="modal-buttons"><button type="button" id="aiConfigCancel" class="button quiet">${returnToOptimize ? '返回图片优化' : '取消'}</button><button type="submit" class="button primary">保存配置</button></div>
+      <div class="modal-buttons ai-sticky-actions ai-span-full"><button type="button" id="aiConfigCancel" class="button quiet">${returnToOptimize ? '返回图片优化' : '取消'}</button><button type="submit" class="button primary">保存配置</button></div>
       </form>`, 'config');
     function showTarget() {
-      try { $('aiSendTarget').textContent = normalizeEndpoint($('aiEndpoint').value); }
+      try {
+        const target = normalizeEndpoint($('aiEndpoint').value);
+        $('aiSendTarget').textContent = target;
+        const changedOrigin = !!apiKey && new URL(target).origin !== apiKeyOrigin;
+        $('aiKeyState').textContent = changedOrigin ? '服务域名已改变，请填写新服务的密钥。旧密钥不会发送至这个地址。' : apiKey ? '本次已为此服务设置密钥。留空保留，填写新密钥可替换。' : '密钥仅用于当前页面，刷新后需要重新填写。';
+        $('aiApiKey').placeholder = apiKey && !changedOrigin ? '本次已设置，留空继续使用' : '填写此服务的 API Key';
+      }
       catch (error) { $('aiSendTarget').textContent = $('aiEndpoint').value.trim() ? error.message : '填写服务地址后显示'; }
     }
     $('aiEndpoint').addEventListener('input', showTarget);
     showTarget();
     $('aiOfficialPreset').onclick = () => { $('aiEndpoint').value = OFFICIAL_ENDPOINT; $('aiModel').value = OFFICIAL_MODEL; $('aiTransport').value = 'multipart'; showTarget(); };
-    $('aiClearKey').onclick = () => { apiKey = ''; $('aiApiKey').value = ''; $('aiApiKey').placeholder = '填写你的 API Key'; $('aiKeyState').textContent = '本次密钥已清除。发起处理前需要重新填写。'; toast('本次页面中的 API Key 已清除。'); };
+    $('aiClearKey').onclick = () => { apiKey = ''; apiKeyOrigin = ''; $('aiApiKey').value = ''; $('aiApiKey').placeholder = '填写你的 API Key'; $('aiKeyState').textContent = '本次密钥已清除。发起处理前需要重新填写。'; toast('本次页面中的 API Key 已清除。'); };
     $('aiConfigCancel').onclick = () => returnToOptimize ? renderOptimize(session) : closeModal();
     $('aiConfigForm').onsubmit = event => {
       event.preventDefault();
       try {
         const next = validateConfig({ endpoint: $('aiEndpoint').value, model: $('aiModel').value, transport: $('aiTransport').value });
         const suppliedKey = $('aiApiKey').value.trim();
-        if (suppliedKey) apiKey = suppliedKey;
+        if (suppliedKey && (suppliedKey.length > 4096 || /[\s\x00-\x1f\x7f]/.test(suppliedKey))) throw new Error('API Key 不能包含空格或换行，请检查后重新填写。');
+        const nextOrigin = new URL(next.endpoint).origin;
+        const changedOrigin = !!apiKey && nextOrigin !== apiKeyOrigin;
+        if (suppliedKey) { apiKey = suppliedKey; apiKeyOrigin = nextOrigin; }
+        else if (changedOrigin) { apiKey = ''; apiKeyOrigin = ''; }
         $('aiApiKey').value = '';
         config = next;
         let persisted = true;
         try { localStorage.setItem(CONFIG_KEY, JSON.stringify(next)); } catch { persisted = false; }
-        const note = persisted ? 'AI 配置已保存，尚未验证连接。' : '配置已用于本次页面；浏览器未允许保存，尚未验证连接。';
+        const note = changedOrigin && !suppliedKey ? '服务地址已更换。请重新填写新服务密钥后使用 AI。' : persisted ? 'AI 配置已保存，尚未验证连接。' : '配置已用于本次页面；浏览器未允许保存，尚未验证连接。';
         toast(note);
         if (returnToOptimize) renderOptimize(session, apiKey ? '' : '已保存服务配置。开始处理前，请在 AI 配置中填写 API Key。');
         else closeModal();
@@ -185,9 +196,16 @@ export function installAI({ getSource, adoptSource, modal, closeModal, toast, es
       <div class="ai-model-note"><strong>当前服务</strong><br>${endpoint ? `${escape(target)} · ${escape(config.model)}` : '尚未配置'}<br><button id="aiEditConfig" type="button" class="text-button">${endpoint ? '调整 AI 配置' : '填写 AI 配置'}</button>${!apiKey ? '<span class="ai-field-help">尚未填写本次页面的 API Key。</span>' : ''}</div>
       <div class="ai-send-notice">点击“开始 AI 优化”后，会将当前图片和调整要求发送至 <strong>${escape(target)}</strong>。该服务可能按用量收费。超过 2048 像素的图片会先缩小，发送文件不超过 12 MB；仓库里的原图会保留。</div>
       ${errorLine(message)}
-      <div class="modal-buttons"><button id="aiOptimizeCancel" class="button quiet">取消</button><button id="aiBeginButton" class="button primary">开始 AI 优化</button></div>`, 'optimize');
-    $('aiPrompt').oninput = () => { session.prompt = $('aiPrompt').value; };
-    body.querySelectorAll('[data-ai-mode]').forEach(button => { button.onclick = () => { session.mode = button.dataset.aiMode; session.prompt = MODES.find(mode => mode.id === session.mode).prompt; renderOptimize(session); }; });
+      <div class="modal-buttons ai-sticky-actions"><button id="aiOptimizeCancel" class="button quiet">取消</button><button id="aiBeginButton" class="button primary">开始 AI 优化</button></div>`, 'optimize');
+    $('aiPrompt').oninput = () => { session.prompt = $('aiPrompt').value; session.prompts[session.mode] = session.prompt; };
+    body.querySelectorAll('[data-ai-mode]').forEach(button => { button.onclick = () => {
+      const nextMode = button.dataset.aiMode;
+      if (nextMode === session.mode) return;
+      session.prompts[session.mode] = $('aiPrompt').value;
+      session.mode = nextMode;
+      session.prompt = session.prompts[nextMode];
+      renderOptimize(session);
+    }; });
     $('aiEditConfig').onclick = () => { session.prompt = $('aiPrompt').value; renderConfig(session, true); };
     $('aiOptimizeCancel').onclick = closeModal;
     $('aiBeginButton').onclick = () => runRequest(session);
@@ -206,7 +224,8 @@ export function installAI({ getSource, adoptSource, modal, closeModal, toast, es
     let currentConfig;
     try { currentConfig = validateConfig(config); }
     catch (error) { renderConfig(session, true, error.message); return; }
-    if (!apiKey) { renderConfig(session, true, '请填写 API Key，保存后再开始处理。'); return; }
+    if (apiKey && apiKeyOrigin !== new URL(currentConfig.endpoint).origin) { apiKey = ''; apiKeyOrigin = ''; }
+    if (!apiKey) { renderConfig(session, true, '请填写当前服务的 API Key，保存后再开始处理。'); return; }
     const controller = new AbortController();
     session.controller = controller;
     const requestId = ++session.requestId;
@@ -291,6 +310,6 @@ export function installAI({ getSource, adoptSource, modal, closeModal, toast, es
   return {
     openConfig,
     openOptimize,
-    dispose() { clearSession(); apiKey = ''; observer.disconnect(); dialog.removeEventListener('close', onClose); $('aiConfigBtn')?.removeEventListener('click', openConfig); $('aiOptimizeBtn')?.removeEventListener('click', openOptimize); }
+    dispose() { clearSession(); apiKey = ''; apiKeyOrigin = ''; observer.disconnect(); dialog.removeEventListener('close', onClose); $('aiConfigBtn')?.removeEventListener('click', openConfig); $('aiOptimizeBtn')?.removeEventListener('click', openOptimize); }
   };
 }
