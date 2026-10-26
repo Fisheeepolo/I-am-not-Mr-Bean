@@ -6,7 +6,7 @@
 
 图片转拼豆 · 实体色卡匹配 · 图纸仓库 · 全屏拼装
 
-[下载源码](https://github.com/Fisheeepolo/-/archive/refs/heads/main.zip) · [本地使用](#本地使用) · [算法研究](#算法研究) · [反馈问题](https://github.com/Fisheeepolo/-/issues)
+[下载源码](https://github.com/Fisheeepolo/I-am-not-bean-god/archive/refs/heads/main.zip) · [本地使用](#本地使用) · [算法研究](#算法研究) · [反馈问题](https://github.com/Fisheeepolo/I-am-not-bean-god/issues)
 
 </div>
 
@@ -32,12 +32,12 @@
 
 ### 1. 下载
 
-点击页面上方 **Code → Download ZIP**，或使用 [源码下载链接](https://github.com/Fisheeepolo/-/archive/refs/heads/main.zip)，解压后进入包含 `package.json` 的文件夹。
+点击页面上方 **Code → Download ZIP**，或使用 [源码下载链接](https://github.com/Fisheeepolo/I-am-not-bean-god/archive/refs/heads/main.zip)，解压后进入包含 `package.json` 的文件夹。
 
 也可以使用 Git：
 
 ```bash
-git clone https://github.com/Fisheeepolo/-.git bead-studio
+git clone https://github.com/Fisheeepolo/I-am-not-bean-god.git bead-studio
 cd bead-studio
 ```
 
@@ -156,6 +156,6 @@ docs/images/            README 界面截图
 
 ## 反馈与资料许可
 
-欢迎在 [Issues](https://github.com/Fisheeepolo/-/issues) 提交问题：说明浏览器、操作步骤、期望结果和实际结果。图像转换问题可以附一张可公开的示例图片，请勿提交 API 密钥或私人照片。
+欢迎在 [Issues](https://github.com/Fisheeepolo/I-am-not-bean-god/issues) 提交问题：说明浏览器、操作步骤、期望结果和实际结果。图像转换问题可以附一张可公开的示例图片，请勿提交 API 密钥或私人照片。
 
 色卡数据许可见 [palette-LICENSE.txt](public/palette-LICENSE.txt)，研究图片来源和许可见 [SOURCES.md](research/content-aware-v4/SOURCES.md)。这些第三方许可不等同于整个项目的统一许可；项目暂未单独声明整体开源许可证。
