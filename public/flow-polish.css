@@ -109,3 +109,32 @@
 }
 
 .background-status{font-size:12px;line-height:1.6;color:#756487;margin:0 0 12px}.background-status[hidden]{display:none}
+
+/* New drawing: naming and upload precede entry into the editor. */
+.new-project-form{display:grid;gap:18px}
+.new-project-name-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;font-weight:600}
+.new-project-auto{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:400}
+.new-project-form input[type=text]{width:100%;box-sizing:border-box;padding:13px 15px;border:1px solid #d9cce9;border-radius:12px;font:inherit;color:#49365d;background:white}
+.new-project-form input[type=text]:disabled{background:#f6f2fa;color:#9384a3}
+.new-project-upload{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:175px;border:2px dashed #c7addf;border-radius:18px;background:#faf7fe;cursor:pointer;color:#7352a0}
+.new-project-upload:hover,.new-project-upload:focus-within{border-color:#8254b9;background:#f2eafa}
+.new-project-upload>span{font-size:32px}
+.new-project-upload small{color:#8a779c;font-size:12px}
+.new-project-upload input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.new-project-form>p{margin:0;color:#8a779c;font-size:13px}
+
+.new-project-upload img{display:block;max-width:100%;width:auto;height:180px;object-fit:contain;border-radius:10px}
+.new-project-upload img[hidden],.new-project-upload span[hidden]{display:none}
+.new-project-upload{padding:16px;box-sizing:border-box}
+#newProjectStart:disabled{background:#e4ddec;color:#a396af;box-shadow:none;opacity:1;cursor:not-allowed}
+
+.new-project-form{gap:12px}.new-project-form .modal-buttons{margin-top:4px;padding-top:0}.new-project-upload img{height:140px}.new-project-form>p{overflow-wrap:anywhere}
+
+/* Simplified editing surface; retained hidden nodes support existing data bindings. */
+#sourcePreview,.ai-entry,#markDone{display:none!important}
+body[data-pending-import="true"] #saveState{display:none!important}
+#fullscreenBtn{display:none}
+body[data-screen="beading"] #fullscreenBtn{display:inline-flex}
+.new-project-upload small[hidden]{display:none}
+
+.colors-panel .color-list-controls .search-field{display:none!important}

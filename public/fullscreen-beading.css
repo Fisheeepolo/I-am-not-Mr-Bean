@@ -1,0 +1,21 @@
+.bead-fullscreen[hidden]{display:none}
+.bead-fullscreen{position:fixed;inset:0;z-index:10000;background:#f5f2f8;color:#49385d;width:100%;height:100%;font:14px system-ui,sans-serif}
+body.bead-fullscreen-open{overflow:hidden}
+.fs-viewport{position:absolute;inset:0}
+.bead-fullscreen #canvasArea{width:100%;height:100%!important;max-height:none!important;min-height:0;margin:0;border:0;border-radius:0;touch-action:none;overscroll-behavior:contain;cursor:grab;scroll-behavior:auto}
+.bead-fullscreen #canvasArea:active{cursor:grabbing}
+.fs-tools{position:absolute;z-index:3;top:max(14px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:9px;border:1px solid #ddd1e8;border-radius:16px;background:#fffffff2;box-shadow:0 5px 24px #49385d20;max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center}
+.bead-fullscreen button{font:inherit;cursor:pointer;color:#634780;background:white;border:1px solid #ddd1e8;border-radius:10px;padding:10px 13px;white-space:nowrap;min-height:42px}
+.bead-fullscreen button:hover{background:#f0e6fa}
+.bead-fullscreen button[aria-pressed=true]{background:#7854a6;color:white;border-color:#7854a6}
+.bead-fullscreen button:focus-visible{outline:3px solid #ab82d3;outline-offset:2px}
+.bead-fullscreen button:disabled{opacity:.4;cursor:not-allowed}
+.fs-colors{position:absolute;z-index:3;bottom:0;left:0;right:0;display:flex;gap:8px;overflow-x:auto;padding:12px 15px max(12px,env(safe-area-inset-bottom));background:#fffffff2;border-top:1px solid #ddd1e8;max-height:100px}
+.fs-colors button{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.fs-colors i{display:block;width:24px;height:24px;border:1px solid #0002;border-radius:5px}
+.fs-wake{position:absolute;z-index:4;right:14px;top:14px;display:none}
+.fs-idle .fs-tools,.fs-idle .fs-colors{visibility:hidden;pointer-events:none}
+.fs-idle .fs-wake{display:block;opacity:.55}
+.fs-no-colors .fs-colors{display:none}
+.fs-locked #canvasArea{overflow:hidden;cursor:default}
+@media(max-width:600px){.fs-tools{width:calc(100% - 24px);padding:6px;gap:4px}.bead-fullscreen button{padding:8px 10px;font-size:13px}.fs-colors{padding:8px;max-height:85px}}

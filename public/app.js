@@ -1,3 +1,4 @@
+import {createFullscreenBeading} from './fullscreen-beading.js';
 import {runPatternJob} from './pattern-job.js';
 import {createSubjectEditor} from './subject-editor.js';
 import { generatePattern, makeDemo, nearestColors, countCells, replaceColor, hexToRgb } from './engine.js';
@@ -25,6 +26,7 @@ let cellSize = 10, fitSize = 10, ruler = 23, view = 'grid', undoStack = [], save
 let customPalettes = {}, basePalette, autoSaveAvailable = true;
 let libraryReady=false, libraryEntries=[], currentProjectId=null, currentCreatedAt=null;
 let sourceBlob=null, savedSourceBlob=null, savedSourceName='', pendingImport=false;
+let pendingProjectName='';
 let appliedSettings=null, parametersDirty=false, suppressSaving=true, screen='library';
 let writeQueue=Promise.resolve(), openingProject=false, generationPromise=null, loadingImage=false;
 let originalBlob=null, originalName='', savedOriginalBlob=null, savedOriginalName='';
@@ -150,19 +152,19 @@ canvas.addEventListener('keydown',e=>{
   const x=selected%pattern.width,y=Math.floor(selected/pattern.width);
   if(e.key==='ArrowLeft'&&x===0||e.key==='ArrowRight'&&x===pattern.width-1||e.key==='ArrowUp'&&y===0||e.key==='ArrowDown'&&y===pattern.height-1)return;
   selectCell(selected+moves[e.key]);
- }else if(e.key===' '){e.preventDefault();markSelected();}
+ }
  else if(e.key.toLowerCase()==='n'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();nextUnfinished();}
  else if(e.key==='Escape'){highlighted=null;renderColorList();draw();}
 });
 function markSelected(){if(sessionReadOnly())return;if(selected<0||pattern.cells[selected]===null)return;if(done.has(selected))done.delete(selected);else done.add(selected);updateSelected();updateProgress();updateColorNav();draw();saveSoon();}
-$('markDone').onclick=markSelected;
+
 function viewAnchor(){const area=$('canvasArea'),r=area.getBoundingClientRect();return selected>=0?selected:hitTest({clientX:r.left+area.clientWidth/2,clientY:r.top+area.clientHeight/2});}
 function zoom(factor){const old=cellSize,anchor=viewAnchor();cellSize=Math.max(Math.min(3,fitSize),Math.min(42,cellSize*factor));if(cellSize===old)return;hovered=-1;draw();if(anchor>=0)scrollToCell(anchor);}
 $('zoomIn').onclick=()=>zoom(1.4);$('zoomOut').onclick=()=>zoom(1/1.4);$('fitBtn').onclick=fitCanvas;$('showCodes').onchange=draw;$('showGrid').onchange=draw;
 if($('readableZoom'))$('readableZoom').onclick=()=>{const anchor=viewAnchor();cellSize=Math.max(24,cellSize);$('showCodes').checked=true;setView('grid');if(anchor>=0)scrollToCell(anchor);toast('已放大显示每格色号，可拖动滚动条查看图纸。');};
 function setView(next){view=next;$('gridView').classList.toggle('active',next==='grid');$('beadView').classList.toggle('active',next==='bead');$('showCodes').disabled=next==='bead';$('showGrid').disabled=next==='bead';draw();}
 $('gridView').onclick=()=>setView('grid');$('beadView').onclick=()=>setView('bead');
-function renderColorList(){const map=paletteMap(), query=$('colorSearch').value.trim().toUpperCase();const items=Object.entries(counts()).sort((a,b)=>b[1]-a[1]);$('colorList').innerHTML=items.filter(([code])=>code.toUpperCase().includes(query)).map(([code,n])=>{const color=map.get(code);return `<div class="color-row ${highlighted===code?'active':''}"><button class="color-main" data-code="${escapeHTML(code)}" aria-pressed="${highlighted===code}" title="高亮 ${escapeHTML(code)}"><span class="color-swatch" style="background:${color.hex}"></span><span class="color-label"><strong>${escapeHTML(code)}</strong></span><span class="color-quantity">${n} 颗</span></button><button class="replace-button" data-replace="${escapeHTML(code)}" aria-label="替换 ${escapeHTML(code)}，查看相近色">⇄</button></div>`;}).join('')||'<div class="empty-list">没有找到这个色号</div>';$('clearHighlight').hidden=!highlighted;updateColorNav();}
+function renderColorList(){const map=paletteMap(), query=$('colorSearch').value.trim().toUpperCase();const items=Object.entries(counts()).sort((a,b)=>b[1]-a[1]);$('colorList').innerHTML=items.filter(([code])=>code.toUpperCase().includes(query)).map(([code,n])=>{const color=map.get(code);return `<div class="color-row ${highlighted===code?'active':''}"><button class="color-main" data-code="${escapeHTML(code)}" aria-pressed="${highlighted===code}" title="高亮 ${escapeHTML(code)}"><span class="color-swatch" style="background:${color.hex}"></span><span class="color-label"><strong>${escapeHTML(code)}</strong></span><span class="color-quantity">${n} 颗</span></button><button class="replace-button" data-replace="${escapeHTML(code)}" aria-label="替换 ${escapeHTML(code)}，查看相近色">⇄</button></div>`;}).join('')||'<div class="empty-list">没有找到这个色号</div>';$('clearHighlight').hidden=!highlighted;updateColorNav();fullscreenView?.refresh();}
 $('colorSearch').oninput=renderColorList;$('colorList').onclick=e=>{const main=e.target.closest('[data-code]'),replace=e.target.closest('[data-replace]');if(main){highlighted=highlighted===main.dataset.code?null:main.dataset.code;renderColorList();draw();if(highlighted) navigateColor(1,true);}if(replace)showAlternatives(replace.dataset.replace);};
 $('clearHighlight').onclick=()=>{highlighted=null;$('colorSearch').value='';renderColorList();draw();};
 function positionsFor(code){
@@ -196,16 +198,17 @@ $('undoBtn').onclick=async()=>{
  }catch(error){if(task===sourceTask){setSaveStatus('恢复未完成 · 当前图纸已保留');toast(error.message);}}finally{finishSourceTask(task);}
 };
 
-async function loadImage(file){
+async function loadImage(file, options={}){
  if(!file)return;if(!pattern){toast('正在打开图纸仓库，请稍后再导入。');return;}
  if(generationPromise){toast('正在生成图纸，请完成后再导入。');return;}
  if(!/^image\/(png|jpeg|webp)$/.test(file.type)){toast('请选择 JPG、PNG 或 WEBP 图片。');return;}
  if(file.size>20*1024*1024){toast('图片超过 20 MB，请压缩后上传。');return;}
  const task=beginSourceTask('正在载入新图片…');let prepared=null;
  try{
-  prepared=await prepareSource(file,file.name,task);if(!prepared)return;
+  prepared=await prepareSource(file,file.name,task);if(!prepared||options.isActive?.()===false)return;
   if(currentProjectId&&!pendingImport)await persistCurrent();
-  if(task!==sourceTask)return;
+  if(task!==sourceTask||options.isActive?.()===false)return;
+  pendingProjectName=String(options.name||file.name.replace(/\.[^.]+$/,'')||'我的拼豆图纸').trim().slice(0,80);
   applyPreparedSource(prepared,{commit:false});prepared=null;
   originalBlob=file;originalName=file.name;aiEdited=false;pendingImport=true;parametersDirty=true;
   $('imageStyle').value='original';$('optimizationMode').value='balanced';$('removeBackground').checked=false;subjectEditor.setState({subjectMode:'auto'});setDimensionInputs(52,52);
@@ -214,6 +217,52 @@ async function loadImage(file){
  finally{releasePreparedSource(prepared);finishSourceTask(task);}
 }
 $('imageFile').onchange=e=>{loadImage(e.target.files[0]);e.target.value='';};
+
+function showNewProject(){
+ if(loadingImage||generationPromise)return;
+ modal('新建图纸',`<form id="newProjectForm" class="new-project-form">
+ <label for="newProjectName">图纸名称</label>
+ <input id="newProjectName" type="text" maxlength="80" placeholder="命名你的图纸">
+ <label class="new-project-upload" for="newProjectImage"><img id="newProjectPreview" alt="待制作的图片预览" hidden><span id="newProjectPlus" aria-hidden="true">＋</span><strong id="newProjectUploadLabel">上传图片</strong><small id="newProjectFormat">JPG、PNG、WEBP · 最大 20 MB</small><input id="newProjectImage" type="file" accept="image/png,image/jpeg,image/webp"></label>
+ <p id="newProjectStatus" role="status" aria-live="polite">请先上传图片</p>
+ <div class="modal-buttons"><button id="newProjectCancel" type="button" class="button quiet">取消</button><button id="newProjectStart" type="submit" class="button primary" disabled>开始制作</button></div></form>`,'');
+ const form=$('newProjectForm'),name=$('newProjectName'),file=$('newProjectImage'),status=$('newProjectStatus'),start=$('newProjectStart'),preview=$('newProjectPreview'),dialog=$('modal');
+ let selectedFile=null,previewURL=null,revision=0,busy=false;
+ const isActive=()=>dialog.open&&$('newProjectForm')===form;
+ const cleanup=()=>{revision++;if(previewURL)URL.revokeObjectURL(previewURL);previewURL=null;dialog.removeEventListener('close',cleanup);};
+ dialog.addEventListener('close',cleanup);
+ $('newProjectCancel').onclick=closeModal;
+ file.onchange=async()=>{
+  const image=file.files[0];file.value='';if(!image)return;
+  const task=++revision;selectedFile=null;start.disabled=true;preview.hidden=true;preview.removeAttribute('src');$('newProjectPlus').hidden=false;$('newProjectUploadLabel').textContent='上传图片';$('newProjectFormat').hidden=false;
+  if(previewURL)URL.revokeObjectURL(previewURL);previewURL=null;
+  if(!/^image\/(png|jpeg|webp)$/.test(image.type)||image.size>20*1024*1024){status.textContent='请选择不超过 20 MB 的 JPG、PNG 或 WEBP 图片。';return;}
+  status.textContent='正在读取图片…';const url=URL.createObjectURL(image);
+  try{
+   const probe=new Image();probe.src=url;await probe.decode();
+   if(!isActive()||task!==revision){URL.revokeObjectURL(url);return;}
+   previewURL=url;selectedFile=image;preview.src=url;preview.hidden=false;$('newProjectPlus').hidden=true;$('newProjectUploadLabel').textContent='更换图片';$('newProjectFormat').hidden=true;
+   status.textContent=`${image.name} · ${probe.naturalWidth} × ${probe.naturalHeight}`;start.disabled=false;
+  }catch{URL.revokeObjectURL(url);if(isActive()&&task===revision)status.textContent='无法读取这张图片，请重新上传。';}
+ };
+ form.onsubmit=async e=>{
+  e.preventDefault();if(!selectedFile||busy)return;
+  busy=true;start.disabled=true;file.disabled=true;name.disabled=true;start.textContent='正在准备…';
+  let number=0;const customName=name.value.trim();
+  if(!customName){
+   let last=0;try{last=Number(localStorage.getItem('bead-unnamed-counter'))||0;}catch{}
+   for(const record of libraryEntries){const match=/^未命名_0(\d+)$/.exec(record.name);if(match)last=Math.max(last,Number(match[1]));}
+   number=Math.max(0,Math.floor(last))+1;
+  }
+  try{
+   const ok=await loadImage(selectedFile,{name:customName||`未命名_0${number}`,isActive});
+   if(!isActive())return;
+   if(ok){if(number)try{localStorage.setItem('bead-unnamed-counter',String(number));}catch{}closeModal();}
+   else status.textContent='图片未能载入，请重试或更换图片。';
+  }finally{busy=false;if(isActive()){start.disabled=!selectedFile;file.disabled=false;name.disabled=false;start.textContent='开始制作';}}
+ };
+}
+
 function syncSizePresets(){const width=+$('gridWidth').value,height=+$('gridHeight').value;document.querySelectorAll('[data-size]').forEach(button=>button.classList.toggle('active',width===+button.dataset.size&&height===+button.dataset.size));}
 function setDimensionInputs(width,height){$('gridWidth').value=width;$('gridHeight').value=height;syncSizePresets();}
 function syncRatio(changed){if(!imageSource||!$('keepRatio').checked){syncSizePresets();return;}const region=subjectEditor.getRegion();const ratio=imageSource.width*region.width/(imageSource.height*region.height);const clamp=n=>Math.max(8,Math.min(160,Math.round(n)));let width=+$('gridWidth').value,height=+$('gridHeight').value;const requested=changed==='width'?width:height;if(!Number.isInteger(requested)||requested<8||requested>160){syncSizePresets();return;}if(changed==='width'){height=clamp(width/ratio);width=clamp(height*ratio);}else{width=clamp(height*ratio);height=clamp(width/ratio);}setDimensionInputs(width,height);}
@@ -238,7 +287,7 @@ function updateSourceControls(){
  document.querySelectorAll('[data-size]').forEach(b=>b.disabled=missing||busy);
  document.body.dataset.pendingImport=String(pendingImport);
  $('pendingSource').src=pendingImport&&imageSource?imageSource.src:'';
- if(pendingImport){$('projectName').textContent=sourceName.replace(/\.[^.]+$/,'')||'新图纸';$('projectMeta').textContent='原图预览';}
+ if(pendingImport){$('projectName').textContent=pendingProjectName||sourceName.replace(/\.[^.]+$/,'')||'新图纸';$('projectMeta').textContent='';}
  updateShopInfo();
 }
 function generate(){if(generationPromise)return generationPromise;generationPromise=runGeneration().finally(()=>{generationPromise=null;updateSourceControls();});return generationPromise;}
@@ -272,7 +321,7 @@ async function runGeneration(){
   }
   if(newImport){currentProjectId=null;currentCreatedAt=null;undoStack=[];$('undoBtn').disabled=true;}else pushUndo();
   if(selectedShopPalette)registerShopPalette(settings.shopId,selectedShopPalette);
-  pattern=next;if(newImport||!currentProjectId)projectName=original?workingName.replace(/\.[^.]+$/,'').slice(0,60)||'我的拼豆图纸':'小狐狸的午后';isDemo=!original;
+  pattern=next;if(newImport||!currentProjectId)projectName=original?(newImport&&pendingProjectName?pendingProjectName:workingName.replace(/\.[^.]+$/,'').slice(0,80)||'我的拼豆图纸'):'小狐狸的午后';isDemo=!original;
   savedSourceBlob=workingBlob;savedSourceName=workingName;savedOriginalBlob=originalBlob;savedOriginalName=originalName;savedAiEdited=aiEdited;activeDraft=true;pendingImport=false;parametersDirty=false;appliedSettings=settings;applySettings(settings);
   done=new Set();selected=-1;hovered=-1;highlighted=null;setView('grid');updateAll(true);await persistCurrent();toast(total()?`已保存图纸：${total()} 颗豆，${Object.keys(counts()).length} 种颜色。`:'图纸为空，可关闭“去除外部底色”或重新框选主体后重试。');return true;
  }catch(e){toast('生成或保存失败：'+e.message);return false;}
@@ -308,6 +357,7 @@ $('helpBtn').onclick=()=>modal('从图片，到一颗颗拼好',`<ol><li><b>上�
 
 
 function showScreen(next){
+ if(next!=='beading')fullscreenView?.close();
  screen=next;updateSourceControls();document.body.dataset.screen=next;
  $('navLibrary').classList.toggle('nav-active',next==='library');$('navLibrary').setAttribute('aria-current',next==='library'?'page':'false');
  $('navRecords').classList.toggle('nav-active',next==='records');$('navRecords').setAttribute('aria-current',next==='records'?'page':'false');
@@ -435,12 +485,13 @@ async function showBeadingRecord(record,autoStart=true){
  restoreProject(restored.project);currentProjectId=restored.projectId;currentCreatedAt=null;
  applyPreparedSource({img:null,url:null,blob:null,name:''});originalBlob=savedOriginalBlob=null;originalName=savedOriginalName='';aiEdited=savedAiEdited=false;
  undoStack=[];$('colorSearch').value='';suppressSaving=false;
- $('focusLibrary').textContent='回到记录';$('exitBeading').textContent='← 返回图纸';
+ $('focusLibrary').textContent='退出';$('exitBeading').textContent='← 返回图纸';
  setSaveStatus('记录自动保存');showScreen('beading');renderTimer();
  if(restored.lockedElsewhere)toast('这份记录正在另一个页面打开；请在另一页返回记录仓库或关闭后再继续。');
 }
 async function leaveBeadingRecord(){
  if(!sessionView)return;
+ fullscreenView.close();
  if(!sessionReadOnly())await timer().setDone([...done]);
  await timer().detach();sessionView=false;activeDraft=false;currentProjectId=null;currentCreatedAt=null;clearTimeout(saveTimer);
 }
@@ -486,7 +537,7 @@ $('libraryGrid').onclick=e=>{
  if(libraryMutation||openingProject||sessionBusy)return;
  const clear=e.target.closest('[data-clear-library-filter]');if(clear){libraryFilters={levels:[],time:'all'};$('librarySearch').value='';renderLibrary();return;}
  const create=e.target.closest('[data-new-project]'),rename=e.target.closest('[data-rename]'),remove=e.target.closest('[data-delete]'),edit=e.target.closest('[data-edit]'),start=e.target.closest('[data-start]');
- if(create){if(!create.disabled)$('imageFile').click();}else if(rename)showRename(rename.dataset.rename);else if(remove)showDelete(remove.dataset.delete);else if(edit)openSavedProject(edit.dataset.edit,'editor');else if(start)openSavedProject(start.dataset.start,'beading');
+ if(create){if(!create.disabled)showNewProject();}else if(rename)showRename(rename.dataset.rename);else if(remove)showDelete(remove.dataset.delete);else if(edit)openSavedProject(edit.dataset.edit,'editor');else if(start)openSavedProject(start.dataset.start,'beading');
 };
 function clearBackup(id){try{const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');if(!id||data?.libraryId===id)localStorage.removeItem(STORAGE_KEY);localStorage.setItem(INITIALIZED_KEY,'1');}catch{}}
 function showRename(id){
@@ -592,4 +643,14 @@ async function init(){updateSourceControls();try{
  suppressSaving=false;if(!currentProjectId&&libraryReady&&activeDraft)await persistCurrent();await refreshRecords();$('canvasLoading').hidden=true;showScreen('library');
  let resizeTimer;new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if((screen==='editor'||screen==='beading')&&Math.abs(cellSize-fitSize)<.1)fitCanvas();},100);}).observe($('canvasArea'));
 }catch(e){$('canvasLoading').textContent='载入失败，请刷新页面重试。';$('libraryStatus').textContent='载入失败：'+e.message;toast(e.message);}}
+const fullscreenView=createFullscreenBeading({area:$('canvasArea'),canvas,
+ getColors:()=>Object.entries(counts()).sort((a,b)=>b[1]-a[1]).map(([code,count])=>({code,count,hex:paletteMap().get(code)?.hex,selected:highlighted===code})),
+ selectColor:code=>{highlighted=highlighted===code?null:code;$('colorSearch').value='';renderColorList();draw();},
+ resize:()=>draw(),fit:fitCanvas,
+ zoom:factor=>{cellSize=Math.max(3,Math.min(42,cellSize*factor));draw();},
+ enlarge:()=>{cellSize=Math.max(24,cellSize);$('showCodes').checked=true;setView('grid');},
+ toggleCodes:()=>{$('showCodes').checked=!$('showCodes').checked;draw();return $('showCodes').checked;},
+ exit:goRecords
+});
+$('fullscreenBtn').onclick=()=>fullscreenView.open();
 init();
