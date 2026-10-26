@@ -19,3 +19,5 @@ body.bead-fullscreen-open{overflow:hidden}
 .fs-no-colors .fs-colors{display:none}
 .fs-locked #canvasArea{overflow:hidden;cursor:default}
 @media(max-width:600px){.fs-tools{width:calc(100% - 24px);padding:6px;gap:4px}.bead-fullscreen button{padding:8px 10px;font-size:13px}.fs-colors{padding:8px;max-height:85px}}
+
+.bead-fullscreen button[hidden]{display:none}

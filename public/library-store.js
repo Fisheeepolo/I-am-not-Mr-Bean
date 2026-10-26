@@ -99,7 +99,7 @@ export function openLibrary() {
     };
     request.onblocked = () => {
       abandoned = true;
-      reject(new Error('其他旧页面阻止了仓库更新，请关闭其他豆豆工坊页面后重试。'));
+      reject(new Error('其他旧页面阻止了仓库更新，请关闭其他我不是豆神页面后重试。'));
     };
     request.onerror = () => reject(storageError(request.error, '打开'));
     request.onsuccess = () => {

@@ -71,7 +71,8 @@ export function createSubjectEditor({ container, onChange = () => {} }) {
     }
     const region = getRegion();
     for (const field of fields) if (field !== editingField) field.value = String(Math.round(region[field.dataset.region] * 1000) / 10);
-    hint.textContent = subjectMode === 'whole' ? '保留整张图片；也可以拖动框选主体。' : subjectMode === 'box' ? '拖动或输入百分比修正；Esc 取消本次框选。' : autoReason === 'alpha' ? '已按透明轮廓定位，可框选修正。' : autoReason === 'segmented' ? '已找到候选范围，请检查后继续。' : '未能可靠区分主体，可框选范围。';
+    hint.textContent = subjectMode === 'whole' ? '保留整张图片；也可以拖动框选主体。' : subjectMode === 'box' ? '拖动或输入百分比修正；Esc 取消本次框选。' : autoReason === 'alpha' ? '' : autoReason === 'segmented' ? '已找到候选范围，请检查后继续。' : '未能可靠区分主体，可框选范围。';
+    hint.hidden = !hint.textContent;
     paint();
   }
 

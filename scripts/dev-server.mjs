@@ -46,5 +46,5 @@ const server = http.createServer(async (incoming, outgoing) => {
     } else if (!outgoing.destroyed) outgoing.end();
   } finally { incoming.removeListener('aborted', abort); }
 });
-server.listen(port, '127.0.0.1', () => console.log(`豆豆工坊预览：http://127.0.0.1:${port} （重新构建后自动读取更新）`));
+server.listen(port, '127.0.0.1', () => console.log(`我不是豆神预览：http://127.0.0.1:${port} （重新构建后自动读取更新）`));
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => server.close(() => process.exit(0)));

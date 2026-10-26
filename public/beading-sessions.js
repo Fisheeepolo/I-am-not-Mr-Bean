@@ -59,6 +59,11 @@ function indexedBackend() {
     create: record => transaction('readwrite', (tx, finish) => { tx.objectStore('snapshots').add(snapshotOf(record)); tx.objectStore('activity').add(stateOf(record)); finish(record); }),
     get: id => transaction('readonly', (tx, finish) => { const a = tx.objectStore('snapshots').get(id); a.onsuccess = () => { const b = tx.objectStore('activity').get(id); b.onsuccess = () => finish(join(a.result, b.result)); }; }),
     list: () => transaction('readonly', (tx, finish) => { const a = tx.objectStore('snapshots').getAll(); a.onsuccess = () => { const b = tx.objectStore('activity').getAll(); b.onsuccess = () => { const states = new Map(b.result.map(value => [value.id, value])); finish(a.result.map(value => join(value, states.get(value.id))).filter(Boolean)); }; }; }),
+    remove: (id, check) => transaction('readwrite', (tx, finish, fail) => {
+      const request = tx.objectStore('activity').get(id); request.onsuccess = () => {
+        try { check(request.result); tx.objectStore('activity').delete(id); tx.objectStore('snapshots').delete(id); finish(request.result); } catch (cause) { fail(cause); }
+      };
+    }),
     update: (id, mutate) => transaction('readwrite', (tx, finish, fail) => {
       const a = tx.objectStore('snapshots').get(id); a.onsuccess = () => { const b = tx.objectStore('activity').get(id); b.onsuccess = () => {
         try { const original = join(a.result, b.result); if (!original) throw error('这份拼豆记录不存在。'); const updated = mutate(original); tx.objectStore('activity').put(stateOf(updated)); finish(updated); } catch (cause) { fail(cause); }
@@ -105,6 +110,12 @@ export function createBeadingSessionStore({ backend = indexedBackend(), storage 
       return backend.create({ id: validId(id()), projectId: validId(input.projectId), name: String(input.name || project.projectName || '我的拼豆图纸').slice(0, 80), thumbnail: String(input.thumbnail || ''), width: project.width, height: project.height, totalBeads, colorCount: new Set(project.cells.filter(Boolean)).size, fingerprint: projectFingerprint(project), project,
         status: 'in_progress', elapsedMs: 0, startedAt: date, completedAt: null, updatedAt: date, done, epoch: 0, sequence: 0, owner: null, leaseUntil: 0 });
     },
+    async remove(id) {
+      const record = await backend.remove(validId(id), state => {
+        if (state?.owner && state.leaseUntil > now()) throw error('这份记录正在计时，请先退出拼豆后再删除。', 'SESSION_BUSY');
+      });
+      if (record) removeJournal(record);
+    },
     async get(id) { return recover(await backend.get(validId(id))); },
     async list() { return (await backend.list()).map(recover).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)); },
     async findPending(projectId, project) { const fingerprint = projectFingerprint(project), signature = patternKey(project); return (await api.list()).find(record => record.projectId === projectId && record.status === 'in_progress' && record.fingerprint === fingerprint && patternKey(record.project) === signature) || null; },
@@ -141,6 +152,7 @@ export function createBeadingSessionStore({ backend = indexedBackend(), storage 
 }
 
 const defaultStore = createBeadingSessionStore();
+export const deleteBeadingSession = id => defaultStore.remove(id);
 export const listBeadingSessions = () => defaultStore.list();
 export const getBeadingSession = id => defaultStore.get(id);
 export const createBeadingSession = input => defaultStore.create(input);

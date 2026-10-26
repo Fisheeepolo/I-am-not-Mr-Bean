@@ -1,0 +1,114 @@
+[
+  {
+    "fixture": "photo-astronaut",
+    "maxColors": 16,
+    "beforeColors": 16,
+    "afterColors": 16,
+    "beforeDE": 5.869238260400025,
+    "afterDE": 5.869238260400025
+  },
+  {
+    "fixture": "photo-astronaut",
+    "maxColors": 20,
+    "beforeColors": 20,
+    "afterColors": 20,
+    "beforeDE": 5.568883503120355,
+    "afterDE": 5.568883503120355
+  },
+  {
+    "fixture": "photo-chelsea",
+    "maxColors": 16,
+    "beforeColors": 16,
+    "afterColors": 16,
+    "beforeDE": 5.564523248897449,
+    "afterDE": 5.564523248897449
+  },
+  {
+    "fixture": "photo-chelsea",
+    "maxColors": 20,
+    "beforeColors": 20,
+    "afterColors": 20,
+    "beforeDE": 5.530458136757977,
+    "afterDE": 5.528207155075093
+  },
+  {
+    "fixture": "photo-rocket",
+    "maxColors": 16,
+    "beforeColors": 16,
+    "afterColors": 16,
+    "beforeDE": 5.740885839853851,
+    "afterDE": 5.746666934905691
+  },
+  {
+    "fixture": "photo-rocket",
+    "maxColors": 20,
+    "beforeColors": 20,
+    "afterColors": 20,
+    "beforeDE": 5.714601186817143,
+    "afterDE": 5.714601186817143
+  },
+  {
+    "fixture": "dev-eyes-lines",
+    "maxColors": 16,
+    "beforeColors": 14,
+    "afterColors": 14,
+    "beforeDE": 4.200314018267291,
+    "afterDE": 4.200314018267291
+  },
+  {
+    "fixture": "dev-eyes-lines",
+    "maxColors": 20,
+    "beforeColors": 17,
+    "afterColors": 18,
+    "beforeDE": 4.195795276413044,
+    "afterDE": 4.196669587189362
+  },
+  {
+    "fixture": "dev-defocus",
+    "maxColors": 16,
+    "beforeColors": 16,
+    "afterColors": 16,
+    "beforeDE": 5.199559785761651,
+    "afterDE": 5.199559785761651
+  },
+  {
+    "fixture": "dev-defocus",
+    "maxColors": 20,
+    "beforeColors": 20,
+    "afterColors": 20,
+    "beforeDE": 5.175446573117852,
+    "afterDE": 5.179830042855872
+  },
+  {
+    "fixture": "dev-low-contrast",
+    "maxColors": 16,
+    "beforeColors": 3,
+    "afterColors": 2,
+    "beforeDE": 3.274528423524946,
+    "afterDE": 3.2745310380443255
+  },
+  {
+    "fixture": "dev-low-contrast",
+    "maxColors": 20,
+    "beforeColors": 3,
+    "afterColors": 2,
+    "beforeDE": 3.274528423524946,
+    "afterDE": 3.2745310380443255
+  },
+  {
+    "fixture": "dev-highlights",
+    "maxColors": 16,
+    "beforeColors": 2,
+    "afterColors": 2,
+    "beforeDE": 6.840638050904634,
+    "afterDE": 6.840638050904634
+  },
+  {
+    "fixture": "dev-highlights",
+    "maxColors": 20,
+    "beforeColors": 2,
+    "afterColors": 2,
+    "beforeDE": 6.840638050904634,
+    "afterDE": 6.840638050904634
+  }
+]

@@ -8,7 +8,9 @@ class MemoryBackend {
   async create(value) { this.records.set(value.id, structuredClone(value)); return structuredClone(value); }
   async get(id) { return structuredClone(this.records.get(id) || null); }
   async list() { return structuredClone([...this.records.values()]); }
+  async remove(id, check) { const state = this.records.get(id); check(state); this.records.delete(id); return structuredClone(state); }
   async update(id, mutate) {
+    if (!this.records.has(id)) throw new Error("Missing record");
     if (this.failNext) { this.failNext = false; throw new Error('Storage unavailable'); }
     const value = mutate(structuredClone(this.records.get(id)));
     this.records.set(id, structuredClone(value)); return structuredClone(value);
@@ -120,3 +122,20 @@ function fixture() {
   console.log('PASS Web Locks reject simultaneous timers and allow immediate recovery after browser crash');
 }
 console.log('All beading session storage and timer tests passed.');
+
+{
+ const f=fixture(), first=await f.create(), other=await f.create();
+ const owned=await f.store.claim(first.id,'active');
+ await assert.rejects(f.store.remove(first.id), {code:'SESSION_BUSY'});
+ assert.ok(await f.store.get(first.id));
+ f.time.advance(16000,false);
+ f.store.journal({...owned,sequence:1,elapsedMs:1000});
+ await f.store.remove(first.id);
+ assert.equal(await f.store.get(first.id),null);
+ assert.ok(await f.store.get(other.id));
+ assert.equal(f.storage.values.size,0);
+ await assert.rejects(f.store.checkpoint(first.id,'active',owned.epoch,{sequence:2,elapsedMs:2000,done:[]}));
+ await f.store.remove(first.id);
+ assert.equal((await f.store.list()).length,1);
+ console.log('PASS record deletion protects active timers, removes recovery journal and rejects stale saves');
+}

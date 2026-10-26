@@ -4,13 +4,13 @@ import { optimizePotts, pottsEnergy } from './graph-cuts.js';
 export const OPTIMIZATION_MODES = ['detail', 'balanced', 'easy'];
 // Freeze these before development evaluation; never tune against the holdout.
 export const OPTIMIZER_PARAMETERS = Object.freeze({
-  version: 'content-aware-v4.2', maximumMatrixEntries: 3_000_000, medoidPasses: 2, componentPasses: 2,
+  version: 'content-aware-v4.3', maximumMatrixEntries: 3_000_000, medoidPasses: 2, componentPasses: 2,
   microProtection: Object.freeze({ kappa: .5, minimumRing: 4, minimumGap: 1, maximumInnerRatio: .35,
     maximumRingRatio: .5, minimumSaliency: .2, minimumSaliencyGain: .05, maximumDefocus: .3 }),
   modes: Object.freeze({
-    detail: Object.freeze({ lambda: 0, sigma: 7, island: 0, expansionPasses: 0 }),
-    balanced: Object.freeze({ lambda: 18, sigma: 7, island: 18, expansionPasses: 2 }),
-    easy: Object.freeze({ lambda: 42, sigma: 10, island: 50, expansionPasses: 2 }),
+    detail: Object.freeze({ lambda: 0, sigma: 7, island: 0, paletteTolerance: 0, expansionPasses: 0 }),
+    balanced: Object.freeze({ lambda: 18, sigma: 7, island: 18, paletteTolerance: 3, expansionPasses: 2 }),
+    easy: Object.freeze({ lambda: 42, sigma: 10, island: 50, paletteTolerance: 5, expansionPasses: 2 }),
   }),
 });
 const square = n => n * n;
@@ -35,8 +35,8 @@ function representatives(unique, paletteSize) {
       const coordinates = item.lab.map(value => Math.floor(value / binWidth)), key = coordinates.join(',');
       const distance = item.lab.reduce((sum, value, j) => sum + square(value - (coordinates[j] + .5) * binWidth), 0);
       let bin = bins.get(key);
-      if (!bin) { bin = { lab: item.lab, weight: 0, representativeDistance: distance }; bins.set(key, bin); }
-      bin.weight += item.weight;
+      if (!bin) { bin = { lab: item.lab, weight: 0, representativeDistance: distance, protected: false }; bins.set(key, bin); }
+      bin.weight += item.weight; bin.protected ||= item.protected;
       if (distance < bin.representativeDistance) { bin.lab = item.lab; bin.representativeDistance = distance; }
     }
     rows = [...bins.values()];
@@ -60,7 +60,7 @@ function paletteCost(selected, rows, matrix, p) {
  * complete assigned sample costs. A non-Euclidean distance has no centroid
  * sufficient statistic, so no Lab-mean shortcut is used here.
  */
-function choosePalette(rows, colors, maximum, metric) {
+function choosePalette(rows, colors, maximum, metric, tolerance = 0) {
   const p = colors.length, m = rows.length, matrix = new Float32Array(m * p), used = new Set();
   const firstCosts = new Float64Array(p);
   for (let r = 0; r < m; r++) {
@@ -73,22 +73,34 @@ function choosePalette(rows, colors, maximum, metric) {
     used.add(best);
   }
   if (!m) return { selected: [], matrix, inputColors: 0, trace: [] };
-  if (used.size <= maximum) return { selected: [...used].sort((a, b) => a - b), matrix, inputColors: used.size, trace: [{ stage: 'nearest-complete', energy: paletteCost([...used], rows, matrix, p) }] };
+  if (!tolerance && used.size <= maximum) return { selected: [...used].sort((a, b) => a - b), matrix, inputColors: used.size, trace: [{ stage: 'nearest-complete', energy: paletteCost([...used], rows, matrix, p) }] };
+  // Penalize only error beyond each source colour's best catalogue match.
+  // This dead zone is not an extra label cost: it stops buying shade distinctions
+  // inside tolerance while a rare contrasting pixel can still justify a colour.
+  const selectionMatrix = tolerance ? new Float32Array(matrix.length) : matrix;
+  if (tolerance) for (let r = 0; r < m; r++) {
+    let floor = Infinity;
+    for (let c = 0; c < p; c++) floor = Math.min(floor, matrix[r * p + c]);
+    for (let c = 0; c < p; c++) {
+      const cost = Math.max(0, matrix[r * p + c] - floor - (rows[r].protected ? 0 : square(tolerance)));
+      selectionMatrix[r * p + c] = cost;
+    }
+  }
   let first = 0;
   for (let c = 1; c < p; c++) if (firstCosts[c] < firstCosts[first]) first = c;
   const selected = [first], chosen = new Set(selected), trace = [{ stage: 'facility-seed', energy: firstCosts[first] }];
-  const best = Float32Array.from(rows, (_, r) => matrix[r * p + first]);
+  const best = Float32Array.from(rows, (_, r) => selectionMatrix[r * p + first]);
   while (selected.length < maximum) {
     let winner = -1, gain = 1e-8;
     for (let c = 0; c < p; c++) {
       if (chosen.has(c)) continue;
       let improvement = 0;
-      for (let r = 0; r < m; r++) { const delta = best[r] - matrix[r * p + c]; if (delta > 0) improvement += rows[r].weight * delta; }
+      for (let r = 0; r < m; r++) { const delta = best[r] - selectionMatrix[r * p + c]; if (delta > 0) improvement += rows[r].weight * delta; }
       if (improvement > gain) { winner = c; gain = improvement; }
     }
     if (winner < 0) break;
     chosen.add(winner); selected.push(winner);
-    for (let r = 0; r < m; r++) best[r] = Math.min(best[r], matrix[r * p + winner]);
+    for (let r = 0; r < m; r++) best[r] = Math.min(best[r], selectionMatrix[r * p + winner]);
     trace.push({ stage: 'facility-add', colors: selected.length, energy: paletteCost(selected, rows, matrix, p) });
   }
   for (let pass = 0; pass < OPTIMIZER_PARAMETERS.medoidPasses; pass++) {
@@ -292,8 +304,8 @@ export function optimizePatternColors(labs, width, height, palette, options = {}
     protectedCells[i] = +(saliency[i] >= .65 || (point.contrast >= 24 && defocus[i] < .5)); protectedCount += protectedCells[i];
     point.weight = (1 + 2 * saliency[i] + .5 * fallback) * (1 - .55 * defocus[i] * (1 - saliency[i]));
     const key = point.lab.join(',');
-    if (!uniqueMap.has(key)) { uniqueMap.set(key, unique.length); unique.push({ lab: point.lab, weight: 0 }); }
-    point.unique = uniqueMap.get(key); unique[point.unique].weight += point.weight;
+    if (!uniqueMap.has(key)) { uniqueMap.set(key, unique.length); unique.push({ lab: point.lab, weight: 0, protected: false }); }
+    point.unique = uniqueMap.get(key); unique[point.unique].weight += point.weight; unique[point.unique].protected ||= !!protectedCells[i];
   }
   const edgeIndex = new Int32Array(n * 4).fill(-1);
   const edges = rawEdges.map(({ u, v, distance, direction }, index) => {
@@ -304,7 +316,7 @@ export function optimizePatternColors(labs, width, height, palette, options = {}
     return { u, v, weight, direction };
   });
   const paletteStarted = clock(), representation = representatives(unique, colors.length);
-  const selection = choosePalette(representation.rows, colors, maximum, metric), k = selection.selected.length;
+  const selection = choosePalette(representation.rows, colors, maximum, metric, options.adaptivePalette === false ? 0 : config.paletteTolerance), k = selection.selected.length;
   const sampleCosts = new Float32Array(unique.length * k);
   for (let r = 0; r < unique.length; r++) for (let c = 0; c < k; c++) sampleCosts[r * k + c] = representation.exact
     ? selection.matrix[r * colors.length + selection.selected[c]] : square(metric(unique[r].lab, colors[selection.selected[c]].lab));
@@ -348,7 +360,7 @@ export function optimizePatternColors(labs, width, height, palette, options = {}
     version: OPTIMIZER_PARAMETERS.version, mode, colorMetric, inputColors: selection.inputColors, outputColors: countMap.size, smoothedCells: changed,
     meanDeltaE76: n ? error76 / n : 0, meanDeltaE2000: n ? error00 / n : 0, weightedRmse: totalWeight ? Math.sqrt(finalEnergy.data / totalWeight) : 0,
     paletteSelection: { approximation: representation.exact ? 'none' : 'actual-source-Lab-bin-representatives', binWidth: representation.binWidth,
-      sourceUniqueColors: unique.length, representativeCount: representation.rows.length, matrixEntries: selection.matrix.length, trace: selection.trace },
+      adaptive: options.adaptivePalette !== false && config.paletteTolerance > 0, tolerance: options.adaptivePalette === false ? 0 : config.paletteTolerance, selectedColors: k, maximumColors: maximum, sourceUniqueColors: unique.length, representativeCount: representation.rows.length, matrixEntries: selection.matrix.length, trace: selection.trace },
     energyTrace, dataEnergyTrace: energyTrace.map(e => e.data), pairwiseEnergyTrace: energyTrace.map(e => e.pairwise), islandEnergyTrace: energyTrace.map(e => e.island),
     initialIslandRates: rates(initialIslands), finalIslandRates: rates(finalIslands), protectedCellCount: protectedCount, microProtection,
     solver: { expansionMoves: cuts.moves, acceptedExpansionMoves: cuts.accepted, expansionPasses: cuts.passes, componentMerges: merges,

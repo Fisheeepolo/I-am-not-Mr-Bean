@@ -7,7 +7,7 @@ import { openLibrary, listProjects, getProject, saveProject as storeProject, ren
 import { installAI } from './ai-workflow.js';
 import { createPatternRenderer, drawBeadGrid } from './pattern-renderer.js';
 import { estimatePatternEffort, getPatternBounds } from './pattern-effort.js';
-import { listBeadingSessions, getBeadingSession, createBeadingSession, findPendingSession, createSessionTimer } from './beading-sessions.js';
+import { deleteBeadingSession, listBeadingSessions, getBeadingSession, createBeadingSession, findPendingSession, createSessionTimer } from './beading-sessions.js';
 
 import { createHostStudio } from './host-studio.js';
 import { createDifficultyExamples, matchesLibraryFilters } from './difficulty-examples.js';
@@ -22,6 +22,7 @@ const INITIALIZED_KEY = 'bead-studio-library-initialized';
 let palettes = {}, paletteId = 'mard', activePalette = [], pattern = null;
 let imageSource = null, sourceName = '', projectName = '小狐狸的午后', isDemo = true;
 let selected = -1, hovered = -1, highlighted = null, done = new Set(), exclusions = {};
+let autoFitView = true;
 let cellSize = 10, fitSize = 10, ruler = 23, view = 'grid', undoStack = [], saveTimer;
 let customPalettes = {}, basePalette, autoSaveAvailable = true;
 let libraryReady=false, libraryEntries=[], currentProjectId=null, currentCreatedAt=null;
@@ -51,7 +52,7 @@ function updateAvailable() { $('availableInfo').textContent = `${availablePalett
 function syncPaletteOptions() { $('paletteSelect').innerHTML = Object.entries(palettes).map(([id,p]) => `<option value="${escapeHTML(id)}">${escapeHTML(p.name)}</option>`).join(''); $('paletteSelect').value = paletteId; }
 function snapshot() { return { pattern: structuredClone(pattern), done: [...done], paletteId, customPalettes: structuredClone(customPalettes), projectName, isDemo, settings:structuredClone(appliedSettings), sourceBlob:savedSourceBlob, sourceName:savedSourceName, originalBlob:savedOriginalBlob, originalName:savedOriginalName, aiEdited:savedAiEdited }; }
 function pushUndo() { undoStack.push(snapshot()); if (undoStack.length > 15) undoStack.shift(); $('undoBtn').disabled = false; }
-function readSettings(){return {...subjectEditor.getState(),optimizationMode:$('optimizationMode').value,imageStyle:$('imageStyle').value,shopId:$('buyerShop').value,width:+$('gridWidth').value,height:+$('gridHeight').value,maxColors:+$('maxColors').value,keepRatio:$('keepRatio').checked,removeBackground:$('removeBackground').checked,backgroundTolerance:+$('tolerance').value};}
+function readSettings(){return {...subjectEditor.getState(),optimizationMode:$('optimizationMode').value,imageStyle:$('imageStyle').value,shopId:'',width:+$('gridWidth').value,height:+$('gridHeight').value,maxColors:+$('maxColors').value,keepRatio:$('keepRatio').checked,removeBackground:$('removeBackground').checked,backgroundTolerance:+$('tolerance').value};}
 function applySettings(settings){
  const value=settings||{};subjectEditor.setState({subjectMode:value.subjectMode||'whole',subjectRegion:value.subjectRegion});
  $('optimizationMode').value=['detail','balanced','easy'].includes(value.optimizationMode)?value.optimizationMode:'balanced';
@@ -93,7 +94,7 @@ function persistCurrent(notify=false){
  writeQueue=operation;return operation;
 }
 function saveLocal(){return persistCurrent().catch(()=>false);}
-function validateProject(data) { if(data.format !== 'bead-studio' || data.version !== 1) throw new Error('这不是豆豆工坊图纸文件。'); if(!Number.isInteger(data.width)||!Number.isInteger(data.height)||data.width<8||data.height<8||data.width>160||data.height>160) throw new Error('图纸宽高须为 8–160。'); if(!Array.isArray(data.cells)||data.cells.length !== data.width*data.height) throw new Error('图纸格子数量与尺寸不一致。'); const p=parsePalette(JSON.stringify(data.palette),'palette.json'); const codes=new Set(p.colors.map(c=>c.code)); if(data.cells.some(c=>c !== null && (typeof c!=='string'||!codes.has(c)))) throw new Error('图纸中有未定义的色号。'); if(data.done && (!Array.isArray(data.done)||data.done.some(i=>!Number.isInteger(i)||i<0||i>=data.cells.length||data.cells[i]===null))) throw new Error('已拼进度数据无效。'); return p; }
+function validateProject(data) { if(data.format !== 'bead-studio' || data.version !== 1) throw new Error('这不是我不是豆神图纸文件。'); if(!Number.isInteger(data.width)||!Number.isInteger(data.height)||data.width<8||data.height<8||data.width>160||data.height>160) throw new Error('图纸宽高须为 8–160。'); if(!Array.isArray(data.cells)||data.cells.length !== data.width*data.height) throw new Error('图纸格子数量与尺寸不一致。'); const p=parsePalette(JSON.stringify(data.palette),'palette.json'); const codes=new Set(p.colors.map(c=>c.code)); if(data.cells.some(c=>c !== null && (typeof c!=='string'||!codes.has(c)))) throw new Error('图纸中有未定义的色号。'); if(data.done && (!Array.isArray(data.done)||data.done.some(i=>!Number.isInteger(i)||i<0||i>=data.cells.length||data.cells[i]===null))) throw new Error('已拼进度数据无效。'); return p; }
 function restoreProject(data) {
  const p=validateProject(data);
  // Restore the catalogue first. The palette embedded in the actual drawing is
@@ -120,7 +121,7 @@ function restoreProject(data) {
 
 function updateAll(fit=false) { if(!pattern) return; pattern.counts=counts(); $('projectName').textContent=projectName;if($('focusProjectName'))$('focusProjectName').textContent=projectName;if($('focusSummary'))$('focusSummary').textContent=`${pattern.width} × ${pattern.height} · ${total()} 颗 · ${Object.keys(counts()).length} 色`; $('projectMeta').textContent=`${pattern.width} × ${pattern.height} · ${isDemo?'原创示例':palettes[paletteId].name}`; $('statSize').textContent=`${pattern.width} × ${pattern.height}`; $('statTotal').textContent=total().toLocaleString(); $('statColors').textContent=Object.keys(pattern.counts).length+' 色'; $('totalBeads').textContent=total().toLocaleString(); $('colorCountBadge').textContent=Object.keys(pattern.counts).length+' 色'; $('colInput').max=pattern.width; $('rowInput').max=pattern.height; $('colInput').value=Math.min(+$('colInput').value||1,pattern.width); $('rowInput').value=Math.min(+$('rowInput').value||1,pattern.height); updateProgress(); renderColorList(); updateSelected(); if(fit) fitCanvas(); else draw(); saveSoon(); }
 function updateProgress(){ if($('statProgress'))$('statProgress').textContent=(total()?Math.round(done.size/total()*100):0)+'%'; }
-function fitCanvas(){ if(!pattern) return; const area=$('canvasArea');if(!area.clientWidth||!area.clientHeight)return; fitSize=Math.min((area.clientWidth-96)/pattern.width,(area.clientHeight-96)/pattern.height); fitSize=Math.max(1,Math.min(18,fitSize)); cellSize=fitSize; ruler=23; area.scrollLeft=0;area.scrollTop=0;draw(); }
+function fitCanvas(){ autoFitView=true;if(!pattern) return; const area=$('canvasArea');if(!area.clientWidth||!area.clientHeight)return; if(!document.body.classList.contains('bead-fullscreen-open')){const bottom=document.querySelector('.canvas-bottom')?.offsetHeight||64;area.style.height=Math.max(220,Math.min(580,window.innerHeight-area.getBoundingClientRect().top-bottom-20))+'px';} fitSize=Math.min((area.clientWidth-96)/pattern.width,(area.clientHeight-96)/pattern.height); fitSize=Math.max(.1,Math.min(42,fitSize)); cellSize=fitSize; ruler=23; area.scrollLeft=0;area.scrollTop=0;draw(); }
 function contrast(hex){ const [r,g,b]=hexToRgb(hex);return r*.299+g*.587+b*.114>150?'#302b33':'#ffffff'; }
 function draw(){
  if(!pattern)return;
@@ -135,7 +136,7 @@ function hitTest(event){return patternRenderer.hitTest(event);}
 function scheduleHover(){if(hoverFrame!==null)return;hoverFrame=requestAnimationFrame(()=>{hoverFrame=null;draw();updateSelected(hovered>=0?hovered:selected);});}
 canvas.addEventListener('mousemove',e=>{const next=hitTest(e);if(next!==hovered){hovered=next;scheduleHover();}});
 canvas.addEventListener('mouseleave',()=>{hovered=-1;scheduleHover();});
-canvas.addEventListener('click',e=>{const index=hitTest(e);if(index>=0){selectCell(index,false);if(screen==='beading'){$('colorSearch').value='';const code=pattern.cells[index];highlighted=code===null?null:(highlighted===code?null:code);renderColorList();draw();}}});
+canvas.addEventListener('click',e=>{const index=hitTest(e);if(index>=0){selectCell(index,false);if(screen==='beading'||fullscreenView?.isOpen()){$('colorSearch').value='';const code=pattern.cells[index];highlighted=code===null?null:(highlighted===code?null:code);renderColorList();draw();}}});
 function scrollToCell(index){const point=patternRenderer.cellCenter(index),area=$('canvasArea');area.scrollTo({left:Math.max(0,point.x-area.clientWidth/2),top:Math.max(0,point.y-area.clientHeight/2),behavior:'smooth'});}
 function selectCell(index,scroll=true){
  if(!pattern||!Number.isInteger(index)||index<0||index>=pattern.cells.length)return;
@@ -143,7 +144,6 @@ function selectCell(index,scroll=true){
  $('colInput').value=col+1;$('rowInput').value=row+1;updateSelected();updateColorNav();draw();if(scroll)scrollToCell(index);
 }
 function updateSelected(index=selected){if(index<0){$('selectedCode').textContent='选择一颗豆';$('selectedCoords').textContent='点击图纸查看色号与位置';$('selectedSwatch').style.background='#e5ddec';$('markDone').disabled=true;$('markDone').classList.remove('done');return;}const code=pattern.cells[index],color=paletteMap().get(code);$('selectedCode').textContent=code||'空白格';$('selectedCoords').textContent=`第 ${index%pattern.width+1} 列 · 第 ${Math.floor(index/pattern.width)+1} 行${done.has(index)?' · 已拼':''}`;$('selectedSwatch').style.background=color?.hex||'#fff';$('markDone').disabled=index!==selected||code===null||sessionReadOnly();$('markDone').classList.toggle('done',done.has(index));}
-$('locateForm').onsubmit=e=>{e.preventDefault();if(!pattern)return;const col=+$('colInput').value,row=+$('rowInput').value;if(!Number.isInteger(col)||!Number.isInteger(row)||col<1||row<1||col>pattern.width||row>pattern.height){toast(`请输入 1–${pattern.width} 列、1–${pattern.height} 行。`);return;}selectCell((row-1)*pattern.width+col-1);canvas.focus({preventScroll:true});};
 canvas.addEventListener('keydown',e=>{
  if(!pattern)return;
  const moves={ArrowLeft:-1,ArrowRight:1,ArrowUp:-pattern.width,ArrowDown:pattern.width};
@@ -153,19 +153,18 @@ canvas.addEventListener('keydown',e=>{
   if(e.key==='ArrowLeft'&&x===0||e.key==='ArrowRight'&&x===pattern.width-1||e.key==='ArrowUp'&&y===0||e.key==='ArrowDown'&&y===pattern.height-1)return;
   selectCell(selected+moves[e.key]);
  }
- else if(e.key.toLowerCase()==='n'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();nextUnfinished();}
  else if(e.key==='Escape'){highlighted=null;renderColorList();draw();}
 });
 function markSelected(){if(sessionReadOnly())return;if(selected<0||pattern.cells[selected]===null)return;if(done.has(selected))done.delete(selected);else done.add(selected);updateSelected();updateProgress();updateColorNav();draw();saveSoon();}
 
 function viewAnchor(){const area=$('canvasArea'),r=area.getBoundingClientRect();return selected>=0?selected:hitTest({clientX:r.left+area.clientWidth/2,clientY:r.top+area.clientHeight/2});}
-function zoom(factor){const old=cellSize,anchor=viewAnchor();cellSize=Math.max(Math.min(3,fitSize),Math.min(42,cellSize*factor));if(cellSize===old)return;hovered=-1;draw();if(anchor>=0)scrollToCell(anchor);}
+function zoom(factor){autoFitView=false;const old=cellSize,anchor=viewAnchor();cellSize=Math.max(Math.min(3,fitSize),Math.min(42,cellSize*factor));if(cellSize===old)return;hovered=-1;draw();if(anchor>=0)scrollToCell(anchor);}
 $('zoomIn').onclick=()=>zoom(1.4);$('zoomOut').onclick=()=>zoom(1/1.4);$('fitBtn').onclick=fitCanvas;$('showCodes').onchange=draw;$('showGrid').onchange=draw;
-if($('readableZoom'))$('readableZoom').onclick=()=>{const anchor=viewAnchor();cellSize=Math.max(24,cellSize);$('showCodes').checked=true;setView('grid');if(anchor>=0)scrollToCell(anchor);toast('已放大显示每格色号，可拖动滚动条查看图纸。');};
-function setView(next){view=next;$('gridView').classList.toggle('active',next==='grid');$('beadView').classList.toggle('active',next==='bead');$('showCodes').disabled=next==='bead';$('showGrid').disabled=next==='bead';draw();}
-$('gridView').onclick=()=>setView('grid');$('beadView').onclick=()=>setView('bead');
+if($('readableZoom'))$('readableZoom').onclick=()=>{autoFitView=false;const anchor=viewAnchor();cellSize=Math.max(24,cellSize);$('showCodes').checked=true;setView('grid');if(anchor>=0)scrollToCell(anchor);toast('已放大显示每格色号，可拖动滚动条查看图纸。');};
+function setView(next){view=next;$('gridView').classList.toggle('active',next==='grid');$('showCodes').disabled=next==='bead';$('showGrid').disabled=next==='bead';draw();}
+$('gridView').onclick=()=>setView('grid');
 function renderColorList(){const map=paletteMap(), query=$('colorSearch').value.trim().toUpperCase();const items=Object.entries(counts()).sort((a,b)=>b[1]-a[1]);$('colorList').innerHTML=items.filter(([code])=>code.toUpperCase().includes(query)).map(([code,n])=>{const color=map.get(code);return `<div class="color-row ${highlighted===code?'active':''}"><button class="color-main" data-code="${escapeHTML(code)}" aria-pressed="${highlighted===code}" title="高亮 ${escapeHTML(code)}"><span class="color-swatch" style="background:${color.hex}"></span><span class="color-label"><strong>${escapeHTML(code)}</strong></span><span class="color-quantity">${n} 颗</span></button><button class="replace-button" data-replace="${escapeHTML(code)}" aria-label="替换 ${escapeHTML(code)}，查看相近色">⇄</button></div>`;}).join('')||'<div class="empty-list">没有找到这个色号</div>';$('clearHighlight').hidden=!highlighted;updateColorNav();fullscreenView?.refresh();}
-$('colorSearch').oninput=renderColorList;$('colorList').onclick=e=>{const main=e.target.closest('[data-code]'),replace=e.target.closest('[data-replace]');if(main){highlighted=highlighted===main.dataset.code?null:main.dataset.code;renderColorList();draw();if(highlighted) navigateColor(1,true);}if(replace)showAlternatives(replace.dataset.replace);};
+$('colorSearch').oninput=renderColorList;$('colorList').onclick=e=>{const main=e.target.closest('[data-code]'),replace=e.target.closest('[data-replace]');if(main){highlighted=highlighted===main.dataset.code?null:main.dataset.code;renderColorList();draw();}if(replace)showAlternatives(replace.dataset.replace);};
 $('clearHighlight').onclick=()=>{highlighted=null;$('colorSearch').value='';renderColorList();draw();};
 function positionsFor(code){
  if(indexedCells!==pattern.cells){indexedCells=pattern.cells;colorIndex=new Map();pattern.cells.forEach((value,index)=>{if(value===null)return;if(!colorIndex.has(value))colorIndex.set(value,[]);colorIndex.get(value).push(index);});}
@@ -185,7 +184,7 @@ function nextUnfinished(){
  if(next===undefined){toast(highlighted?`${highlighted} 已全部拼好，选择其他颜色继续。`:'这张图纸已经全部拼好啦！');return;}
  selectCell(next);canvas.focus({preventScroll:true});
 }
-$('prevColor').onclick=()=>navigateColor(-1);$('nextColor').onclick=()=>navigateColor(1);
+
 if($('nextUnfinished'))$('nextUnfinished').onclick=nextUnfinished;
 function showAlternatives(code){const original=paletteMap().get(code);const candidates=nearestColors(original.hex,availablePalette().filter(c=>c.code!==code),6);modal('给这颗豆，换个近似色',`<div class="modal-current"><span class="color-swatch" style="background:${original.hex}"></span><div><strong>${escapeHTML(code)}</strong><br><span>当前共 ${counts()[code]} 颗 · ${escapeHTML(palettes[paletteId].name)}</span></div></div><p>按屏幕色差从小到大排列，仅显示当前配色来源中的可用色。</p><div class="alternative-list">${candidates.map((c,i)=>`<button class="alternative" data-alternative="${escapeHTML(c.code)}"><span class="color-swatch" style="background:${c.hex}"></span><span class="alt-info"><strong>${escapeHTML(c.code)} ${i===0?'<span style="font-size:9px;color:#a99bb5;margin-left:8px">最接近</span>':''}</strong><small>${c.hex} · 色差 ΔE ${c.distance.toFixed(1)}</small></span><span class="alt-choose">替换全部 →</span></button>`).join('')||'<div class="empty-list">没有可用替代色，请在东道主补充可用颜色后重新匹配。</div>'}</div><div class="replace-all-note">替换后同步更新图纸和清单，可以撤销。色差越小越接近，实物请对照商家色卡。</div>`,'COLOR MATCH');$('modalBody').querySelectorAll('[data-alternative]').forEach(button=>button.onclick=()=>{const replacement=button.dataset.alternative;pushUndo();const n=counts()[code];pattern.cells=replaceColor(pattern.cells,code,replacement);for(const i of [...done])if(undoStack.at(-1).pattern.cells[i]===code)done.delete(i);if(highlighted===code)highlighted=replacement;updateAll();closeModal();toast(`已将 ${n} 颗 ${code} 替换为 ${replacement}，可撤销。`);});}
 $('undoBtn').onclick=async()=>{
@@ -279,7 +278,7 @@ function updateSourceControls(){
  $('undoBtn').title='撤销上一次图纸调整';
  $('undoBtn').disabled=busy||!undoStack.length;
  for(const id of ['saveProject','startBeading'])$(id).disabled=busy||!pattern;
- $('exportBtn').disabled=busy||pendingImport||!pattern;
+ $('exportBtn').disabled=busy||pendingImport||!pattern;$('previewPattern').disabled=busy||!pattern;
  for(const id of ['navLibrary','navRecords','navHost','libraryNew','openProject','difficultyExamplesBtn'])if($(id))$(id).disabled=!!generationPromise||!pattern;
  const missing=!imageSource&&!isDemo&&!pendingImport;
  for(const id of ['gridWidth','gridHeight','maxColors','keepRatio','removeBackground','tolerance','imageStyle','optimizationMode','generateBtn'])$(id).disabled=missing||busy;
@@ -299,7 +298,7 @@ async function runGeneration(){
  const available=selectedShopPalette?.colors||availablePalette();if(!available.length){toast('当前色卡没有可用颜色，请先在东道主补充颜色。');return false;}
  if(!imageSource&&!isDemo){toast('这份旧图纸没有原图，可继续拼豆或匹配店家颜色。');return false;}
  const original=imageSource,workingBlob=sourceBlob,workingName=sourceName,newImport=pendingImport;
- const controls=[...document.querySelectorAll('.source-panel button,.source-panel input,.source-panel select,#saveProject,#startBeading,#navLibrary,#navRecords,#navHost,#openProject,#libraryNew,#aiConfigBtn')].map(el=>[el,el.disabled]);controls.forEach(([el])=>el.disabled=true);
+ const controls=[...document.querySelectorAll('.top-parameters button,.top-parameters input,.top-parameters select,.source-panel button,.source-panel input,.source-panel select,#previewPattern,#saveProject,#startBeading,#navLibrary,#navRecords,#navHost,#openProject,#libraryNew,#aiConfigBtn')].map(el=>[el,el.disabled]);controls.forEach(([el])=>el.disabled=true);
  $('editorScreen').inert=true;$('subjectEditor').inert=true;$('canvasLoading').hidden=false;$('canvasLoading').textContent='正在定位主体并匹配颜色…';
  await new Promise(r=>setTimeout(r,40));
  try{
@@ -337,10 +336,20 @@ function csvCell(value){const s=String(value);return '"'+s.replace(/"/g,'""')+'"
 function exportList(){const map=paletteMap();const rows=[['色卡','色号','HEX','用豆数量'],...Object.entries(counts()).sort((a,b)=>b[1]-a[1]).map(([code,n])=>[palettes[paletteId].name,code,map.get(code).hex,n])];downloadText(safeName()+'-用色清单.csv',rows.map(r=>r.map(csvCell).join(',')).join('\r\n'),'text/csv;charset=utf-8',true);toast('用色清单已导出。');}
 $('downloadList').onclick=exportList;
 function exportPositions(){const rows=[['X列','Y行','色号','已拼']];pattern.cells.forEach((code,i)=>{if(code!==null)rows.push([i%pattern.width+1,Math.floor(i/pattern.width)+1,code,done.has(i)?'是':'否']);});downloadText(safeName()+'-逐颗坐标.csv',rows.map(r=>r.map(csvCell).join(',')).join('\r\n'),'text/csv;charset=utf-8',true);toast('逐颗坐标已导出，左上角为 (1,1)。');}
-async function exportPNG(){toast('正在绘制高清图纸…');await new Promise(r=>setTimeout(r,30));const unit=32,pad=58,top=112,gridW=pattern.width*unit,gridH=pattern.height*unit;const colors=Object.entries(counts()).sort((a,b)=>b[1]-a[1]);const width=Math.max(800,gridW+pad*2),columns=Math.max(3,Math.floor((width-pad*2)/190));const legendRows=Math.ceil(colors.length/columns);const height=top+gridH+104+legendRows*45+65;const off=document.createElement('canvas');off.width=width;off.height=height;const c=off.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,width,height);c.fillStyle='#43374e';c.font='bold 28px sans-serif';c.fillText(projectName.slice(0,30),pad,44,width-pad*2);c.font='15px sans-serif';c.fillStyle='#8e7b9c';c.fillText(`${pattern.width} × ${pattern.height}  |  ${total()} 颗  |  ${colors.length} 色  |  ${palettes[paletteId].name}`,pad,77,width-pad*2);const map=paletteMap();pattern.cells.forEach((code,i)=>{const x=pad+i%pattern.width*unit,y=top+Math.floor(i/pattern.width)*unit;if(code===null){c.fillStyle='#eef0f3';c.fillRect(x,y,unit,unit);return;}const color=map.get(code);c.fillStyle=color.hex;c.fillRect(x,y,unit,unit);c.fillStyle=contrast(color.hex);c.font='bold 10px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(code,x+unit/2,y+unit/2,unit-3);});drawBeadGrid(c,{columns:pattern.width,rows:pattern.height,cellSize:unit,left:pad,top});c.strokeStyle='#a497ad';c.strokeRect(pad,top,gridW,gridH);c.fillStyle='#897792';c.font='11px sans-serif';c.textAlign='center';c.textBaseline='middle';for(let x=0;x<pattern.width;x++){c.fillText(x+1,pad+(x+.5)*unit,top-17);c.fillText(x+1,pad+(x+.5)*unit,top+gridH+18);}for(let y=0;y<pattern.height;y++){c.fillText(y+1,pad-21,top+(y+.5)*unit);c.fillText(y+1,pad+gridW+21,top+(y+.5)*unit);}const legendTop=top+gridH+64;c.textAlign='left';c.fillStyle='#43374e';c.font='bold 20px sans-serif';c.fillText('用色统计',pad,legendTop);colors.forEach(([code,n],i)=>{const x=pad+(i%columns)*190,y=legendTop+38+Math.floor(i/columns)*45;c.fillStyle=map.get(code).hex;c.fillRect(x,y-12,24,24);c.strokeStyle='#ddd';c.lineWidth=1;c.strokeRect(x,y-12,24,24);c.fillStyle='#66546f';c.font='16px sans-serif';c.fillText(`${code} × ${n}`,x+35,y);});c.font='12px sans-serif';c.fillStyle='#a194a9';c.fillText('豆豆工坊 · 浅灰格为空位 · X 为列，Y 为行，左上角 (1,1) · 屏幕色仅供参考，实物请以商家色卡为准。',pad,height-25,width-pad*2);off.toBlob(blob=>{if(!blob){toast('导出失败，请尝试较小尺寸。');return;}downloadBlob(safeName()+'-拼豆图纸.png',blob);toast('高清图纸已导出，含色号、逐行列坐标和用色统计。');},'image/png');}
-$('exportBtn').onclick=()=>{modal('把灵感带到拼豆桌上',`<button class="export-option" id="exportPng"><span>▧</span><div><strong>高清 PNG 图纸</strong><small>每格色号 · 四边坐标 · 10 格辅助线 · 用色统计</small></div><span>↓</span></button><button class="export-option" id="exportCsv"><span>▤</span><div><strong>用色清单 CSV</strong><small>色卡、色号、颜色与用量，方便备豆</small></div><span>↓</span></button><button class="export-option" id="exportCoords"><span>⌖</span><div><strong>逐颗坐标 CSV</strong><small>每颗豆的 X 列、Y 行、色号和完成状态</small></div><span>↓</span></button><button class="export-option" id="exportBackup"><span>▣</span><div><strong>图纸备份 JSON</strong><small>色卡、图纸、参数与进度 · 不含原图</small></div><span>↓</span></button><p style="font-size:10px">导出为完整图纸，不受当前高亮或缩放影响。仓库保留原图与编辑参数。下方 JSON 备份保留色卡和进度，不含原图。</p>`,'TAKE YOUR PATTERN');$('exportPng').onclick=()=>{closeModal();exportPNG();};$('exportCsv').onclick=exportList;$('exportCoords').onclick=exportPositions;$('exportBackup').onclick=()=>downloadText(safeName()+'.beads.json',JSON.stringify(serializable(),null,2),'application/json');};
+async function exportPNG(){toast('正在绘制高清图纸…');await new Promise(r=>setTimeout(r,30));const unit=32,pad=58,top=112,gridW=pattern.width*unit,gridH=pattern.height*unit;const colors=Object.entries(counts()).sort((a,b)=>b[1]-a[1]);const width=Math.max(800,gridW+pad*2),columns=Math.max(3,Math.floor((width-pad*2)/190));const legendRows=Math.ceil(colors.length/columns);const height=top+gridH+104+legendRows*45+65;const off=document.createElement('canvas');off.width=width;off.height=height;const c=off.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,width,height);c.fillStyle='#43374e';c.font='bold 28px sans-serif';c.fillText(projectName.slice(0,30),pad,44,width-pad*2);c.font='15px sans-serif';c.fillStyle='#8e7b9c';c.fillText(`${pattern.width} × ${pattern.height}  |  ${total()} 颗  |  ${colors.length} 色  |  ${palettes[paletteId].name}`,pad,77,width-pad*2);const map=paletteMap();pattern.cells.forEach((code,i)=>{const x=pad+i%pattern.width*unit,y=top+Math.floor(i/pattern.width)*unit;if(code===null){c.fillStyle='#eef0f3';c.fillRect(x,y,unit,unit);return;}const color=map.get(code);c.fillStyle=color.hex;c.fillRect(x,y,unit,unit);c.fillStyle=contrast(color.hex);c.font='bold 10px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(code,x+unit/2,y+unit/2,unit-3);});drawBeadGrid(c,{columns:pattern.width,rows:pattern.height,cellSize:unit,left:pad,top});c.strokeStyle='#a497ad';c.strokeRect(pad,top,gridW,gridH);c.fillStyle='#897792';c.font='11px sans-serif';c.textAlign='center';c.textBaseline='middle';for(let x=0;x<pattern.width;x++){c.fillText(x+1,pad+(x+.5)*unit,top-17);c.fillText(x+1,pad+(x+.5)*unit,top+gridH+18);}for(let y=0;y<pattern.height;y++){c.fillText(y+1,pad-21,top+(y+.5)*unit);c.fillText(y+1,pad+gridW+21,top+(y+.5)*unit);}const legendTop=top+gridH+64;c.textAlign='left';c.fillStyle='#43374e';c.font='bold 20px sans-serif';c.fillText('用色统计',pad,legendTop);colors.forEach(([code,n],i)=>{const x=pad+(i%columns)*190,y=legendTop+38+Math.floor(i/columns)*45;c.fillStyle=map.get(code).hex;c.fillRect(x,y-12,24,24);c.strokeStyle='#ddd';c.lineWidth=1;c.strokeRect(x,y-12,24,24);c.fillStyle='#66546f';c.font='16px sans-serif';c.fillText(`${code} × ${n}`,x+35,y);});c.font='12px sans-serif';c.fillStyle='#a194a9';c.fillText('我不是豆神 · 浅灰格为空位 · X 为列，Y 为行，左上角 (1,1) · 屏幕色仅供参考，实物请以商家色卡为准。',pad,height-25,width-pad*2);off.toBlob(blob=>{if(!blob){toast('导出失败，请尝试较小尺寸。');return;}downloadBlob(safeName()+'-拼豆图纸.png',blob);toast('高清图纸已导出，含色号、逐行列坐标和用色统计。');},'image/png');}
+function showExportOptions(){modal('把灵感带到拼豆桌上',`<button class="export-option" id="exportPng"><span>▧</span><div><strong>高清 PNG 图纸</strong><small>每格色号 · 四边坐标 · 10 格辅助线 · 用色统计</small></div></button><button class="export-option" id="exportCsv"><span>▤</span><div><strong>用色清单 CSV</strong><small>色卡、色号、颜色与用量，方便备豆</small></div></button><button class="export-option" id="exportCoords"><span>⌖</span><div><strong>逐颗坐标 CSV</strong><small>每颗豆的 X 列、Y 行、色号和完成状态</small></div></button><button class="export-option" id="exportBackup"><span>▣</span><div><strong>图纸备份 JSON</strong><small>色卡、图纸、参数与进度 · 不含原图</small></div></button><p style="font-size:10px">导出为完整图纸，不受当前高亮或缩放影响。仓库保留原图与编辑参数。下方 JSON 备份保留色卡和进度，不含原图。</p>`,'TAKE YOUR PATTERN');$('exportPng').onclick=()=>{closeModal();exportPNG();};$('exportCsv').onclick=exportList;$('exportCoords').onclick=exportPositions;$('exportBackup').onclick=()=>downloadText(safeName()+'.beads.json',JSON.stringify(serializable(),null,2),'application/json');};
 $('saveProject').onclick=async()=>{if(await ensureGenerated()){activeDraft=true;await persistCurrent(true).catch(()=>{});}};
 $('openProject').onclick=()=>$('projectFile').click();
+$('exportBtn').onclick=()=>{
+ if(!libraryEntries.length){toast('仓库中还没有图纸。');return;}
+ modal('选择要导出的图纸',`<div class="library-export-list">${libraryEntries.map(entry=>`<button type="button" class="export-option" data-export-project="${escapeHTML(entry.id)}"><span>▧</span><div><strong>${escapeHTML(entry.name)}</strong><small>${entry.totalBeads.toLocaleString()} 颗豆</small></div></button>`).join('')}</div>`,'');
+ $('modalBody').querySelectorAll('[data-export-project]').forEach(button=>button.onclick=async()=>{
+  const buttons=[...$('modalBody').querySelectorAll('[data-export-project]')];buttons.forEach(b=>b.disabled=true);
+  try{if(await openSavedProject(button.dataset.exportProject,'library'))showExportOptions();}
+  finally{buttons.forEach(b=>b.disabled=false);}
+ });
+};
+
 $('projectFile').onchange=async e=>{
  const file=e.target.files[0];e.target.value='';if(!file||!pattern)return;
  if(generationPromise){toast('正在生成图纸，请完成后再导入。');return;}
@@ -353,7 +362,7 @@ $('projectFile').onchange=async e=>{
  }catch(error){if(task===sourceTask){suppressSaving=false;setSaveStatus('打开未完成 · 当前图纸已保留');toast('打开失败：'+error.message);}}finally{finishSourceTask(task);}
 };
 $('sourceInfo').onclick=()=>modal('可追溯的色卡，安心选色',`<p>内置 MARD 291 色和 221 色来自开源社区整理的拼豆色卡数据，保留原有色号与 RGB。显示时会补齐数字位数，例如 H7 → H07。</p><p>这是屏幕参考色卡，并非品牌官方实测标准。显示器、拍摄和实物批次都会影响颜色，替代色的选择请结合商家实物色卡。</p><p><a class="footer-link" href="https://github.com/HansBug/pindou-color-data/tree/main/mard-291-github" target="_blank" rel="noopener">查看原始数据 ↗</a> · <a class="footer-link" href="./palette-LICENSE.txt" target="_blank">MIT 数据许可 ↗</a></p><div class="notice-box">通用版支持导入其他品牌或店铺色卡。不同品牌的同一编号可能代表不同颜色，请确认所选色卡再购买。</div>`,'COLOR DATA');
-$('helpBtn').onclick=()=>modal('从图片，到一颗颗拼好',`<ol><li><b>上传图片：</b>选择 PNG、JPG 或 WEBP。主体清晰、背景简单的图片更适合，透明 PNG 可以直接保留空白区域。</li><li><b>AI 优化（可选）：</b>先在 AI 配置里填写图片编辑接口、模型和密钥。上传照片后可转拼豆插画、简化背景或按文字微调；对比满意后采用。原图会保留，随时可恢复。</li><li><b>调整参数：</b>尺寸决定横纵各有多少颗豆；颜色越少越容易备豆。纯色背景可尝试勾选去除。</li><li><b>选择色卡：</b>内置 MARD 参考色卡，也能选择东道主中的店家色卡，生成时只使用店家标记为可用的颜色。</li><li><b>查看与替色：</b>点击清单色号高亮对应豆子，左右箭头逐颗查看；⇄ 可选择相近色，一键替换并更新数量。</li><li><b>快速定位：</b>X 是列，Y 是行，从左上角 (1,1) 开始。输入坐标直接定位，或点击图纸锁定。聚焦图纸后用方向键移动，空格标记已拼。</li><li><b>计时与记录：</b>开始拼豆会自动计时；手动暂停、返回仓库或切换到后台时暂停。重新打开可继续，离线时间不计入；意外中断恢复最近一次备份。点击“完成”保存耗时和完成日期，可在“拼豆记录”查看。</li><li><b>导出与保存：</b>PNG 图纸适合打印或平板查看，CSV 用于备料与核对。保存到仓库会保留原图、参数和进度，之后可继续编辑。</li></ol><div class="notice-box">放大后显示每格色号；每 10 格有辅助线。普通制图在本机浏览器处理；仅主动使用 AI 时，图片会发送到你配置的服务。图纸仓库保存于此浏览器，含本次导入的原图。开始拼豆进入简洁模式，点击图上豆子或颜色清单可高亮同色。下载的 JSON 备份不含原图。</div>`,'A LITTLE GUIDE');
+$('helpBtn').onclick=()=>modal('从图片，到一颗颗拼好',`<ol><li><b>上传图片：</b>选择 PNG、JPG 或 WEBP。主体清晰、背景简单的图片更适合，透明 PNG 可以直接保留空白区域。</li><li><b>AI 优化（可选）：</b>先在 AI 配置里填写图片编辑接口、模型和密钥。上传照片后可转拼豆插画、简化背景或按文字微调；对比满意后采用。原图会保留，随时可恢复。</li><li><b>调整参数：</b>尺寸决定横纵各有多少颗豆；颜色越少越容易备豆。纯色背景可尝试勾选去除。</li><li><b>选择色卡：</b>内置 MARD 参考色卡，也能选择东道主中的店家色卡，生成时只使用店家标记为可用的颜色。</li><li><b>查看与替色：</b>点击清单色号高亮对应豆子，⇄ 可选择相近色，一键替换并更新数量。</li><li><b>快速定位：</b>X 是列，Y 是行，从左上角 (1,1) 开始。输入坐标直接定位，或点击图纸锁定。聚焦图纸后用方向键移动。</li><li><b>计时与记录：</b>开始拼豆会自动计时；手动暂停、返回仓库或切换到后台时暂停。重新打开可继续，离线时间不计入；意外中断恢复最近一次备份。点击“完成”保存耗时和完成日期，可在“拼豆记录”查看。</li><li><b>导出与保存：</b>PNG 图纸适合打印或平板查看，CSV 用于备料与核对。保存到仓库会保留原图、参数和进度，之后可继续编辑。</li></ol><div class="notice-box">放大后显示每格色号；每 10 格有辅助线。普通制图在本机浏览器处理；仅主动使用 AI 时，图片会发送到你配置的服务。图纸仓库保存于此浏览器，含本次导入的原图。开始拼豆进入简洁模式，点击图上豆子或颜色清单可高亮同色。下载的 JSON 备份不含原图。</div>`,'A LITTLE GUIDE');
 
 
 function showScreen(next){
@@ -371,13 +380,7 @@ function showScreen(next){
   requestAnimationFrame(()=>{
    if(screen!==next)return;
    fitCanvas();
-   if(next==='beading'&&pattern){
-    cellSize=Math.max(24,cellSize);draw();
-    let anchor=selected;
-    if(anchor<0)anchor=pattern.cells.findIndex((code,index)=>code!==null&&!done.has(index));
-    if(anchor<0)anchor=pattern.cells.findIndex(code=>code!==null);
-    if(anchor>=0)selectCell(anchor);
-   }
+   requestAnimationFrame(()=>{if(screen===next&&autoFitView)fitCanvas();});
   });
  }
  window.scrollTo({top:0,behavior:'instant'});
@@ -385,7 +388,7 @@ function showScreen(next){
 function renderLibrary(){
  const query=$('librarySearch').value.trim().toLowerCase(),sort=$('librarySort').value;
  const entries=libraryEntries.filter(p=>p.name.toLowerCase().includes(query)&&matchesLibraryFilters(p,libraryFilters)).sort(sort==='name'?(a,b)=>a.name.localeCompare(b.name,'zh-CN'):(a,b)=>b.updatedAt.localeCompare(a.updatedAt));
- $('libraryCount').textContent=libraryEntries.length;$('libraryTotalBeads').textContent=libraryEntries.reduce((n,p)=>n+p.totalBeads,0).toLocaleString();$('libraryInProgress').textContent=recordEntries.filter(p=>p.status==='in_progress').length;
+ $('exportBtn').disabled=!libraryEntries.length||!!generationPromise;$('libraryCount').textContent=libraryEntries.length;$('libraryTotalBeads').textContent=libraryEntries.reduce((n,p)=>n+p.totalBeads,0).toLocaleString();$('libraryInProgress').textContent=recordEntries.filter(p=>p.status==='in_progress').length;
  const newTile=`<button id="libraryNew" class="library-card library-new-card" type="button" data-new-project ${generationPromise||!pattern?'disabled':''}><span class="library-new-icon" aria-hidden="true">＋</span><strong>新建图纸</strong></button>`;
  $('libraryGrid').innerHTML=newTile+entries.map(p=>{const effort=p.effort;const id=escapeHTML(p.id),name=escapeHTML(p.name);return `<article class="library-card library-project-card"><div class="library-preview"><img src="${escapeHTML(p.thumbnail)}" alt="${name}的拼豆图纸" loading="lazy"><button class="delete-project library-trash" data-delete="${id}" type="button" aria-label="删除 ${name}" title="删除图纸"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5M14 11v5"/></svg></button><span class="library-card-badge">${p.width} × ${p.height}</span><div class="library-card-actions"><button class="button quiet library-edit" data-edit="${id}" type="button" aria-label="编辑 ${name}">编辑</button><button class="button primary library-start" data-start="${id}" type="button" aria-label="拼豆 ${name}">拼豆</button></div></div><div class="library-card-body"><h3><button class="library-name" data-rename="${id}" type="button" aria-label="修改名称 ${name}" title="点击修改名称">${name}</button></h3><div class="library-card-meta"><span>${p.totalBeads.toLocaleString()} 颗豆 · ${p.colorCount} 色</span></div><div class="library-estimate" title="按豆数、颜色与零碎色块估算；实际时间因熟练度而异"><span class="difficulty difficulty-${[1,2,3].includes(effort?.level)?effort.level:'unknown'}">${escapeHTML(effort?.difficulty||'待评估')}</span><span>预计 ${escapeHTML(effort?.label?.replace(/^约/,'')||'—')}</span></div></div></article>`;}).join('');
  const filtered=libraryFilters.levels.length>0||libraryFilters.time!=='all';$('libraryFilterBtn').setAttribute('aria-pressed',String(filtered));$('libraryFilterBtn').textContent=filtered?'筛选 · 已选':'筛选';
@@ -474,7 +477,7 @@ function renderRecords(){
 
  $('recordGrid').innerHTML=entries.map(record=>{
   const complete=record.status==='completed',id=escapeHTML(record.id),name=escapeHTML(record.name);
-  return `<article class="library-card library-project-card record-card ${complete?'is-completed':'is-progress'}"><div class="library-preview record-preview"><img src="${escapeHTML(record.thumbnail)}" alt="${name}的拼豆记录"><span class="record-status ${complete?'completed':'in-progress'}">${complete?'已完成':'进行中'}</span><span class="library-card-badge">${record.width} × ${record.height}</span><div class="library-card-actions record-actions"><button class="button ${complete?'quiet':'primary'}" data-record="${id}">${complete?'查看图纸':'继续拼豆'}</button></div></div><div class="library-card-body"><h3 class="record-name" title="${name}">${name}</h3><div class="record-meta"><span>${record.totalBeads.toLocaleString()} 颗 · ${record.colorCount} 色</span><strong>${elapsedLabel(record.elapsedMs)}</strong></div><div class="record-meta"><span>${complete?'完成':'开始'} ${recordDate(complete?record.completedAt:record.startedAt)}</span></div></div></article>`;
+  return `<article class="library-card library-project-card record-card ${complete?'is-completed':'is-progress'}"><div class="library-preview record-preview"><button class="delete-project library-trash" data-delete-record="${id}" type="button" aria-label="删除记录 ${name}" title="删除拼豆记录"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5M14 11v5"/></svg></button><img src="${escapeHTML(record.thumbnail)}" alt="${name}的拼豆记录"><span class="record-status ${complete?'completed':'in-progress'}">${complete?'已完成':'进行中'}</span><span class="library-card-badge">${record.width} × ${record.height}</span><div class="library-card-actions record-actions"><button class="button ${complete?'quiet':'primary'}" data-record="${id}">${complete?'查看图纸':'继续拼豆'}</button></div></div><div class="library-card-body"><h3 class="record-name" title="${name}">${name}</h3><div class="record-meta"><span>${record.totalBeads.toLocaleString()} 颗 · ${record.colorCount} 色</span><strong>${elapsedLabel(record.elapsedMs)}</strong></div><div class="record-meta"><span>${complete?'完成':'开始'} ${recordDate(complete?record.completedAt:record.startedAt)}</span></div></div></article>`;
  }).join('')||'<div class="records-empty"><p>暂无记录，从图纸仓库开始</p></div>';
 }
 async function showBeadingRecord(record,autoStart=true){
@@ -522,7 +525,17 @@ async function openRecord(id){
  catch(error){sessionError(error);return false;}finally{sessionBusy=false;renderTimer();}
 }
 $('navLibrary').onclick=goLibrary;$('navRecords').onclick=goRecords;$('focusLibrary').onclick=goRecords;
-$('recordGrid').onclick=e=>{const button=e.target.closest('[data-record]');if(button)openRecord(button.dataset.record);};
+function confirmDeleteRecord(id){
+ const record=recordEntries.find(item=>item.id===id);if(!record)return;
+ modal('删除这份拼豆记录？',`<p><strong>${escapeHTML(record.name)}</strong></p><p>将删除这次拼豆的计时与完成记录，原图纸会保留。删除后无法恢复。</p><p id="recordDeleteError" role="alert"></p><div class="modal-buttons"><button id="recordDeleteCancel" class="button quiet" autofocus>取消</button><button id="recordDeleteConfirm" class="button danger-button">确认删除</button></div>`,'');
+ $('recordDeleteCancel').onclick=closeModal;
+ $('recordDeleteConfirm').onclick=async()=>{
+  $('recordDeleteConfirm').disabled=true;
+  try{await deleteBeadingSession(id);closeModal();await refreshRecords();toast('拼豆记录已删除，原图纸已保留。');}
+  catch(error){$('recordDeleteError').textContent=error.message;$('recordDeleteConfirm').disabled=false;}
+ };
+}
+$('recordGrid').onclick=e=>{const remove=e.target.closest('[data-delete-record]');if(remove){confirmDeleteRecord(remove.dataset.deleteRecord);return;}const button=e.target.closest('[data-record]');if(button)openRecord(button.dataset.record);};
 $('exitBeading').onclick=async()=>{if(sessionBusy)return;const id=timer().current()?.projectId;try{await leaveBeadingRecord();if(!id||!await openSavedProject(id,'editor')){await refreshRecords();showScreen('library');}}catch(error){sessionError(error);}};
 $('pauseTimer').onclick=async()=>{if(sessionBusy)return;sessionBusy=true;renderTimer();try{if(timer().current()?.running)await timer().pause();else await timer().resume();}catch(error){sessionError(error);}finally{sessionBusy=false;renderTimer();}};
 $('completeBeading').onclick=async()=>{
@@ -584,7 +597,7 @@ const hostStudio=createHostStudio({container:$('hostContent'),modal,closeModal,t
 function syncBuyerShops(wanted=$('buyerShop').value){
  const shops=hostStudio.listShops();
  $('buyerShop').innerHTML='<option value="">参考色卡 · 不限店家</option>'+shops.map(shop=>`<option value="${escapeHTML(shop.id)}">${escapeHTML(shop.name)}${shop.isDemo?' · 演示':''}</option>`).join('');
- $('buyerShop').value=shops.some(shop=>shop.id===wanted)?wanted:'';updateShopInfo();
+ $('buyerShop').value='';updateShopInfo();
 }
 function updateShopInfo(){
  const id=$('buyerShop').value,shop=id?hostStudio.getShop(id):null;
@@ -641,16 +654,16 @@ async function init(){updateSourceControls();try{
  if(!restored){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw&&!localStorage.getItem(INITIALIZED_KEY)){restoreProject(JSON.parse(raw));restored=true;}}catch{}}
  if(!restored){try{activeDraft=!localStorage.getItem(INITIALIZED_KEY);}catch{}pattern=makeDemo(52,52,activePalette);appliedSettings=readSettings();updateAll(true);}
  suppressSaving=false;if(!currentProjectId&&libraryReady&&activeDraft)await persistCurrent();await refreshRecords();$('canvasLoading').hidden=true;showScreen('library');
- let resizeTimer;new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if((screen==='editor'||screen==='beading')&&Math.abs(cellSize-fitSize)<.1)fitCanvas();},100);}).observe($('canvasArea'));
+ let resizeTimer;new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if((screen==='editor'||screen==='beading')&&autoFitView)fitCanvas();},100);}).observe($('canvasArea'));
 }catch(e){$('canvasLoading').textContent='载入失败，请刷新页面重试。';$('libraryStatus').textContent='载入失败：'+e.message;toast(e.message);}}
 const fullscreenView=createFullscreenBeading({area:$('canvasArea'),canvas,
  getColors:()=>Object.entries(counts()).sort((a,b)=>b[1]-a[1]).map(([code,count])=>({code,count,hex:paletteMap().get(code)?.hex,selected:highlighted===code})),
  selectColor:code=>{highlighted=highlighted===code?null:code;$('colorSearch').value='';renderColorList();draw();},
- resize:()=>draw(),fit:fitCanvas,
- zoom:factor=>{cellSize=Math.max(3,Math.min(42,cellSize*factor));draw();},
- enlarge:()=>{cellSize=Math.max(24,cellSize);$('showCodes').checked=true;setView('grid');},
+ resize:()=>{if(autoFitView)fitCanvas();else draw();},fit:fitCanvas,
+ zoom:factor=>{autoFitView=false;cellSize=Math.max(3,Math.min(42,cellSize*factor));draw();},
  toggleCodes:()=>{$('showCodes').checked=!$('showCodes').checked;draw();return $('showCodes').checked;},
  exit:goRecords
 });
 $('fullscreenBtn').onclick=()=>fullscreenView.open();
+$('previewPattern').onclick=async()=>{if(screen!=='editor'||generationPromise||loadingImage)return;if(!await ensureGenerated())return;if(screen!=='editor')return;setView('grid');fullscreenView.open({preview:true});};
 init();

@@ -8,7 +8,7 @@ const palette = [{ code: 'base', hex: '#888888' }, { code: 'speck', hex: '#90909
 const labsFor = count => Array.from({ length: 81 }, (_, i) => rgbToLab(hexToRgb(i >= 39 && i < 39 + count ? '#909090' : '#888888')));
 const zeros = () => new Float32Array(81);
 const run = (count, options = {}) => optimizePatternColors(labsFor(count), 9, 9, palette,
-  { maxColors: 3, spatialRegularization: false, saliencyMap: zeros(), defocusMap: zeros(), ...options });
+  { maxColors: 3, adaptivePalette: false, spatialRegularization: false, saliencyMap: zeros(), defocusMap: zeros(), ...options });
 
 test('the <=2 connected-component penalty is a real step, and high-saliency components are exempt', () => {
   for (const count of [1, 2]) {

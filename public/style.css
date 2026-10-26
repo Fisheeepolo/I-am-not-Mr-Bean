@@ -1013,7 +1013,7 @@ body[data-screen="host"] #libraryScreen,body[data-screen="host"] #editorScreen,b
 .pending-preview{display:none}
 body[data-screen="editor"][data-pending-import="true"] .pending-preview{display:flex;align-items:center;justify-content:center;min-height:400px;height:calc(100dvh - 250px);padding:24px;background:#f7f3fa}
 .pending-preview img{display:block;max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
-body[data-screen="editor"][data-pending-import="true"] .workspace>:not(.workspace-header):not(.pending-preview),body[data-screen="editor"][data-pending-import="true"] .right-column{display:none}
+body[data-screen="editor"][data-pending-import="true"] .workspace>:not(.workspace-header):not(.pending-preview):not(.canvas-shell),body[data-screen="editor"][data-pending-import="true"] .right-column{display:none}
 body[data-screen="editor"][data-pending-import="true"] .studio{grid-template-columns:260px minmax(0,1fr)}
 @media(max-width:700px){#hostScreen{padding:18px 14px 25px}body[data-screen="editor"][data-pending-import="true"] .studio{grid-template-columns:1fr}body[data-screen="editor"][data-pending-import="true"] .pending-preview{min-height:260px;height:360px}}
 
