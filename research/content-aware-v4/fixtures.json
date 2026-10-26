@@ -1,0 +1,755 @@
+[
+  {
+    "id": "photo-astronaut",
+    "title": "宇航员",
+    "split": "development",
+    "kind": "photo",
+    "width": 64,
+    "height": 64,
+    "sourceWidth": 256,
+    "sourceHeight": 256,
+    "source": "data/photo-astronaut.rgba",
+    "png": "data/photo-astronaut.png",
+    "sourceSha256": "c051c68b361c37a9378d4aabff06353ba777a4fed4339ac3456bbc4339c94f84",
+    "regionType": "manual-rectangle-ROI-proxy",
+    "markers": [],
+    "license": "NASA; public domain",
+    "sourceUrl": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/astronaut.png",
+    "documentation": "https://scikit-image.org/docs/stable/api/skimage.data.html#skimage.data.astronaut",
+    "originalSha256": "88431cd9653ccd539741b555fb0a46b61558b301d4110412b5bc28b5e3ea6cb5",
+    "originalSize": [
+      512,
+      512
+    ],
+    "roiNormalized": [
+      0.18,
+      0.08,
+      0.64,
+      0.6
+    ],
+    "note": "全图保持长宽比；源图重采样至目标4倍。矩形ROI仅为评测区域代理，不是分割或语义真值。",
+    "region": "data/photo-astronaut.mask",
+    "regionSha256": "6e18e1b8a658bded5b8b4f646ce254e7d2ad5ea93463264900782f0ebb0d1d0e",
+    "regionPng": "data/photo-astronaut-region.png"
+  },
+  {
+    "id": "photo-chelsea",
+    "title": "猫咪",
+    "split": "development",
+    "kind": "photo",
+    "width": 64,
+    "height": 43,
+    "sourceWidth": 256,
+    "sourceHeight": 172,
+    "source": "data/photo-chelsea.rgba",
+    "png": "data/photo-chelsea.png",
+    "sourceSha256": "cd17cc68db7fc6cfa0b3c6662dd16649b13ad53357a4880067493c8d1b129aa8",
+    "regionType": "manual-rectangle-ROI-proxy",
+    "markers": [],
+    "license": "Stefan van der Walt; CC0",
+    "sourceUrl": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/chelsea.png",
+    "documentation": "https://scikit-image.org/docs/stable/api/skimage.data.html#skimage.data.chelsea",
+    "originalSha256": "596aa1e7cb875eb79f437e310381d26b338a81c2da23439704a73c4651e8c4bb",
+    "originalSize": [
+      451,
+      300
+    ],
+    "roiNormalized": [
+      0.22,
+      0.13,
+      0.8,
+      0.9
+    ],
+    "note": "全图保持长宽比；源图重采样至目标4倍。矩形ROI仅为评测区域代理，不是分割或语义真值。",
+    "region": "data/photo-chelsea.mask",
+    "regionSha256": "668096b35a7537ae49c62cdd1e4e1203c44368e7d6e55fc73569074f4a83ecaa",
+    "regionPng": "data/photo-chelsea-region.png"
+  },
+  {
+    "id": "photo-rocket",
+    "title": "火箭",
+    "split": "development",
+    "kind": "photo",
+    "width": 64,
+    "height": 43,
+    "sourceWidth": 256,
+    "sourceHeight": 172,
+    "source": "data/photo-rocket.rgba",
+    "png": "data/photo-rocket.png",
+    "sourceSha256": "ad96e53d5fe304a0e2fe83ba1b3b45782e12894e472d1aea323cdc1902ae6100",
+    "regionType": "manual-rectangle-ROI-proxy",
+    "markers": [],
+    "license": "SpaceX; public domain",
+    "sourceUrl": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/rocket.jpg",
+    "documentation": "https://scikit-image.org/docs/stable/api/skimage.data.html#skimage.data.rocket",
+    "originalSha256": "c2dd0de7c538df8d111e479619b129464d0269d0ae5fd18ca91d33a7fdfea95c",
+    "originalSize": [
+      640,
+      427
+    ],
+    "roiNormalized": [
+      0.43,
+      0.05,
+      0.7,
+      0.9
+    ],
+    "note": "全图保持长宽比；源图重采样至目标4倍。矩形ROI仅为评测区域代理，不是分割或语义真值。",
+    "region": "data/photo-rocket.mask",
+    "regionSha256": "2f16790e5c50ec8cba3f13c72d05430ce04e3431218e7be4ed4a990f1a6cc272",
+    "regionPng": "data/photo-rocket-region.png"
+  },
+  {
+    "id": "photo-coffee",
+    "title": "咖啡杯",
+    "split": "heldout",
+    "kind": "photo",
+    "width": 64,
+    "height": 43,
+    "sourceWidth": 256,
+    "sourceHeight": 172,
+    "source": "data/photo-coffee.rgba",
+    "png": "data/photo-coffee.png",
+    "sourceSha256": "28886a484b5f106eb0c955aecacb1ac27a2cebafd2a5644e6d00813fd4f9497a",
+    "regionType": "manual-rectangle-ROI-proxy",
+    "markers": [],
+    "license": "Rachel Michetti; CC0; courtesy Pikolo Espresso Bar",
+    "sourceUrl": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/coffee.png",
+    "documentation": "https://scikit-image.org/docs/stable/api/skimage.data.html#skimage.data.coffee",
+    "originalSha256": "cc02f8ca188b167c775a7101b5d767d1e71792cf762c33d6fa15a4599b5a8de7",
+    "originalSize": [
+      600,
+      400
+    ],
+    "roiNormalized": [
+      0.18,
+      0.16,
+      0.77,
+      0.94
+    ],
+    "note": "全图保持长宽比；源图重采样至目标4倍。矩形ROI仅为评测区域代理，不是分割或语义真值。",
+    "region": "data/photo-coffee.mask",
+    "regionSha256": "b15f467cfef78f08ca6364b85591148625bae68f8a062f7b1631f9aa20e5699a",
+    "regionPng": "data/photo-coffee-region.png"
+  },
+  {
+    "id": "photo-hubble_deep_field",
+    "title": "哈勃深空",
+    "split": "heldout",
+    "kind": "photo",
+    "width": 64,
+    "height": 56,
+    "sourceWidth": 256,
+    "sourceHeight": 224,
+    "source": "data/photo-hubble_deep_field.rgba",
+    "png": "data/photo-hubble_deep_field.png",
+    "sourceSha256": "dbeccedd4387f08756733529df7063087c97216c199a90235a3d24553c7f75f2",
+    "regionType": "unavailable",
+    "markers": [],
+    "license": "NASA; public domain; HubbleSite",
+    "sourceUrl": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/hubble_deep_field.jpg",
+    "documentation": "https://scikit-image.org/docs/stable/api/skimage.data.html#skimage.data.hubble_deep_field",
+    "originalSha256": "3a19c5dd8a927a9334bb1229a6d63711b1c0c767fb27e2286e7c84a3e2c2f5f4",
+    "originalSize": [
+      1000,
+      872
+    ],
+    "roiNormalized": null,
+    "note": "无主体掩码或ROI：只报全图色差，区域色差不可用。"
+  },
+  {
+    "id": "photo-retina",
+    "title": "视网膜",
+    "split": "heldout",
+    "kind": "photo",
+    "width": 64,
+    "height": 64,
+    "sourceWidth": 256,
+    "sourceHeight": 256,
+    "source": "data/photo-retina.rgba",
+    "png": "data/photo-retina.png",
+    "sourceSha256": "0539182dc042a0ca7b1d731d868af357904b7dd5022209edffbf94c0de310132",
+    "regionType": "manual-rectangle-ROI-proxy",
+    "markers": [],
+    "license": "Mikael Häggström; CC0 1.0; Wikimedia",
+    "sourceUrl": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/retina.jpg",
+    "documentation": "https://scikit-image.org/docs/stable/api/skimage.data.html#skimage.data.retina",
+    "originalSha256": "38a07f36f27f095e818aea7b96d34202c05176d30253c66733f2e00379e9e0e6",
+    "originalSize": [
+      1411,
+      1411
+    ],
+    "roiNormalized": [
+      0.17,
+      0.17,
+      0.83,
+      0.83
+    ],
+    "note": "全图保持长宽比；源图重采样至目标4倍。矩形ROI仅为评测区域代理，不是分割或语义真值。",
+    "region": "data/photo-retina.mask",
+    "regionSha256": "a4f0f1b049f28e90d577c2c0ce84b93b7a641c87b8a15c416b57173e26ca7138",
+    "regionPng": "data/photo-retina-region.png"
+  },
+  {
+    "id": "photo-grass",
+    "title": "草地纹理",
+    "split": "heldout",
+    "kind": "photo",
+    "width": 64,
+    "height": 64,
+    "sourceWidth": 256,
+    "sourceHeight": 256,
+    "source": "data/photo-grass.rgba",
+    "png": "data/photo-grass.png",
+    "sourceSha256": "b9011867e51c6a2aec285cb365888396a8bf675574001fbfee4ca213e492274a",
+    "regionType": "unavailable",
+    "markers": [],
+    "license": "DeviantArt source identified by scikit-image; CC0",
+    "sourceUrl": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/grass.png",
+    "documentation": "https://scikit-image.org/docs/stable/api/skimage.data.html#skimage.data.grass",
+    "originalSha256": "b6b6022426b38936c43a4ac09635cd78af074e90f42ffa8227ac8b7452d39f89",
+    "originalSize": [
+      512,
+      512
+    ],
+    "roiNormalized": null,
+    "note": "无主体掩码或ROI：只报全图色差，区域色差不可用。"
+  },
+  {
+    "id": "dev-eyes-lines",
+    "title": "细线与微小眼睛",
+    "split": "development",
+    "kind": "synthetic",
+    "width": 64,
+    "height": 64,
+    "sourceWidth": 256,
+    "sourceHeight": 256,
+    "source": "data/dev-eyes-lines.rgba",
+    "png": "data/dev-eyes-lines.png",
+    "sourceSha256": "0de0e83c2f20631f50faadf562ace50bccad633d0a94b6ca377e019d2945c63e",
+    "regionType": "ground-truth-object-mask",
+    "markers": [
+      {
+        "x": 25,
+        "y": 28,
+        "rgb": [
+          38,
+          32,
+          43
+        ],
+        "backgroundRgb": [
+          233,
+          188,
+          143
+        ],
+        "backgroundPoint": [
+          25,
+          25
+        ],
+        "name": "eye-1-beads"
+      },
+      {
+        "x": 39,
+        "y": 28,
+        "rgb": [
+          38,
+          32,
+          43
+        ],
+        "backgroundRgb": [
+          233,
+          188,
+          143
+        ],
+        "backgroundPoint": [
+          39,
+          25
+        ],
+        "name": "eye-2-beads"
+      }
+    ],
+    "note": "程序绘制的真实细线/眼睛；主体mask由绘图几何独立产生。细线宽0.5豆，眼睛1/2豆。",
+    "region": "data/dev-eyes-lines.mask",
+    "regionSha256": "97e97f03e323d61b51efc850409ddd946f9ce2f1561ff042d5e923934f959ec0",
+    "regionPng": "data/dev-eyes-lines-region.png"
+  },
+  {
+    "id": "dev-defocus",
+    "title": "散焦背景与清晰主体",
+    "split": "development",
+    "kind": "synthetic",
+    "width": 64,
+    "height": 64,
+    "sourceWidth": 256,
+    "sourceHeight": 256,
+    "source": "data/dev-defocus.rgba",
+    "png": "data/dev-defocus.png",
+    "sourceSha256": "e4c04c270493d47c363a33139d5bfac042e04039d66315b2f84beda3a926025a",
+    "regionType": "ground-truth-object-mask",
+    "markers": [],
+    "note": "背景先加固定种子噪声再GaussianBlur；清晰主体后绘制。散焦标签只在此合成过程已知。",
+    "region": "data/dev-defocus.mask",
+    "regionSha256": "84fbbd190b262ab67d3ddeb2dee9ec7b25895cc22a16c8141f3c2597a18a0df0",
+    "regionPng": "data/dev-defocus-region.png"
+  },
+  {
+    "id": "dev-low-contrast",
+    "title": "低反差1–2豆细节",
+    "split": "development",
+    "kind": "synthetic",
+    "width": 64,
+    "height": 64,
+    "sourceWidth": 256,
+    "sourceHeight": 256,
+    "source": "data/dev-low-contrast.rgba",
+    "png": "data/dev-low-contrast.png",
+    "sourceSha256": "a990c924c0c7201d30b77b5807ff233e0128a16938667cfe742006532916dcb2",
+    "regionType": "ground-truth-feature-mask",
+    "markers": [
+      {
+        "x": 17,
+        "y": 18,
+        "rgb": [
+          157,
+          169,
+          155
+        ],
+        "backgroundRgb": [
+          174,
+          186,
+          172
+        ],
+        "backgroundPoint": [
+          17,
+          21
+        ],
+        "name": "desired-1-bead-detail-0"
+      },
+      {
+        "x": 34,
+        "y": 21,
+        "rgb": [
+          157,
+          169,
+          155
+        ],
+        "backgroundRgb": [
+          174,
+          186,
+          172
+        ],
+        "backgroundPoint": [
+          34,
+          24
+        ],
+        "name": "desired-2-bead-detail-1"
+      },
+      {
+        "x": 24,
+        "y": 43,
+        "rgb": [
+          157,
+          169,
+          155
+        ],
+        "backgroundRgb": [
+          174,
+          186,
+          172
+        ],
+        "backgroundPoint": [
+          24,
+          46
+        ],
+        "name": "desired-1-bead-detail-2"
+      },
+      {
+        "x": 48,
+        "y": 42,
+        "rgb": [
+          157,
+          169,
+          155
+        ],
+        "backgroundRgb": [
+          174,
+          186,
+          172
+        ],
+        "backgroundPoint": [
+          48,
+          45
+        ],
+        "name": "desired-2-bead-detail-3"
+      }
+    ],
+    "note": "所有标注小色块都是希望保留的细节；原始碎片率不能当作单独质量指标。",
+    "region": "data/dev-low-contrast.mask",
+    "regionSha256": "53ec2bbc55986cce9ed3a89cd536aa4119029138730d394726d6970d6aa01e48",
+    "regionPng": "data/dev-low-contrast-region.png"
+  },
+  {
+    "id": "dev-highlights",
+    "title": "强反差真实高光",
+    "split": "development",
+    "kind": "synthetic",
+    "width": 64,
+    "height": 64,
+    "sourceWidth": 256,
+    "sourceHeight": 256,
+    "source": "data/dev-highlights.rgba",
+    "png": "data/dev-highlights.png",
+    "sourceSha256": "fbfeec09e0a2a4802562ba79e405854d041ef5d96c5177dab000c96245678ff7",
+    "regionType": "ground-truth-feature-mask",
+    "markers": [
+      {
+        "x": 17,
+        "y": 18,
+        "rgb": [
+          250,
+          248,
+          229
+        ],
+        "backgroundRgb": [
+          83,
+          116,
+          139
+        ],
+        "backgroundPoint": [
+          17,
+          21
+        ],
+        "name": "desired-1-bead-detail-0"
+      },
+      {
+        "x": 34,
+        "y": 21,
+        "rgb": [
+          250,
+          248,
+          229
+        ],
+        "backgroundRgb": [
+          83,
+          116,
+          139
+        ],
+        "backgroundPoint": [
+          34,
+          24
+        ],
+        "name": "desired-2-bead-detail-1"
+      },
+      {
+        "x": 24,
+        "y": 43,
+        "rgb": [
+          250,
+          248,
+          229
+        ],
+        "backgroundRgb": [
+          83,
+          116,
+          139
+        ],
+        "backgroundPoint": [
+          24,
+          46
+        ],
+        "name": "desired-1-bead-detail-2"
+      },
+      {
+        "x": 48,
+        "y": 42,
+        "rgb": [
+          250,
+          248,
+          229
+        ],
+        "backgroundRgb": [
+          83,
+          116,
+          139
+        ],
+        "backgroundPoint": [
+          48,
+          45
+        ],
+        "name": "desired-2-bead-detail-3"
+      }
+    ],
+    "note": "所有标注小色块都是希望保留的细节；原始碎片率不能当作单独质量指标。",
+    "region": "data/dev-highlights.mask",
+    "regionSha256": "53ec2bbc55986cce9ed3a89cd536aa4119029138730d394726d6970d6aa01e48",
+    "regionPng": "data/dev-highlights-region.png"
+  },
+  {
+    "id": "held-eyes-lines",
+    "title": "细线与微小眼睛（保留）",
+    "split": "heldout",
+    "kind": "synthetic",
+    "width": 64,
+    "height": 64,
+    "sourceWidth": 256,
+    "sourceHeight": 256,
+    "source": "data/held-eyes-lines.rgba",
+    "png": "data/held-eyes-lines.png",
+    "sourceSha256": "2dced1a3438ebbf6a7ce7afc8715103aed392a42fee2a661723519eee0452a87",
+    "regionType": "ground-truth-object-mask",
+    "markers": [
+      {
+        "x": 27,
+        "y": 28,
+        "rgb": [
+          38,
+          32,
+          43
+        ],
+        "backgroundRgb": [
+          233,
+          188,
+          143
+        ],
+        "backgroundPoint": [
+          27,
+          25
+        ],
+        "name": "eye-1-beads"
+      },
+      {
+        "x": 41,
+        "y": 28,
+        "rgb": [
+          38,
+          32,
+          43
+        ],
+        "backgroundRgb": [
+          233,
+          188,
+          143
+        ],
+        "backgroundPoint": [
+          41,
+          25
+        ],
+        "name": "eye-2-beads"
+      }
+    ],
+    "note": "程序绘制的真实细线/眼睛；主体mask由绘图几何独立产生。细线宽0.5豆，眼睛1/2豆。",
+    "region": "data/held-eyes-lines.mask",
+    "regionSha256": "4762270ec92c548536398ee44adec5136fdac18c462441e4c6a6c37cdcff57b9",
+    "regionPng": "data/held-eyes-lines-region.png"
+  },
+  {
+    "id": "held-defocus",
+    "title": "散焦背景与清晰主体（保留）",
+    "split": "heldout",
+    "kind": "synthetic",
+    "width": 64,
+    "height": 64,
+    "sourceWidth": 256,
+    "sourceHeight": 256,
+    "source": "data/held-defocus.rgba",
+    "png": "data/held-defocus.png",
+    "sourceSha256": "c08ede722ef2c3447c5cf5ed33fcf99df33c5babdddb363a205047cf5c6d9cc3",
+    "regionType": "ground-truth-object-mask",
+    "markers": [],
+    "note": "背景先加固定种子噪声再GaussianBlur；清晰主体后绘制。散焦标签只在此合成过程已知。",
+    "region": "data/held-defocus.mask",
+    "regionSha256": "84fbbd190b262ab67d3ddeb2dee9ec7b25895cc22a16c8141f3c2597a18a0df0",
+    "regionPng": "data/held-defocus-region.png"
+  },
+  {
+    "id": "held-low-contrast",
+    "title": "低反差1–2豆细节（保留）",
+    "split": "heldout",
+    "kind": "synthetic",
+    "width": 64,
+    "height": 64,
+    "sourceWidth": 256,
+    "sourceHeight": 256,
+    "source": "data/held-low-contrast.rgba",
+    "png": "data/held-low-contrast.png",
+    "sourceSha256": "b0b14e6ae4e4b9e5dde4107b92f2b507b22cf3c8c1122745940f38eb1ddf19be",
+    "regionType": "ground-truth-feature-mask",
+    "markers": [
+      {
+        "x": 13,
+        "y": 36,
+        "rgb": [
+          157,
+          169,
+          155
+        ],
+        "backgroundRgb": [
+          174,
+          186,
+          172
+        ],
+        "backgroundPoint": [
+          13,
+          39
+        ],
+        "name": "desired-2-bead-detail-0"
+      },
+      {
+        "x": 28,
+        "y": 17,
+        "rgb": [
+          157,
+          169,
+          155
+        ],
+        "backgroundRgb": [
+          174,
+          186,
+          172
+        ],
+        "backgroundPoint": [
+          28,
+          20
+        ],
+        "name": "desired-1-bead-detail-1"
+      },
+      {
+        "x": 43,
+        "y": 47,
+        "rgb": [
+          157,
+          169,
+          155
+        ],
+        "backgroundRgb": [
+          174,
+          186,
+          172
+        ],
+        "backgroundPoint": [
+          43,
+          50
+        ],
+        "name": "desired-1-bead-detail-2"
+      },
+      {
+        "x": 46,
+        "y": 25,
+        "rgb": [
+          157,
+          169,
+          155
+        ],
+        "backgroundRgb": [
+          174,
+          186,
+          172
+        ],
+        "backgroundPoint": [
+          46,
+          28
+        ],
+        "name": "desired-2-bead-detail-3"
+      }
+    ],
+    "note": "所有标注小色块都是希望保留的细节；原始碎片率不能当作单独质量指标。",
+    "region": "data/held-low-contrast.mask",
+    "regionSha256": "67d5c10877a1de9c31c5fdd9ae1ce432f7974126821356f71b54b201c8d90c3a",
+    "regionPng": "data/held-low-contrast-region.png"
+  },
+  {
+    "id": "held-highlights",
+    "title": "强反差真实高光（保留）",
+    "split": "heldout",
+    "kind": "synthetic",
+    "width": 64,
+    "height": 64,
+    "sourceWidth": 256,
+    "sourceHeight": 256,
+    "source": "data/held-highlights.rgba",
+    "png": "data/held-highlights.png",
+    "sourceSha256": "a1ad2f9d3ce03b09ce5e3b90e943419c2437c0694b07fe1320678835321a735a",
+    "regionType": "ground-truth-feature-mask",
+    "markers": [
+      {
+        "x": 13,
+        "y": 36,
+        "rgb": [
+          250,
+          248,
+          229
+        ],
+        "backgroundRgb": [
+          83,
+          116,
+          139
+        ],
+        "backgroundPoint": [
+          13,
+          39
+        ],
+        "name": "desired-2-bead-detail-0"
+      },
+      {
+        "x": 28,
+        "y": 17,
+        "rgb": [
+          250,
+          248,
+          229
+        ],
+        "backgroundRgb": [
+          83,
+          116,
+          139
+        ],
+        "backgroundPoint": [
+          28,
+          20
+        ],
+        "name": "desired-1-bead-detail-1"
+      },
+      {
+        "x": 43,
+        "y": 47,
+        "rgb": [
+          250,
+          248,
+          229
+        ],
+        "backgroundRgb": [
+          83,
+          116,
+          139
+        ],
+        "backgroundPoint": [
+          43,
+          50
+        ],
+        "name": "desired-1-bead-detail-2"
+      },
+      {
+        "x": 46,
+        "y": 25,
+        "rgb": [
+          250,
+          248,
+          229
+        ],
+        "backgroundRgb": [
+          83,
+          116,
+          139
+        ],
+        "backgroundPoint": [
+          46,
+          28
+        ],
+        "name": "desired-2-bead-detail-3"
+      }
+    ],
+    "note": "所有标注小色块都是希望保留的细节；原始碎片率不能当作单独质量指标。",
+    "region": "data/held-highlights.mask",
+    "regionSha256": "67d5c10877a1de9c31c5fdd9ae1ce432f7974126821356f71b54b201c8d90c3a",
+    "regionPng": "data/held-highlights-region.png"
+  }
+]

@@ -7,6 +7,17 @@ const field = (width, height, rgba = [255, 255, 255, 255]) => new Uint8ClampedAr
 const sample = (data, sw, sh, w, h, mode = 'balanced', extra = {}) => sampleImageForPattern(data, sw, sh, w, h, { optimizationMode: mode, ...extra });
 const rgbAt = (image, x, y) => [...image.data.slice((y * image.width + x) * 4, (y * image.width + x) * 4 + 3)];
 
+test('saliency ablation changes only exponential weights, not contrast recovery strength', () => {
+  const source = field(20, 20);
+  for (let y = 9; y < 11; y++) for (let x = 9; x < 11; x++) source.set([0, 0, 0, 255], (y * 20 + x) * 4);
+  for (const mode of ['detail', 'balanced', 'easy']) {
+    const disabled = sample(source, 20, 20, 5, 5, mode, { saliencySampling: false });
+    const zeroWeights = sample(source, 20, 20, 5, 5, mode, { betaSaliency: 0, betaGradient: 0 });
+    assert.deepEqual(disabled, zeroWeights);
+    assert.notDeepEqual(disabled.data, sample(source, 20, 20, 5, 5, mode, { saliencySampling: false, contrastRecovery: false }).data);
+  }
+});
+
 test('unchanged resolution is an owned exact copy, including hidden RGB and alpha', () => {
   const source = new Uint8ClampedArray([1, 2, 3, 0, 240, 128, 5, 128]);
   const copy = source.slice();
@@ -19,7 +30,8 @@ test('unchanged resolution is an owned exact copy, including hidden RGB and alph
 
 test('fractional footprints use actual overlap area, not nearest pixel counts', () => {
   const data = new Uint8ClampedArray([0, 0, 0, 255, 100, 100, 100, 255, 200, 200, 200, 255]);
-  const result = sample(data, 3, 1, 2, 1);
+  // Geometric integration is a separate ablation from v4's colour weighting.
+  const result = sample(data, 3, 1, 2, 1, 'balanced', { saliencySampling: false });
   assert.deepEqual([...result.data], [33, 33, 33, 255, 167, 167, 167, 255]);
 });
 
@@ -33,7 +45,7 @@ test('premultiplied alpha blocks hidden white from bleeding into a red silhouett
 test('sub-cell eyes and thin strokes retain more target-scale contrast than area sampling', () => {
   const eye = field(20, 20);
   for (let y = 9; y < 11; y++) for (let x = 9; x < 11; x++) eye.set([0, 0, 0, 255], (y * 20 + x) * 4);
-  const area = sample(eye, 20, 20, 5, 5, 'balanced', { contrastRecovery: false });
+  const area = sample(eye, 20, 20, 5, 5, 'balanced', { contrastRecovery: false, saliencySampling: false });
   const detail = sample(eye, 20, 20, 5, 5, 'detail');
   const balanced = sample(eye, 20, 20, 5, 5, 'balanced');
   const easy = sample(eye, 20, 20, 5, 5, 'easy');
@@ -72,7 +84,9 @@ test('balanced does not sharpen multi-colour photographic texture merely because
   }
   const area = sample(source, 20, 20, 5, 5, 'balanced', { contrastRecovery: false });
   assert.deepEqual(sample(source, 20, 20, 5, 5).data, area.data);
-  assert.deepEqual(sample(source, 20, 20, 5, 5, 'easy').data, area.data);
+  // v4 has mode-specific projection weights; compare against the same mode
+  // with contrast recovery disabled, not a differently weighted colour mean.
+  assert.deepEqual(sample(source, 20, 20, 5, 5, 'easy').data, sample(source, 20, 20, 5, 5, 'easy', { contrastRecovery: false }).data);
 });
 
 test('contrast recovery preserves exact area alpha and source channel bounds', () => {
@@ -106,4 +120,24 @@ test('invalid shapes and unknown optimization modes fail clearly', () => {
   assert.throws(() => sample(field(2, 2), 3, 2, 1, 1));
   assert.throws(() => sample(field(2, 2), 2, 2, 1, 1, 'toString'));
   assert.throws(() => sample(field(2, 2), 2, 2, 1, 1, 'imaginary'));
+});
+
+test('exponential colour weights obey the two-colour mixture while alpha remains geometric coverage', () => {
+  const source = new Uint8ClampedArray([0, 0, 0, 64, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]);
+  const analysis = { width: 2, height: 2, saliency: new Float32Array([1, 0, 0, 0]), gradient: new Float32Array(4), defocus: new Float32Array([0, .5, .5, .5]), defocusConfidence: new Float32Array([0, 1, 1, 1]) };
+  const result = sample(source, 2, 2, 1, 1, 'balanced', { analysis, contrastRecovery: false, betaSaliency: 2, betaGradient: 0 });
+  const expected = Math.round(255 * 765 / (64 * Math.exp(2) + 765));
+  assert.deepEqual([...result.data], [expected, expected, expected, 207]);
+  assert.ok(Math.abs(result.saliency[0] - Math.sqrt(64 / 829)) < 1e-6);
+  assert.ok(Math.abs(result.defocus[0] - 382.5 / 829) < 1e-6);
+  const unweighted = sample(source, 2, 2, 1, 1, 'balanced', { analysis, contrastRecovery: false, saliencySampling: false });
+  assert.equal(unweighted.data[3], result.data[3]);
+  assert.ok(result.data[0] < unweighted.data[0]);
+});
+
+test('bounded saliency weights do not promise that an arbitrarily thin line survives', () => {
+  const source = field(8, 8); source.set([0, 0, 0, 255], 0);
+  const saliency = new Float32Array(64), gradient = new Float32Array(64); saliency[0] = 1; gradient[0] = 1;
+  const result = sample(source, 8, 8, 1, 1, 'balanced', { contrastRecovery: false, analysis: { width: 8, height: 8, saliency, gradient } });
+  assert.ok(rgbToLab(rgbAt(result, 0, 0))[0] > 50, '1/64 area remains background-side even with maximal feature weights');
 });

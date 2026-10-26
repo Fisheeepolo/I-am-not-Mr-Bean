@@ -1,13 +1,13 @@
 import {segmentBackground} from './background-segmentation.js';
-import {hexToRgb,rgbToLab,labDistanceSq} from './color-utils.js';
+import {hexToRgb,rgbToLab,deltaE2000} from './color-utils.js';
 import {optimizePatternColors} from './pattern-optimizer.js';
 export {hexToRgb,rgbToLab} from './color-utils.js';
 
-export const deltaE = (a, b) => Math.sqrt(labDistanceSq(rgbToLab(a), rgbToLab(b)));
+export const deltaE = (a, b) => deltaE2000(rgbToLab(a), rgbToLab(b));
 
 export function nearestColors(hex, palette, limit = 5) {
   const lab = rgbToLab(hexToRgb(hex));
-  return palette.map(c => ({ ...c, distance: Math.sqrt(labDistanceSq(lab, rgbToLab(hexToRgb(c.hex)))) }))
+  return palette.map(c => ({ ...c, distance: deltaE2000(lab, rgbToLab(hexToRgb(c.hex))) }))
     .sort((a, b) => a.distance - b.distance || String(a.code).localeCompare(String(b.code)))
     .slice(0, Math.max(0, Math.floor(limit)));
 }
@@ -43,7 +43,7 @@ export function generatePattern(imageData, width, height, palette, options = {})
   // may change bead colours but never fills a transparent or removed cell.
   const visibleLabs = labs.map((lab,i)=>skip[i]?null:lab);
   const result = optimizePatternColors(visibleLabs,width,height,palette,{...options,maxColors});
-  return {width,height,...result,algorithm:'local-structure-v3'};
+  return {width,height,...result,algorithm:'content-aware-v4'};
 }
 
 export function makeDemo(width = 52, height = 52, palette = []) {

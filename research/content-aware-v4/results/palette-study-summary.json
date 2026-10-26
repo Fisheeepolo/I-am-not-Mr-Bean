@@ -1,0 +1,149 @@
+{
+  "positiveControls": 15,
+  "groups": [
+    {
+      "split": "development",
+      "kind": "all",
+      "method": "full",
+      "n": 7,
+      "meanDeltaE2000": 5.262308271206168,
+      "saliencyWeightedDeltaE2000": 5.306861491601181,
+      "edgeExactF1": 0.3157953789742834,
+      "edgeTol1F1": 0.7212817426628364,
+      "speckleRatio": 0.03478882241486711,
+      "medianMs": 192.0780857142858
+    },
+    {
+      "split": "development",
+      "kind": "all",
+      "method": "frequencyPalette",
+      "n": 7,
+      "meanDeltaE2000": 5.304071126568192,
+      "saliencyWeightedDeltaE2000": 5.35411559525007,
+      "edgeExactF1": 0.31778303118275564,
+      "edgeTol1F1": 0.723589737533563,
+      "speckleRatio": 0.03477665593853821,
+      "medianMs": 185.53157142857123
+    },
+    {
+      "split": "development",
+      "kind": "photo",
+      "method": "full",
+      "n": 3,
+      "meanDeltaE2000": 5.675844070276285,
+      "saliencyWeightedDeltaE2000": 5.804069145251839,
+      "edgeExactF1": 0.23134363142983017,
+      "edgeTol1F1": 0.813851185814702,
+      "speckleRatio": 0.061398528343023256,
+      "medianMs": 288.3798333333334
+    },
+    {
+      "split": "development",
+      "kind": "photo",
+      "method": "frequencyPalette",
+      "n": 3,
+      "meanDeltaE2000": 5.768475458527741,
+      "saliencyWeightedDeltaE2000": 5.902664763703986,
+      "edgeExactF1": 0.23341088144173147,
+      "edgeTol1F1": 0.8203181644223848,
+      "speckleRatio": 0.06145152010658915,
+      "medianMs": 275.9268333333336
+    },
+    {
+      "split": "development",
+      "kind": "synthetic",
+      "method": "full",
+      "n": 4,
+      "meanDeltaE2000": 4.95215642190358,
+      "saliencyWeightedDeltaE2000": 4.933955751363186,
+      "edgeExactF1": 0.3791341896326233,
+      "edgeTol1F1": 0.6518546602989372,
+      "speckleRatio": 0.01483154296875,
+      "medianMs": 119.85177500000009
+    },
+    {
+      "split": "development",
+      "kind": "synthetic",
+      "method": "frequencyPalette",
+      "n": 4,
+      "meanDeltaE2000": 4.95576787759853,
+      "saliencyWeightedDeltaE2000": 4.942703718909634,
+      "edgeExactF1": 0.38106214348852374,
+      "edgeTol1F1": 0.6510434173669467,
+      "speckleRatio": 0.0147705078125,
+      "medianMs": 117.73512499999947
+    },
+    {
+      "split": "heldout",
+      "kind": "all",
+      "method": "full",
+      "n": 8,
+      "meanDeltaE2000": 4.664065509112113,
+      "saliencyWeightedDeltaE2000": 4.656105211024919,
+      "edgeExactF1": 0.31673589790608786,
+      "edgeTol1F1": 0.7361217235950943,
+      "speckleRatio": 0.06275610432672342,
+      "medianMs": 155.14004999999992
+    },
+    {
+      "split": "heldout",
+      "kind": "all",
+      "method": "frequencyPalette",
+      "n": 8,
+      "meanDeltaE2000": 4.672519746484487,
+      "saliencyWeightedDeltaE2000": 4.671676770456258,
+      "edgeExactF1": 0.31731379657524195,
+      "edgeTol1F1": 0.7345843206731352,
+      "speckleRatio": 0.06252291353041943,
+      "medianMs": 148.31581249999977
+    },
+    {
+      "split": "heldout",
+      "kind": "photo",
+      "method": "full",
+      "n": 4,
+      "meanDeltaE2000": 4.3754283540192125,
+      "saliencyWeightedDeltaE2000": 4.37962649450267,
+      "edgeExactF1": 0.25459946806430567,
+      "edgeTol1F1": 0.8203599967075863,
+      "speckleRatio": 0.11031445474719684,
+      "medianMs": 197.58997499999998
+    },
+    {
+      "split": "heldout",
+      "kind": "photo",
+      "method": "frequencyPalette",
+      "n": 4,
+      "meanDeltaE2000": 4.391089593107534,
+      "saliencyWeightedDeltaE2000": 4.406119468486524,
+      "edgeExactF1": 0.25377174405762026,
+      "edgeTol1F1": 0.8177364800587519,
+      "speckleRatio": 0.11088567081083887,
+      "medianMs": 185.85110000000012
+    },
+    {
+      "split": "heldout",
+      "kind": "synthetic",
+      "method": "full",
+      "n": 4,
+      "meanDeltaE2000": 4.952702664205015,
+      "saliencyWeightedDeltaE2000": 4.932583927547168,
+      "edgeExactF1": 0.37887232774787005,
+      "edgeTol1F1": 0.6518834504826023,
+      "speckleRatio": 0.01519775390625,
+      "medianMs": 112.69012499999985
+    },
+    {
+      "split": "heldout",
+      "kind": "synthetic",
+      "method": "frequencyPalette",
+      "n": 4,
+      "meanDeltaE2000": 4.953949899861439,
+      "saliencyWeightedDeltaE2000": 4.9372340724259915,
+      "edgeExactF1": 0.38085584909286363,
+      "edgeTol1F1": 0.6514321612875186,
+      "speckleRatio": 0.01416015625,
+      "medianMs": 110.78052499999944
+    }
+  ]
+}

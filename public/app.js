@@ -1,4 +1,4 @@
-import {convertSourceToPattern} from './pattern-pipeline.js';
+import {runPatternJob} from './pattern-job.js';
 import {createSubjectEditor} from './subject-editor.js';
 import { generatePattern, makeDemo, nearestColors, countCells, replaceColor, hexToRgb } from './engine.js';
 import { parsePalette } from './palette-import.js';
@@ -108,7 +108,7 @@ function restoreProject(data) {
   while(Object.hasOwn(palettes,id)) id=root+'-'+suffix++;
   customPalettes[id]=p; palettes[id]=p;
  }
- syncPaletteOptions(); setPalette(id); pattern={width:data.width,height:data.height,cells:[...data.cells],algorithm:['local-structure-v2','local-structure-v3'].includes(data.algorithm)?data.algorithm:'legacy'}; projectName=String(data.projectName||'我的拼豆图纸').slice(0,80); isDemo=!!data.isDemo; done=new Set(data.done||[]); exclusions={};
+ syncPaletteOptions(); setPalette(id); pattern={width:data.width,height:data.height,cells:[...data.cells],algorithm:['local-structure-v2','local-structure-v3','content-aware-v4'].includes(data.algorithm)?data.algorithm:'legacy'}; projectName=String(data.projectName||'我的拼豆图纸').slice(0,80); isDemo=!!data.isDemo; done=new Set(data.done||[]); exclusions={};
  if(data.exclusions && typeof data.exclusions==='object') for(const [key,value] of Object.entries(data.exclusions)) {
   const restoredKey=key===data.paletteId?id:key;
   if(Object.hasOwn(palettes,restoredKey) && Array.isArray(value)) exclusions[restoredKey]=value.filter(c=>palettes[restoredKey].colors.some(p=>p.code===c));
@@ -250,8 +250,8 @@ async function runGeneration(){
  const available=selectedShopPalette?.colors||availablePalette();if(!available.length){toast('当前色卡没有可用颜色，请先在东道主补充颜色。');return false;}
  if(!imageSource&&!isDemo){toast('这份旧图纸没有原图，可继续拼豆或匹配店家颜色。');return false;}
  const original=imageSource,workingBlob=sourceBlob,workingName=sourceName,newImport=pendingImport;
- const controls=[...document.querySelectorAll('.source-panel button,.source-panel input,.source-panel select,#saveProject,#startBeading,#navLibrary,#openProject,#libraryNew,#aiConfigBtn')].map(el=>[el,el.disabled]);controls.forEach(([el])=>el.disabled=true);
- $('subjectEditor').inert=true;$('canvasLoading').hidden=false;$('canvasLoading').textContent='正在定位主体并匹配颜色…';
+ const controls=[...document.querySelectorAll('.source-panel button,.source-panel input,.source-panel select,#saveProject,#startBeading,#navLibrary,#navRecords,#navHost,#openProject,#libraryNew,#aiConfigBtn')].map(el=>[el,el.disabled]);controls.forEach(([el])=>el.disabled=true);
+ $('editorScreen').inert=true;$('subjectEditor').inert=true;$('canvasLoading').hidden=false;$('canvasLoading').textContent='正在定位主体并匹配颜色…';
  await new Promise(r=>setTimeout(r,40));
  try{
   let next;
@@ -265,10 +265,10 @@ async function runGeneration(){
    let bounds={x:0,y:0,width:off.width,height:off.height};
    if(settings.keepRatio){const scale=Math.min(off.width/sw,off.height/sh),dw=sw*scale,dh=sh*scale;bounds={x:(off.width-dw)/2,y:(off.height-dh)/2,width:dw,height:dh};}
    c.drawImage(original,sx,sy,sw,sh,bounds.x,bounds.y,bounds.width,bounds.height);
-   next=convertSourceToPattern(c.getImageData(0,0,off.width,off.height),off.width,off.height,width,height,available,{...settings,contentBounds:bounds});
+   next=await runPatternJob(c.getImageData(0,0,off.width,off.height),off.width,off.height,width,height,available,{...settings,contentBounds:bounds});
   }else{
    const demo=makeDemo(width,height,available),m=new Map(available.map(a=>[a.code,a]));demo.cells.forEach((code,i)=>{if(code){c.fillStyle=m.get(code).hex;c.fillRect(i%width,Math.floor(i/width),1,1);}});
-   next=convertSourceToPattern(c.getImageData(0,0,width,height),width,height,width,height,available,{...settings,removeBackground:false});
+   next=await runPatternJob(c.getImageData(0,0,width,height),width,height,width,height,available,{...settings,removeBackground:false});
   }
   if(newImport){currentProjectId=null;currentCreatedAt=null;undoStack=[];$('undoBtn').disabled=true;}else pushUndo();
   if(selectedShopPalette)registerShopPalette(settings.shopId,selectedShopPalette);
@@ -276,7 +276,7 @@ async function runGeneration(){
   savedSourceBlob=workingBlob;savedSourceName=workingName;savedOriginalBlob=originalBlob;savedOriginalName=originalName;savedAiEdited=aiEdited;activeDraft=true;pendingImport=false;parametersDirty=false;appliedSettings=settings;applySettings(settings);
   done=new Set();selected=-1;hovered=-1;highlighted=null;setView('grid');updateAll(true);await persistCurrent();toast(total()?`已保存图纸：${total()} 颗豆，${Object.keys(counts()).length} 种颜色。`:'图纸为空，可关闭“去除外部底色”或重新框选主体后重试。');return true;
  }catch(e){toast('生成或保存失败：'+e.message);return false;}
- finally{controls.forEach(([el,disabled])=>el.disabled=disabled);$('canvasLoading').hidden=true;updateSourceControls();}
+ finally{$('editorScreen').inert=false;controls.forEach(([el,disabled])=>el.disabled=disabled);$('canvasLoading').hidden=true;updateSourceControls();}
 }
 $('generateBtn').onclick=generate;
 $('paletteSelect').onchange=()=>{$('buyerShop').value='';updateShopInfo();const next=$('paletteSelect').value, oldMap=paletteMap();pushUndo();setPalette(next);const avail=availablePalette();const replacements=new Map();for(const code of Object.keys(counts()))replacements.set(code,nearestColors(oldMap.get(code).hex,avail.length?avail:activePalette,1)[0].code);pattern.cells=pattern.cells.map(c=>c===null?null:replacements.get(c));done=new Set();highlighted=null;appliedSettings={...appliedSettings,shopId:''};parametersDirty=settingsDiffer();updateAll();toast('已按新色卡匹配图纸，数量保持不变。');};

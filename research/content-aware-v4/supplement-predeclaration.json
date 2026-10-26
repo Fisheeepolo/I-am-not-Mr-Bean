@@ -1,0 +1,19 @@
+{
+  "declaredAt": "2026-10-26T07:06:13.981Z",
+  "status": "Declared before first main heldout output; not yet executed",
+  "purpose": "Palette-selection supplemental two-arm study, separate from the 195-row main matrix",
+  "arms": [
+    "full catalogue facility/medoid + v4.2 downstream",
+    "nearest DE00 weighted frequency Top-K subset + same v4.2 downstream"
+  ],
+  "K": 18,
+  "mode": "balanced",
+  "metric": "de2000",
+  "weights": "(1+2s+0.5*min(1,q/25))*(1-0.55*f*(1-s)), exactly optimizer data weight",
+  "votes": "Each common sampled source Lab votes for full-catalogue nearest DE00; lexicographic code ties; weighted totals descending/code ascending; keep min(K,positive-frequency colors)",
+  "shared": "segmentation, abstraction, sampling, original style, Labs/S/F computed once per measured iteration and reused by both arms",
+  "downstream": "Same optimizer parameters/microProtection gates; subset arm nearest-complete palette stage skips facility/medoid; changed initial labels and resulting micro gates are downstream effects, not separately tuned",
+  "fixtures": "All fixed 15 main fixtures, split unchanged; no new data and no holdout-driven parameters",
+  "timing": "One warmup plus 3 measured; shared preparation, selection, optimization and end-to-end explicitly recorded; after main CPU timing completes",
+  "evaluation": "Reuse locked independent metrics; positive control full grid must match main full K18"
+}

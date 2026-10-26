@@ -1,3 +1,5 @@
+import { analyzeImageStructure } from './image-abstraction.js';
+
 /**
  * Deterministic, alpha-aware source-to-bead sampling.
  *
@@ -8,6 +10,12 @@
  * marks smaller than a bead are not guaranteed to survive.
  */
 const MODES = Object.freeze({ detail: 1.5, balanced: 1.2, easy: .35 });
+export const SALIENCY_SAMPLING_PARAMETERS = Object.freeze({
+  detail: Object.freeze({ betaSaliency: 1.35, betaGradient: .6 }),
+  balanced: Object.freeze({ betaSaliency: 1.1, betaGradient: .45 }),
+  easy: Object.freeze({ betaSaliency: .75, betaGradient: .3 })
+});
+const unit = value => Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0;
 
 function validSize(width, height, limit) {
   return Number.isInteger(width) && Number.isInteger(height) && width > 0 && height > 0 && width * height <= limit;
@@ -19,21 +27,34 @@ export function sampleImageForPattern(imageData, sourceWidth, sourceHeight, widt
   if (!source || source.length !== sourceWidth * sourceHeight * 4) throw new Error('图片像素与取样尺寸不一致。');
   const mode = options.optimizationMode ?? 'balanced';
   if (!Object.hasOwn(MODES, mode)) throw new Error('不支持的图纸优化模式。');
+  const analysis = options.analysis ?? analyzeImageStructure(source, sourceWidth, sourceHeight, options);
+  const sourceCount = sourceWidth * sourceHeight;
+  if (analysis.width !== sourceWidth || analysis.height !== sourceHeight || analysis.saliency?.length !== sourceCount || analysis.gradient?.length !== sourceCount) throw new Error('取样结构分析尺寸不一致。');
+  if (['defocus', 'defocusConfidence'].some(key => analysis[key] && analysis[key].length !== sourceCount)) throw new Error('取样结构分析尺寸不一致。');
+  const weighted = options.saliencySampling !== false;
+  const betaSaliency = options.betaSaliency ?? SALIENCY_SAMPLING_PARAMETERS[mode].betaSaliency;
+  const betaGradient = options.betaGradient ?? SALIENCY_SAMPLING_PARAMETERS[mode].betaGradient;
+  if (![betaSaliency, betaGradient].every(value => Number.isFinite(value) && value >= 0 && value <= 4)) throw new Error('显著性取样权重无效。');
   // A true pixel-art source already at bead resolution must remain unchanged,
   // including its alpha and hidden RGB channels.
-  if (sourceWidth === width && sourceHeight === height) return { data: new Uint8ClampedArray(source), width, height };
+  if (sourceWidth === width && sourceHeight === height) return {
+    data: new Uint8ClampedArray(source), width, height,
+    saliency: new Float32Array(analysis.saliency), defocus: new Float32Array(analysis.defocus ?? sourceCount), defocusConfidence: new Float32Array(analysis.defocusConfidence ?? sourceCount)
+  };
 
   const n = width * height, means = new Float32Array(n * 3);
   const minimum = new Uint8Array(n * 3), maximum = new Uint8Array(n * 3);
   const deviations = new Float32Array(n), alpha = new Float32Array(n), concentration = new Float32Array(n);
   const data = new Uint8ClampedArray(n * 4);
+  const saliency = new Float32Array(n), defocus = new Float32Array(n), defocusConfidence = new Float32Array(n);
+  const finish = () => ({ data, width, height, saliency, defocus, defocusConfidence });
   const scaleX = sourceWidth / width, scaleY = sourceHeight / height, area = scaleX * scaleY;
 
   for (let y = 0; y < height; y++) {
     const y0 = y * scaleY, y1 = (y + 1) * scaleY;
     for (let x = 0; x < width; x++) {
       const x0 = x * scaleX, x1 = (x + 1) * scaleX, i = y * width + x, at = i * 3;
-      let coverage = 0, r = 0, g = 0, b = 0, second = 0;
+      let coverage = 0, colorMass = 0, r = 0, g = 0, b = 0, second = 0, saliencySq = 0, defocusSum = 0, confidenceSum = 0;
       let rMin = 255, gMin = 255, bMin = 255, rMax = 0, gMax = 0, bMax = 0;
       const localColors = new Map();
       for (let sy = Math.floor(y0); sy < Math.min(sourceHeight, Math.ceil(y1)); sy++) {
@@ -44,21 +65,27 @@ export function sampleImageForPattern(imageData, sourceWidth, sourceHeight, widt
           const weight = overlapY * (Math.min(x1, sx + 1) - Math.max(x0, sx)) * source[p + 3] / 255;
           if (weight <= 0) continue;
           const sr = source[p], sg = source[p + 1], sb = source[p + 2];
+          const sourceIndex = sy * sourceWidth + sx, s = unit(analysis.saliency[sourceIndex]), gFeature = unit(analysis.gradient[sourceIndex]);
+          const colorWeight = weight * (weighted ? Math.exp(betaSaliency * s + betaGradient * gFeature) : 1);
           coverage += weight;
+          colorMass += colorWeight;
+          saliencySq += weight * s * s;
+          defocusSum += weight * unit(analysis.defocus?.[sourceIndex]); confidenceSum += weight * unit(analysis.defocusConfidence?.[sourceIndex]);
           const colorBin = (sr >> 4) * 256 + (sg >> 4) * 16 + (sb >> 4);
           localColors.set(colorBin, (localColors.get(colorBin) ?? 0) + weight);
-          r += sr * weight; g += sg * weight; b += sb * weight;
-          second += (sr * sr + sg * sg + sb * sb) * weight;
+          r += sr * colorWeight; g += sg * colorWeight; b += sb * colorWeight;
+          second += (sr * sr + sg * sg + sb * sb) * colorWeight;
           rMin = Math.min(rMin, sr); gMin = Math.min(gMin, sg); bMin = Math.min(bMin, sb);
           rMax = Math.max(rMax, sr); gMax = Math.max(gMax, sg); bMax = Math.max(bMax, sb);
         }
       }
       if (!coverage) continue;
-      r /= coverage; g /= coverage; b /= coverage;
+      r /= colorMass; g /= colorMass; b /= colorMass;
       means[at] = r; means[at + 1] = g; means[at + 2] = b;
       minimum[at] = rMin; minimum[at + 1] = gMin; minimum[at + 2] = bMin;
       maximum[at] = rMax; maximum[at + 1] = gMax; maximum[at + 2] = bMax;
-      deviations[i] = Math.sqrt(Math.max(0, (second / coverage - r * r - g * g - b * b) / 3));
+      deviations[i] = Math.sqrt(Math.max(0, (second / colorMass - r * r - g * g - b * b) / 3));
+      saliency[i] = Math.sqrt(saliencySq / coverage); defocus[i] = defocusSum / coverage; defocusConfidence[i] = confidenceSum / coverage;
       let first = 0, secondBin = 0;
       for (const mass of localColors.values()) {
         if (mass > first) { secondBin = first; first = mass; }
@@ -70,8 +97,10 @@ export function sampleImageForPattern(imageData, sourceWidth, sourceHeight, widt
     }
   }
 
-  const gain = options.contrastRecovery === false ? 0 : MODES[mode];
-  if (!gain) return { data, width, height };
+  // Keep the recovery strength fixed when ablating exponential weights: the
+  // no-saliency experiment must not silently increase a second mechanism.
+  const gain = options.contrastRecovery === false ? 0 : MODES[mode] * .65;
+  if (!gain) return finish();
   for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
     const i = y * width + x, at = i * 3;
     // Do not sharpen transparent silhouettes or weak texture. Opaque sampling
@@ -113,5 +142,5 @@ export function sampleImageForPattern(imageData, sourceWidth, sourceHeight, widt
       data[i * 4 + c] = Math.max(minimum[at + c], Math.min(maximum[at + c], means[at + c] + residuals[c] * amount));
     }
   }
-  return { data, width, height };
+  return finish();
 }

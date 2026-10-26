@@ -1,0 +1,2459 @@
+{
+  "protocol": "palette-study-v1",
+  "mainProtocol": "content-aware-v4.4",
+  "startedAt": "2026-10-26T07:12:25.903Z",
+  "node": "v24.14.1",
+  "split": "heldout",
+  "sourceHashes": {
+    "../../public/pattern-pipeline.js": "8b79f49abf5e42317bb4e9ec37919e0889030da9d9e644ceab9425e4ddfb4d7f",
+    "../../public/background-segmentation.js": "90145b7ac5d6b35aad64fc5339f6a0d3eaf95e517df77acd202a84266dccce5f",
+    "../../public/color-utils.js": "1c1c358dc96a9d5eeba008d538156aebca5562a7b30b578a546a7cb7c182d08a",
+    "../../public/image-sampling.js": "ee9958678b7f453ac3c9d0d0230a21cc9b4b770d3d230d4213096d3e700eaf48",
+    "../../public/image-abstraction.js": "36b8321414330c7e1b10f1ce381ba740778df39b1207b400ca7921b0a3c46572",
+    "../../public/image-styles.js": "25d30fd36ef933d87dceee21b5e5d64958081c03bf0d20e5907597aca1c52a1a",
+    "../../public/engine.js": "fa585c49d39ea236a8212f66192c8d681439a6e040d18410f418adcf7774ef80",
+    "../../public/pattern-optimizer.js": "9e4ee491f392fc627bbe0df681f9f4953bb9e3846b4139a52aa91b046544c4b9",
+    "../../public/graph-cuts.js": "72e76df47e656c2186873956f08d7fb7bc7e61f8207ef80aff81e555eed79326"
+  },
+  "studyHashes": {
+    "palette-study.mjs": "7cb0a8374632b42eb56799ab51f42452df24b2a93bee64095a9c642126199f39",
+    "SUPPLEMENTAL-PROTOCOL.md": "8472025d1dbf20e1154880dd707c11420169431ee6561f721f2cd0754793d1cf",
+    "PALETTE-STUDY.md": "74544cb3ca18931e835715c2cb096d6eb27b452bc45256d80c38afdaf0e0e9b2"
+  },
+  "protocolLockHash": "3e63e129f573845c845eba1b8ea3a548ed8eb398934c16aa42465fbf66a133d2",
+  "fixtureManifestHash": "00d98bbb7051ae299638dc5984ffe9ad60a14a1271d78ce7ef18a2035bfedd98",
+  "paletteHash": "d739bae87117ac53d73076bfdcb72d85456921cc8b5f5b24c3ee83d1da5d1a9b",
+  "timingBoundary": "Decoded RGBA through shared preprocessing + optional weighted Top K + optimizer; excludes I/O, decoding, checks, hashing and metrics.",
+  "timingDesign": "One paired warmup, three paired measured repetitions; shared preprocessing is measured once per pair and attributed equally; alternating arm order.",
+  "finishedAt": "2026-10-26T07:12:34.286Z",
+  "evaluationProtocol": "content-aware-v4.4",
+  "fixtureManifestSha256": "00d98bbb7051ae299638dc5984ffe9ad60a14a1271d78ce7ef18a2035bfedd98",
+  "evaluationEnvironment": {
+    "python": "3.12.14",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "skimage": "0.25.2",
+    "pillow": "13.0.0"
+  },
+  "evaluationHash": "15e1312f4877811c9f282c23617bbe8a8ffef0f48bfff6dc7d1f18300560ff7c",
+  "rows": [
+    {
+      "fixture": "photo-coffee",
+      "split": "heldout",
+      "kind": "photo",
+      "method": "full",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 43,
+      "usedColors": 18,
+      "timesMs": [
+        239.0915,
+        264.42470000000003,
+        263.3874999999998
+      ],
+      "medianMs": 263.3874999999998,
+      "prepTimesMs": [
+        50.17150000000004,
+        56.6409000000001,
+        66.30009999999993
+      ],
+      "paletteSelectionTimesMs": [
+        0,
+        0,
+        0
+      ],
+      "optimizationTimesMs": [
+        188.91999999999996,
+        207.78379999999993,
+        197.0873999999999
+      ],
+      "stageMediansMs": {
+        "preprocessing": 56.6409000000001,
+        "topKSelection": 0,
+        "optimizer": 197.0873999999999
+      },
+      "sourceImageHash": "28886a484b5f106eb0c955aecacb1ac27a2cebafd2a5644e6d00813fd4f9497a",
+      "commonInputHash": "c4e2985bcda9f17dea55f94a33824059c4244735efd92eca3e5948003da11d5d",
+      "candidatePaletteAudit": null,
+      "positiveControlMatchesMain": true,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 5.4498481130486685,
+      "saliencyWeightedDeltaE2000": 5.498941850427844,
+      "regionType": "manual-rectangle-ROI-proxy",
+      "regionDeltaE2000": 6.218659001500002,
+      "complementDeltaE2000": 4.7370290540083575,
+      "regionSaliencyWeightedDeltaE2000": 6.155877797105426,
+      "complementSaliencyWeightedDeltaE2000": 4.761652411685716,
+      "roiPriorityWeightedDeltaE2000": 5.699579618522066,
+      "edgeExactPrecision": 0.31024171442810866,
+      "edgeExactRecall": 0.2232783357245337,
+      "edgeExactF1": 0.25967254145374913,
+      "edgeExactReferenceEdges": 5576,
+      "edgeExactPredictedEdges": 4013,
+      "edgeTol1Precision": 0.9299775728881137,
+      "edgeTol1Recall": 0.7587876614060258,
+      "edgeTol1F1": 0.8357058676504193,
+      "edgeTol1ReferenceEdges": 5576,
+      "edgeTol1PredictedEdges": 4013,
+      "componentCount": 316,
+      "tinyComponents": 219,
+      "tinyCells": 255,
+      "nonempty": 2752,
+      "speckleRatio": 0.09265988372093023,
+      "speckleBelow005": false,
+      "referenceSalientTinyCells": 189,
+      "nonExemptTinyCells": 66,
+      "nonExemptSpeckleRatio": 0.023982558139534885,
+      "compactnessMean": 1.7946349676603053,
+      "compactnessAreaWeighted": 4.048041205181798,
+      "rowTransitions": 811,
+      "markersTotal": 0,
+      "markersPreserved": 0,
+      "markerDetails": []
+    },
+    {
+      "fixture": "photo-coffee",
+      "split": "heldout",
+      "kind": "photo",
+      "method": "frequencyPalette",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 43,
+      "usedColors": 18,
+      "timesMs": [
+        229.72570000000007,
+        228.76620000000003,
+        240.28849999999966
+      ],
+      "medianMs": 229.72570000000007,
+      "prepTimesMs": [
+        50.17150000000004,
+        56.6409000000001,
+        66.30009999999993
+      ],
+      "paletteSelectionTimesMs": [
+        126.9941,
+        123.46479999999997,
+        127.27489999999989
+      ],
+      "optimizationTimesMs": [
+        52.560100000000034,
+        48.660499999999956,
+        46.71349999999984
+      ],
+      "stageMediansMs": {
+        "preprocessing": 56.6409000000001,
+        "topKSelection": 126.9941,
+        "optimizer": 48.660499999999956
+      },
+      "sourceImageHash": "28886a484b5f106eb0c955aecacb1ac27a2cebafd2a5644e6d00813fd4f9497a",
+      "commonInputHash": "c4e2985bcda9f17dea55f94a33824059c4244735efd92eca3e5948003da11d5d",
+      "candidatePaletteAudit": {
+        "selection": "exact-DE00-nearest-full-catalogue-weighted-frequency",
+        "selectedCodes": [
+          "G13",
+          "G20",
+          "H16",
+          "F18",
+          "F11",
+          "G08",
+          "G07",
+          "F10",
+          "M13",
+          "ZG02",
+          "E16",
+          "P05",
+          "G04",
+          "G16",
+          "G03",
+          "G21",
+          "G09",
+          "G10"
+        ],
+        "sourceNearestColors": 44,
+        "weightSum": 3504.1854902702466,
+        "weightedHistogram": [
+          {
+            "code": "G13",
+            "weight": 556.1834322077887,
+            "count": 447
+          },
+          {
+            "code": "G20",
+            "weight": 546.4554295511897,
+            "count": 440
+          },
+          {
+            "code": "H16",
+            "weight": 328.22817741402235,
+            "count": 278
+          },
+          {
+            "code": "F18",
+            "weight": 308.6890373692873,
+            "count": 247
+          },
+          {
+            "code": "F11",
+            "weight": 289.94137998089974,
+            "count": 218
+          },
+          {
+            "code": "G08",
+            "weight": 224.39154898607677,
+            "count": 171
+          },
+          {
+            "code": "G07",
+            "weight": 218.24689744072668,
+            "count": 173
+          },
+          {
+            "code": "F10",
+            "weight": 211.1849400846475,
+            "count": 159
+          },
+          {
+            "code": "M13",
+            "weight": 210.59829978952217,
+            "count": 169
+          },
+          {
+            "code": "ZG02",
+            "weight": 93.141113567248,
+            "count": 71
+          },
+          {
+            "code": "E16",
+            "weight": 63.41624233014907,
+            "count": 45
+          },
+          {
+            "code": "P05",
+            "weight": 59.63024377143321,
+            "count": 54
+          },
+          {
+            "code": "G04",
+            "weight": 49.403562263345826,
+            "count": 42
+          },
+          {
+            "code": "G16",
+            "weight": 49.279389277818694,
+            "count": 38
+          },
+          {
+            "code": "G03",
+            "weight": 31.457503774297745,
+            "count": 25
+          },
+          {
+            "code": "G21",
+            "weight": 31.029292556901353,
+            "count": 19
+          },
+          {
+            "code": "G09",
+            "weight": 29.669367159481745,
+            "count": 24
+          },
+          {
+            "code": "G10",
+            "weight": 28.955834739764637,
+            "count": 22
+          },
+          {
+            "code": "M14",
+            "weight": 19.511419149970408,
+            "count": 10
+          },
+          {
+            "code": "M09",
+            "weight": 15.615027232873214,
+            "count": 8
+          },
+          {
+            "code": "R20",
+            "weight": 14.902940970725071,
+            "count": 9
+          },
+          {
+            "code": "A06",
+            "weight": 13.998760706565143,
+            "count": 10
+          },
+          {
+            "code": "P11",
+            "weight": 12.979378876914673,
+            "count": 10
+          },
+          {
+            "code": "G19",
+            "weight": 12.371389180928558,
+            "count": 10
+          },
+          {
+            "code": "R01",
+            "weight": 11.390551158774873,
+            "count": 10
+          },
+          {
+            "code": "G14",
+            "weight": 10.069946711137685,
+            "count": 6
+          },
+          {
+            "code": "P07",
+            "weight": 8.23265520113391,
+            "count": 4
+          },
+          {
+            "code": "G17",
+            "weight": 7.793451245144304,
+            "count": 4
+          },
+          {
+            "code": "R23",
+            "weight": 5.849275563228755,
+            "count": 4
+          },
+          {
+            "code": "A23",
+            "weight": 5.086284193745559,
+            "count": 3
+          },
+          {
+            "code": "R22",
+            "weight": 4.856456734539561,
+            "count": 3
+          },
+          {
+            "code": "G01",
+            "weight": 4.427226960012478,
+            "count": 3
+          },
+          {
+            "code": "F17",
+            "weight": 4.161994666064915,
+            "count": 2
+          },
+          {
+            "code": "G12",
+            "weight": 4.032516487176612,
+            "count": 3
+          },
+          {
+            "code": "F06",
+            "weight": 3.50407954492343,
+            "count": 2
+          },
+          {
+            "code": "H04",
+            "weight": 2.260014311294356,
+            "count": 1
+          },
+          {
+            "code": "P23",
+            "weight": 2.1230703869940064,
+            "count": 1
+          },
+          {
+            "code": "P01",
+            "weight": 1.9192107450598759,
+            "count": 1
+          },
+          {
+            "code": "R25",
+            "weight": 1.8230460605807035,
+            "count": 1
+          },
+          {
+            "code": "R21",
+            "weight": 1.6008887924508821,
+            "count": 1
+          },
+          {
+            "code": "H17",
+            "weight": 1.5977405260504445,
+            "count": 1
+          },
+          {
+            "code": "F03",
+            "weight": 1.4891134236681205,
+            "count": 1
+          },
+          {
+            "code": "A18",
+            "weight": 1.4594891985010157,
+            "count": 1
+          },
+          {
+            "code": "H07",
+            "weight": 1.2278699771911208,
+            "count": 1
+          }
+        ],
+        "emptySourceSentinel": false
+      },
+      "positiveControlMatchesMain": null,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 5.46606135446581,
+      "saliencyWeightedDeltaE2000": 5.524291993151805,
+      "regionType": "manual-rectangle-ROI-proxy",
+      "regionDeltaE2000": 6.249520715766834,
+      "complementDeltaE2000": 4.739660658133489,
+      "regionSaliencyWeightedDeltaE2000": 6.198148861496137,
+      "complementSaliencyWeightedDeltaE2000": 4.7680119406340555,
+      "roiPriorityWeightedDeltaE2000": 5.720551097930618,
+      "edgeExactPrecision": 0.3118172790466733,
+      "edgeExactRecall": 0.22525107604017217,
+      "edgeExactF1": 0.261557684298209,
+      "edgeExactReferenceEdges": 5576,
+      "edgeExactPredictedEdges": 4028,
+      "edgeTol1Precision": 0.9299900695134061,
+      "edgeTol1Recall": 0.7604017216642754,
+      "edgeTol1F1": 0.836688930553782,
+      "edgeTol1ReferenceEdges": 5576,
+      "edgeTol1PredictedEdges": 4028,
+      "componentCount": 327,
+      "tinyComponents": 225,
+      "tinyCells": 261,
+      "nonempty": 2752,
+      "speckleRatio": 0.09484011627906977,
+      "speckleBelow005": false,
+      "referenceSalientTinyCells": 188,
+      "nonExemptTinyCells": 73,
+      "nonExemptSpeckleRatio": 0.026526162790697673,
+      "compactnessMean": 1.7718172542538824,
+      "compactnessAreaWeighted": 4.024329894619416,
+      "rowTransitions": 821,
+      "markersTotal": 0,
+      "markersPreserved": 0,
+      "markerDetails": []
+    },
+    {
+      "fixture": "photo-hubble_deep_field",
+      "split": "heldout",
+      "kind": "photo",
+      "method": "full",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 56,
+      "usedColors": 18,
+      "timesMs": [
+        146.9973,
+        155.89599999999973,
+        145.2470999999996
+      ],
+      "medianMs": 146.9973,
+      "prepTimesMs": [
+        52.407700000000204,
+        64.75649999999996,
+        58.384399999999914
+      ],
+      "paletteSelectionTimesMs": [
+        0,
+        0,
+        0
+      ],
+      "optimizationTimesMs": [
+        94.58959999999979,
+        91.13949999999977,
+        86.86269999999968
+      ],
+      "stageMediansMs": {
+        "preprocessing": 58.384399999999914,
+        "topKSelection": 0,
+        "optimizer": 91.13949999999977
+      },
+      "sourceImageHash": "dbeccedd4387f08756733529df7063087c97216c199a90235a3d24553c7f75f2",
+      "commonInputHash": "f55902a6e8294183bd76f89685cf752e4d2107d781e8f9d567af22173b9a95a4",
+      "candidatePaletteAudit": null,
+      "positiveControlMatchesMain": true,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 3.318959000909177,
+      "saliencyWeightedDeltaE2000": 3.5123253465903637,
+      "regionType": "unavailable",
+      "regionDeltaE2000": null,
+      "complementDeltaE2000": null,
+      "regionSaliencyWeightedDeltaE2000": null,
+      "complementSaliencyWeightedDeltaE2000": null,
+      "roiPriorityWeightedDeltaE2000": null,
+      "edgeExactPrecision": 0.28641476781078745,
+      "edgeExactRecall": 0.2592012529365701,
+      "edgeExactF1": 0.2721293505069883,
+      "edgeExactReferenceEdges": 3831,
+      "edgeExactPredictedEdges": 3467,
+      "edgeTol1Precision": 0.9959619267378137,
+      "edgeTol1Recall": 0.7867397546332551,
+      "edgeTol1F1": 0.8790734311341833,
+      "edgeTol1ReferenceEdges": 3831,
+      "edgeTol1PredictedEdges": 3467,
+      "componentCount": 338,
+      "tinyComponents": 320,
+      "tinyCells": 384,
+      "nonempty": 3584,
+      "speckleRatio": 0.10714285714285714,
+      "speckleBelow005": false,
+      "referenceSalientTinyCells": 170,
+      "nonExemptTinyCells": 214,
+      "nonExemptSpeckleRatio": 0.05970982142857143,
+      "compactnessMean": 1.4510676467695705,
+      "compactnessAreaWeighted": 38.27134615091745,
+      "rowTransitions": 650,
+      "markersTotal": 0,
+      "markersPreserved": 0,
+      "markerDetails": []
+    },
+    {
+      "fixture": "photo-hubble_deep_field",
+      "split": "heldout",
+      "kind": "photo",
+      "method": "frequencyPalette",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 56,
+      "usedColors": 18,
+      "timesMs": [
+        141.73750000000018,
+        153.1546000000003,
+        144.5020999999997
+      ],
+      "medianMs": 144.5020999999997,
+      "prepTimesMs": [
+        52.407700000000204,
+        64.75649999999996,
+        58.384399999999914
+      ],
+      "paletteSelectionTimesMs": [
+        49.70149999999967,
+        51.58730000000014,
+        50.56269999999995
+      ],
+      "optimizationTimesMs": [
+        39.62830000000031,
+        36.8108000000002,
+        35.554999999999836
+      ],
+      "stageMediansMs": {
+        "preprocessing": 58.384399999999914,
+        "topKSelection": 50.56269999999995,
+        "optimizer": 36.8108000000002
+      },
+      "sourceImageHash": "dbeccedd4387f08756733529df7063087c97216c199a90235a3d24553c7f75f2",
+      "commonInputHash": "f55902a6e8294183bd76f89685cf752e4d2107d781e8f9d567af22173b9a95a4",
+      "candidatePaletteAudit": {
+        "selection": "exact-DE00-nearest-full-catalogue-weighted-frequency",
+        "selectedCodes": [
+          "H07",
+          "H06",
+          "H16",
+          "H05",
+          "M12",
+          "G08",
+          "C18",
+          "G17",
+          "R13",
+          "H04",
+          "M03",
+          "R22",
+          "G14",
+          "E23",
+          "P02",
+          "H15",
+          "D03",
+          "R07"
+        ],
+        "sourceNearestColors": 33,
+        "weightSum": 4415.253258674774,
+        "weightedHistogram": [
+          {
+            "code": "H07",
+            "weight": 3549.3156822847104,
+            "count": 3046
+          },
+          {
+            "code": "H06",
+            "weight": 347.46867954885164,
+            "count": 226
+          },
+          {
+            "code": "H16",
+            "weight": 166.56186248258194,
+            "count": 115
+          },
+          {
+            "code": "H05",
+            "weight": 110.95407510199254,
+            "count": 62
+          },
+          {
+            "code": "M12",
+            "weight": 41.60879667273048,
+            "count": 22
+          },
+          {
+            "code": "G08",
+            "weight": 38.372344446973585,
+            "count": 25
+          },
+          {
+            "code": "C18",
+            "weight": 25.234848853810533,
+            "count": 15
+          },
+          {
+            "code": "G17",
+            "weight": 21.17110013663015,
+            "count": 12
+          },
+          {
+            "code": "R13",
+            "weight": 18.74884775822623,
+            "count": 10
+          },
+          {
+            "code": "H04",
+            "weight": 11.472412629329662,
+            "count": 6
+          },
+          {
+            "code": "M03",
+            "weight": 10.539777446810579,
+            "count": 5
+          },
+          {
+            "code": "R22",
+            "weight": 9.988521951428547,
+            "count": 6
+          },
+          {
+            "code": "G14",
+            "weight": 8.88444822564109,
+            "count": 5
+          },
+          {
+            "code": "E23",
+            "weight": 5.26907887836218,
+            "count": 3
+          },
+          {
+            "code": "P02",
+            "weight": 4.304799908551539,
+            "count": 2
+          },
+          {
+            "code": "H15",
+            "weight": 4.198366085163525,
+            "count": 2
+          },
+          {
+            "code": "D03",
+            "weight": 3.917062000624881,
+            "count": 2
+          },
+          {
+            "code": "R07",
+            "weight": 3.6606424633934145,
+            "count": 2
+          },
+          {
+            "code": "P23",
+            "weight": 3.6589002014314884,
+            "count": 2
+          },
+          {
+            "code": "M14",
+            "weight": 3.344112819613555,
+            "count": 2
+          },
+          {
+            "code": "G07",
+            "weight": 3.269175687327164,
+            "count": 2
+          },
+          {
+            "code": "E21",
+            "weight": 2.369919411144234,
+            "count": 1
+          },
+          {
+            "code": "C29",
+            "weight": 2.1677637341979143,
+            "count": 1
+          },
+          {
+            "code": "M08",
+            "weight": 2.13881225481243,
+            "count": 1
+          },
+          {
+            "code": "M15",
+            "weight": 2.0238840412140306,
+            "count": 1
+          },
+          {
+            "code": "ZG06",
+            "weight": 2.0228535680216706,
+            "count": 1
+          },
+          {
+            "code": "ZG02",
+            "weight": 2.0186571988501414,
+            "count": 1
+          },
+          {
+            "code": "G21",
+            "weight": 2.0005679094797406,
+            "count": 1
+          },
+          {
+            "code": "R20",
+            "weight": 1.8909583762821438,
+            "count": 1
+          },
+          {
+            "code": "ZG05",
+            "weight": 1.8138660242075686,
+            "count": 1
+          },
+          {
+            "code": "H14",
+            "weight": 1.6616698997211186,
+            "count": 1
+          },
+          {
+            "code": "M04",
+            "weight": 1.6097658951273637,
+            "count": 1
+          },
+          {
+            "code": "H20",
+            "weight": 1.591004777531984,
+            "count": 1
+          }
+        ],
+        "emptySourceSentinel": false
+      },
+      "positiveControlMatchesMain": null,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 3.3278567374711088,
+      "saliencyWeightedDeltaE2000": 3.5295655862306674,
+      "regionType": "unavailable",
+      "regionDeltaE2000": null,
+      "complementDeltaE2000": null,
+      "regionSaliencyWeightedDeltaE2000": null,
+      "complementSaliencyWeightedDeltaE2000": null,
+      "roiPriorityWeightedDeltaE2000": null,
+      "edgeExactPrecision": 0.2852601156069364,
+      "edgeExactRecall": 0.2576350822239624,
+      "edgeExactF1": 0.2707447538060622,
+      "edgeExactReferenceEdges": 3831,
+      "edgeExactPredictedEdges": 3460,
+      "edgeTol1Precision": 0.9959537572254336,
+      "edgeTol1Recall": 0.7828243278517358,
+      "edgeTol1F1": 0.8766206837291756,
+      "edgeTol1ReferenceEdges": 3831,
+      "edgeTol1PredictedEdges": 3460,
+      "componentCount": 341,
+      "tinyComponents": 324,
+      "tinyCells": 387,
+      "nonempty": 3584,
+      "speckleRatio": 0.10797991071428571,
+      "speckleBelow005": false,
+      "referenceSalientTinyCells": 173,
+      "nonExemptTinyCells": 214,
+      "nonExemptSpeckleRatio": 0.05970982142857143,
+      "compactnessMean": 1.4477918331895896,
+      "compactnessAreaWeighted": 38.2709020802057,
+      "rowTransitions": 652,
+      "markersTotal": 0,
+      "markersPreserved": 0,
+      "markerDetails": []
+    },
+    {
+      "fixture": "photo-retina",
+      "split": "heldout",
+      "kind": "photo",
+      "method": "full",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 64,
+      "usedColors": 18,
+      "timesMs": [
+        289.48590000000013,
+        285.65859999999975,
+        309.08730000000014
+      ],
+      "medianMs": 289.48590000000013,
+      "prepTimesMs": [
+        56.02559999999994,
+        67.85099999999966,
+        58.753200000000106
+      ],
+      "paletteSelectionTimesMs": [
+        0,
+        0,
+        0
+      ],
+      "optimizationTimesMs": [
+        233.4603000000002,
+        217.8076000000001,
+        250.33410000000003
+      ],
+      "stageMediansMs": {
+        "preprocessing": 58.753200000000106,
+        "topKSelection": 0,
+        "optimizer": 233.4603000000002
+      },
+      "sourceImageHash": "0539182dc042a0ca7b1d731d868af357904b7dd5022209edffbf94c0de310132",
+      "commonInputHash": "e3055909cba6688176cd62c369b2b53244fb21e2c0d9d2868e905d137f81d5cf",
+      "candidatePaletteAudit": null,
+      "positiveControlMatchesMain": true,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 4.109486906769661,
+      "saliencyWeightedDeltaE2000": 4.016855389781918,
+      "regionType": "manual-rectangle-ROI-proxy",
+      "regionDeltaE2000": 4.707123262706778,
+      "complementDeltaE2000": 3.65741549516028,
+      "regionSaliencyWeightedDeltaE2000": 4.714584371392322,
+      "complementSaliencyWeightedDeltaE2000": 3.663248535565922,
+      "roiPriorityWeightedDeltaE2000": 4.289389727908411,
+      "edgeExactPrecision": 0.2453176643408006,
+      "edgeExactRecall": 0.17851416354890434,
+      "edgeExactF1": 0.20665119876256766,
+      "edgeExactReferenceEdges": 3742,
+      "edgeExactPredictedEdges": 2723,
+      "edgeTol1Precision": 0.7183253764230628,
+      "edgeTol1Recall": 0.5542490646712988,
+      "edgeTol1F1": 0.6257098290765054,
+      "edgeTol1ReferenceEdges": 3742,
+      "edgeTol1PredictedEdges": 2723,
+      "componentCount": 161,
+      "tinyComponents": 123,
+      "tinyCells": 135,
+      "nonempty": 4096,
+      "speckleRatio": 0.032958984375,
+      "speckleBelow005": false,
+      "referenceSalientTinyCells": 121,
+      "nonExemptTinyCells": 14,
+      "nonExemptSpeckleRatio": 0.00341796875,
+      "compactnessMean": 1.6929473369721337,
+      "compactnessAreaWeighted": 6.54174997779915,
+      "rowTransitions": 555,
+      "markersTotal": 0,
+      "markersPreserved": 0,
+      "markerDetails": []
+    },
+    {
+      "fixture": "photo-retina",
+      "split": "heldout",
+      "kind": "photo",
+      "method": "frequencyPalette",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 64,
+      "usedColors": 17,
+      "timesMs": [
+        268.0987,
+        275.83809999999994,
+        290.20510000000013
+      ],
+      "medianMs": 275.83809999999994,
+      "prepTimesMs": [
+        56.02559999999994,
+        67.85099999999966,
+        58.753200000000106
+      ],
+      "paletteSelectionTimesMs": [
+        155.0318000000002,
+        147.52829999999994,
+        158.98090000000047
+      ],
+      "optimizationTimesMs": [
+        57.041299999999865,
+        60.45880000000034,
+        72.47099999999955
+      ],
+      "stageMediansMs": {
+        "preprocessing": 58.753200000000106,
+        "topKSelection": 155.0318000000002,
+        "optimizer": 60.45880000000034
+      },
+      "sourceImageHash": "0539182dc042a0ca7b1d731d868af357904b7dd5022209edffbf94c0de310132",
+      "commonInputHash": "e3055909cba6688176cd62c369b2b53244fb21e2c0d9d2868e905d137f81d5cf",
+      "candidatePaletteAudit": {
+        "selection": "exact-DE00-nearest-full-catalogue-weighted-frequency",
+        "selectedCodes": [
+          "F03",
+          "G20",
+          "H07",
+          "F13",
+          "R01",
+          "G08",
+          "R22",
+          "F23",
+          "R25",
+          "F19",
+          "H16",
+          "F05",
+          "F06",
+          "M14",
+          "F11",
+          "A07",
+          "A12",
+          "P07"
+        ],
+        "sourceNearestColors": 30,
+        "weightSum": 4949.347982452148,
+        "weightedHistogram": [
+          {
+            "code": "F03",
+            "weight": 1354.5853633067252,
+            "count": 1182
+          },
+          {
+            "code": "G20",
+            "weight": 1013.8380338619303,
+            "count": 818
+          },
+          {
+            "code": "H07",
+            "weight": 987.9705065670622,
+            "count": 884
+          },
+          {
+            "code": "F13",
+            "weight": 606.5139945891543,
+            "count": 523
+          },
+          {
+            "code": "R01",
+            "weight": 331.73459275027653,
+            "count": 285
+          },
+          {
+            "code": "G08",
+            "weight": 103.17371204723041,
+            "count": 48
+          },
+          {
+            "code": "R22",
+            "weight": 99.43282650786135,
+            "count": 44
+          },
+          {
+            "code": "F23",
+            "weight": 78.2461735908009,
+            "count": 63
+          },
+          {
+            "code": "R25",
+            "weight": 48.413583788382645,
+            "count": 36
+          },
+          {
+            "code": "F19",
+            "weight": 47.75049780984284,
+            "count": 34
+          },
+          {
+            "code": "H16",
+            "weight": 45.651756174762234,
+            "count": 22
+          },
+          {
+            "code": "F05",
+            "weight": 44.92152186182143,
+            "count": 34
+          },
+          {
+            "code": "F06",
+            "weight": 32.10405036139734,
+            "count": 15
+          },
+          {
+            "code": "M14",
+            "weight": 32.05763869754029,
+            "count": 26
+          },
+          {
+            "code": "F11",
+            "weight": 24.533115023378286,
+            "count": 11
+          },
+          {
+            "code": "A07",
+            "weight": 23.59245425455955,
+            "count": 18
+          },
+          {
+            "code": "A12",
+            "weight": 14.693935387584842,
+            "count": 11
+          },
+          {
+            "code": "P07",
+            "weight": 9.408881418916401,
+            "count": 7
+          },
+          {
+            "code": "A18",
+            "weight": 8.277074850177566,
+            "count": 6
+          },
+          {
+            "code": "Y02",
+            "weight": 8.039686241986281,
+            "count": 6
+          },
+          {
+            "code": "G12",
+            "weight": 7.009679572854136,
+            "count": 5
+          },
+          {
+            "code": "G19",
+            "weight": 5.703772902240172,
+            "count": 4
+          },
+          {
+            "code": "F01",
+            "weight": 5.1492815715852265,
+            "count": 3
+          },
+          {
+            "code": "F25",
+            "weight": 2.988227520727455,
+            "count": 2
+          },
+          {
+            "code": "A11",
+            "weight": 2.9643712948868393,
+            "count": 2
+          },
+          {
+            "code": "A09",
+            "weight": 2.8714739101011917,
+            "count": 2
+          },
+          {
+            "code": "F08",
+            "weight": 2.778786411098012,
+            "count": 2
+          },
+          {
+            "code": "G07",
+            "weight": 2.098469642859519,
+            "count": 1
+          },
+          {
+            "code": "F18",
+            "weight": 1.5267396989918274,
+            "count": 1
+          },
+          {
+            "code": "A10",
+            "weight": 1.317780835449661,
+            "count": 1
+          }
+        ],
+        "emptySourceSentinel": false
+      },
+      "positiveControlMatchesMain": null,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 4.147020885143874,
+      "saliencyWeightedDeltaE2000": 4.080236903353067,
+      "regionType": "manual-rectangle-ROI-proxy",
+      "regionDeltaE2000": 4.7707381866284155,
+      "complementDeltaE2000": 3.6752210052902123,
+      "regionSaliencyWeightedDeltaE2000": 4.848887379917778,
+      "complementSaliencyWeightedDeltaE2000": 3.690687258471839,
+      "roiPriorityWeightedDeltaE2000": 4.3347746939866605,
+      "edgeExactPrecision": 0.24371953505811775,
+      "edgeExactRecall": 0.173703901656868,
+      "edgeExactF1": 0.20283975659229214,
+      "edgeExactReferenceEdges": 3742,
+      "edgeExactPredictedEdges": 2667,
+      "edgeTol1Precision": 0.7157855268091489,
+      "edgeTol1Recall": 0.5416889363976484,
+      "edgeTol1F1": 0.616685446982813,
+      "edgeTol1ReferenceEdges": 3742,
+      "edgeTol1PredictedEdges": 2667,
+      "componentCount": 157,
+      "tinyComponents": 121,
+      "tinyCells": 132,
+      "nonempty": 4096,
+      "speckleRatio": 0.0322265625,
+      "speckleBelow005": false,
+      "referenceSalientTinyCells": 121,
+      "nonExemptTinyCells": 11,
+      "nonExemptSpeckleRatio": 0.002685546875,
+      "compactnessMean": 1.6986917301369329,
+      "compactnessAreaWeighted": 6.542527101544715,
+      "rowTransitions": 553,
+      "markersTotal": 0,
+      "markersPreserved": 0,
+      "markerDetails": []
+    },
+    {
+      "fixture": "photo-grass",
+      "split": "heldout",
+      "kind": "photo",
+      "method": "full",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 64,
+      "usedColors": 9,
+      "timesMs": [
+        125.92020000000048,
+        90.48919999999998,
+        90.27750000000015
+      ],
+      "medianMs": 90.48919999999998,
+      "prepTimesMs": [
+        86.85500000000047,
+        57.253099999999904,
+        58.01760000000013
+      ],
+      "paletteSelectionTimesMs": [
+        0,
+        0,
+        0
+      ],
+      "optimizationTimesMs": [
+        39.065200000000004,
+        33.23610000000008,
+        32.259900000000016
+      ],
+      "stageMediansMs": {
+        "preprocessing": 58.01760000000013,
+        "topKSelection": 0,
+        "optimizer": 33.23610000000008
+      },
+      "sourceImageHash": "b9011867e51c6a2aec285cb365888396a8bf675574001fbfee4ca213e492274a",
+      "commonInputHash": "5e104dbc91a39578bd876c58486a9032f0fc84730015924f0def9cca75f2a60e",
+      "candidatePaletteAudit": null,
+      "positiveControlMatchesMain": true,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 4.623419395349344,
+      "saliencyWeightedDeltaE2000": 4.490383391210554,
+      "regionType": "unavailable",
+      "regionDeltaE2000": null,
+      "complementDeltaE2000": null,
+      "regionSaliencyWeightedDeltaE2000": null,
+      "complementSaliencyWeightedDeltaE2000": null,
+      "roiPriorityWeightedDeltaE2000": null,
+      "edgeExactPrecision": 0.38693645722399717,
+      "edgeExactRecall": 0.21930486394044565,
+      "edgeExactF1": 0.2799447815339176,
+      "edgeExactReferenceEdges": 19881,
+      "edgeExactPredictedEdges": 11268,
+      "edgeTol1Precision": 1.0,
+      "edgeTol1Recall": 0.8884864946431266,
+      "edgeTol1F1": 0.9409508589692369,
+      "edgeTol1ReferenceEdges": 19881,
+      "edgeTol1PredictedEdges": 11268,
+      "componentCount": 1057,
+      "tinyComponents": 705,
+      "tinyCells": 854,
+      "nonempty": 4096,
+      "speckleRatio": 0.20849609375,
+      "speckleBelow005": false,
+      "referenceSalientTinyCells": 285,
+      "nonExemptTinyCells": 569,
+      "nonExemptSpeckleRatio": 0.138916015625,
+      "compactnessMean": 1.8011980091948359,
+      "compactnessAreaWeighted": 6.802785843934733,
+      "rowTransitions": 2288,
+      "markersTotal": 0,
+      "markersPreserved": 0,
+      "markerDetails": []
+    },
+    {
+      "fixture": "photo-grass",
+      "split": "heldout",
+      "kind": "photo",
+      "method": "frequencyPalette",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 64,
+      "usedColors": 9,
+      "timesMs": [
+        122.4930000000004,
+        92.64070000000083,
+        93.33850000000075
+      ],
+      "medianMs": 93.33850000000075,
+      "prepTimesMs": [
+        86.85500000000047,
+        57.253099999999904,
+        58.01760000000013
+      ],
+      "paletteSelectionTimesMs": [
+        9.482299999999668,
+        8.971000000000458,
+        9.066800000000512
+      ],
+      "optimizationTimesMs": [
+        26.15570000000025,
+        26.41660000000047,
+        26.254100000000108
+      ],
+      "stageMediansMs": {
+        "preprocessing": 58.01760000000013,
+        "topKSelection": 9.066800000000512,
+        "optimizer": 26.254100000000108
+      },
+      "sourceImageHash": "b9011867e51c6a2aec285cb365888396a8bf675574001fbfee4ca213e492274a",
+      "commonInputHash": "5e104dbc91a39578bd876c58486a9032f0fc84730015924f0def9cca75f2a60e",
+      "candidatePaletteAudit": {
+        "selection": "exact-DE00-nearest-full-catalogue-weighted-frequency",
+        "selectedCodes": [
+          "H04",
+          "M15",
+          "R13",
+          "H05",
+          "H23",
+          "P02",
+          "H06",
+          "H03",
+          "H11"
+        ],
+        "sourceNearestColors": 9,
+        "weightSum": 6958.86188046204,
+        "weightedHistogram": [
+          {
+            "code": "H04",
+            "weight": 2695.1059946599567,
+            "count": 1625
+          },
+          {
+            "code": "M15",
+            "weight": 1772.0354315946656,
+            "count": 1063
+          },
+          {
+            "code": "R13",
+            "weight": 1728.353932241825,
+            "count": 973
+          },
+          {
+            "code": "H05",
+            "weight": 282.92501104612165,
+            "count": 149
+          },
+          {
+            "code": "H23",
+            "weight": 218.4027316247572,
+            "count": 130
+          },
+          {
+            "code": "P02",
+            "weight": 204.35722409845638,
+            "count": 123
+          },
+          {
+            "code": "H06",
+            "weight": 33.40509234610089,
+            "count": 18
+          },
+          {
+            "code": "H03",
+            "weight": 22.56490952364653,
+            "count": 14
+          },
+          {
+            "code": "H11",
+            "weight": 1.711553326521456,
+            "count": 1
+          }
+        ],
+        "emptySourceSentinel": false
+      },
+      "positiveControlMatchesMain": null,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 4.623419395349344,
+      "saliencyWeightedDeltaE2000": 4.490383391210554,
+      "regionType": "unavailable",
+      "regionDeltaE2000": null,
+      "complementDeltaE2000": null,
+      "regionSaliencyWeightedDeltaE2000": null,
+      "complementSaliencyWeightedDeltaE2000": null,
+      "roiPriorityWeightedDeltaE2000": null,
+      "edgeExactPrecision": 0.38693645722399717,
+      "edgeExactRecall": 0.21930486394044565,
+      "edgeExactF1": 0.2799447815339176,
+      "edgeExactReferenceEdges": 19881,
+      "edgeExactPredictedEdges": 11268,
+      "edgeTol1Precision": 1.0,
+      "edgeTol1Recall": 0.8884864946431266,
+      "edgeTol1F1": 0.9409508589692369,
+      "edgeTol1ReferenceEdges": 19881,
+      "edgeTol1PredictedEdges": 11268,
+      "componentCount": 1057,
+      "tinyComponents": 705,
+      "tinyCells": 854,
+      "nonempty": 4096,
+      "speckleRatio": 0.20849609375,
+      "speckleBelow005": false,
+      "referenceSalientTinyCells": 285,
+      "nonExemptTinyCells": 569,
+      "nonExemptSpeckleRatio": 0.138916015625,
+      "compactnessMean": 1.8011980091948359,
+      "compactnessAreaWeighted": 6.802785843934733,
+      "rowTransitions": 2288,
+      "markersTotal": 0,
+      "markersPreserved": 0,
+      "markerDetails": []
+    },
+    {
+      "fixture": "held-eyes-lines",
+      "split": "heldout",
+      "kind": "synthetic",
+      "method": "full",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 64,
+      "usedColors": 17,
+      "timesMs": [
+        86.82340000000022,
+        89.55499999999938,
+        96.6261999999997
+      ],
+      "medianMs": 89.55499999999938,
+      "prepTimesMs": [
+        49.53680000000077,
+        50.57799999999952,
+        51.739700000000084
+      ],
+      "paletteSelectionTimesMs": [
+        0,
+        0,
+        0
+      ],
+      "optimizationTimesMs": [
+        37.28659999999945,
+        38.97699999999986,
+        44.886499999999614
+      ],
+      "stageMediansMs": {
+        "preprocessing": 50.57799999999952,
+        "topKSelection": 0,
+        "optimizer": 38.97699999999986
+      },
+      "sourceImageHash": "2dced1a3438ebbf6a7ce7afc8715103aed392a42fee2a661723519eee0452a87",
+      "commonInputHash": "888a5682646d3e5bd2682a2e051a1ee63299e830bba9746470fe4ad6e096f714",
+      "candidatePaletteAudit": null,
+      "positiveControlMatchesMain": true,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 4.44355700539367,
+      "saliencyWeightedDeltaE2000": 4.57286894586524,
+      "regionType": "ground-truth-object-mask",
+      "regionDeltaE2000": 2.595853006574541,
+      "complementDeltaE2000": 5.681134530897068,
+      "regionSaliencyWeightedDeltaE2000": 3.0779723412931457,
+      "complementSaliencyWeightedDeltaE2000": 5.9269923966149145,
+      "roiPriorityWeightedDeltaE2000": 3.9145837225813636,
+      "edgeExactPrecision": 0.1706070287539936,
+      "edgeExactRecall": 0.3662551440329218,
+      "edgeExactF1": 0.23278116826503925,
+      "edgeExactReferenceEdges": 729,
+      "edgeExactPredictedEdges": 1565,
+      "edgeTol1Precision": 0.5450479233226837,
+      "edgeTol1Recall": 1.0,
+      "edgeTol1F1": 0.7055417700578991,
+      "edgeTol1ReferenceEdges": 729,
+      "edgeTol1PredictedEdges": 1565,
+      "componentCount": 145,
+      "tinyComponents": 136,
+      "tinyCells": 160,
+      "nonempty": 4096,
+      "speckleRatio": 0.0390625,
+      "speckleBelow005": false,
+      "referenceSalientTinyCells": 59,
+      "nonExemptTinyCells": 101,
+      "nonExemptSpeckleRatio": 0.024658203125,
+      "compactnessMean": 1.3860881772112634,
+      "compactnessAreaWeighted": 5.782577790755826,
+      "rowTransitions": 291,
+      "markersTotal": 2,
+      "markersPreserved": 2,
+      "markerDetails": [
+        {
+          "name": "eye-1-beads",
+          "preserved": true,
+          "contrastRetention": 0.9775933738580433,
+          "directionalRetention": 1.0268369261838335,
+          "targetDeltaE2000": 7.410586037986823
+        },
+        {
+          "name": "eye-2-beads",
+          "preserved": true,
+          "contrastRetention": 0.9775933738580433,
+          "directionalRetention": 1.0268369261838335,
+          "targetDeltaE2000": 7.410586037986823
+        }
+      ]
+    },
+    {
+      "fixture": "held-eyes-lines",
+      "split": "heldout",
+      "kind": "synthetic",
+      "method": "frequencyPalette",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 64,
+      "usedColors": 17,
+      "timesMs": [
+        87.09070000000065,
+        90.15389999999934,
+        93.22659999999905
+      ],
+      "medianMs": 90.15389999999934,
+      "prepTimesMs": [
+        49.53680000000077,
+        50.57799999999952,
+        51.739700000000084
+      ],
+      "paletteSelectionTimesMs": [
+        6.097200000000157,
+        6.509900000000016,
+        7.2554999999993015
+      ],
+      "optimizationTimesMs": [
+        31.456699999999728,
+        33.0659999999998,
+        34.23139999999967
+      ],
+      "stageMediansMs": {
+        "preprocessing": 50.57799999999952,
+        "topKSelection": 6.509900000000016,
+        "optimizer": 33.0659999999998
+      },
+      "sourceImageHash": "2dced1a3438ebbf6a7ce7afc8715103aed392a42fee2a661723519eee0452a87",
+      "commonInputHash": "888a5682646d3e5bd2682a2e051a1ee63299e830bba9746470fe4ad6e096f714",
+      "candidatePaletteAudit": {
+        "selection": "exact-DE00-nearest-full-catalogue-weighted-frequency",
+        "selectedCodes": [
+          "C27",
+          "G09",
+          "H14",
+          "G17",
+          "R20",
+          "G14",
+          "M04",
+          "H05",
+          "G04",
+          "ZG02",
+          "F06",
+          "M09",
+          "M14",
+          "M15",
+          "H03",
+          "H16",
+          "M12",
+          "H04"
+        ],
+        "sourceNearestColors": 27,
+        "weightSum": 4455.643704755605,
+        "weightedHistogram": [
+          {
+            "code": "C27",
+            "weight": 2426.4065389524467,
+            "count": 2367
+          },
+          {
+            "code": "G09",
+            "weight": 1605.0289960539976,
+            "count": 1504
+          },
+          {
+            "code": "H14",
+            "weight": 66.59734986250326,
+            "count": 43
+          },
+          {
+            "code": "G17",
+            "weight": 52.07821383059972,
+            "count": 21
+          },
+          {
+            "code": "R20",
+            "weight": 47.79706380008628,
+            "count": 31
+          },
+          {
+            "code": "G14",
+            "weight": 39.148896931650846,
+            "count": 16
+          },
+          {
+            "code": "M04",
+            "weight": 32.065124974550784,
+            "count": 22
+          },
+          {
+            "code": "H05",
+            "weight": 26.7824459945637,
+            "count": 10
+          },
+          {
+            "code": "G04",
+            "weight": 25.137342351170435,
+            "count": 16
+          },
+          {
+            "code": "ZG02",
+            "weight": 23.981088726513903,
+            "count": 13
+          },
+          {
+            "code": "F06",
+            "weight": 18.8855798849033,
+            "count": 10
+          },
+          {
+            "code": "M09",
+            "weight": 16.11401235046524,
+            "count": 8
+          },
+          {
+            "code": "M14",
+            "weight": 14.414441062572113,
+            "count": 8
+          },
+          {
+            "code": "M15",
+            "weight": 13.182589366094266,
+            "count": 5
+          },
+          {
+            "code": "H03",
+            "weight": 5.911045685058543,
+            "count": 3
+          },
+          {
+            "code": "H16",
+            "weight": 5.546046554553866,
+            "count": 2
+          },
+          {
+            "code": "M12",
+            "weight": 5.084861670348837,
+            "count": 2
+          },
+          {
+            "code": "H04",
+            "weight": 4.871039105509837,
+            "count": 2
+          },
+          {
+            "code": "P23",
+            "weight": 4.249625688685493,
+            "count": 2
+          },
+          {
+            "code": "H20",
+            "weight": 4.221209587525472,
+            "count": 2
+          },
+          {
+            "code": "M13",
+            "weight": 3.581820159685498,
+            "count": 2
+          },
+          {
+            "code": "G21",
+            "weight": 3.3633296959257315,
+            "count": 2
+          },
+          {
+            "code": "H06",
+            "weight": 3.193725202209729,
+            "count": 1
+          },
+          {
+            "code": "C29",
+            "weight": 2.7556751146516096,
+            "count": 1
+          },
+          {
+            "code": "ZG05",
+            "weight": 2.0674717606216872,
+            "count": 1
+          },
+          {
+            "code": "R12",
+            "weight": 1.6140086746448983,
+            "count": 1
+          },
+          {
+            "code": "P09",
+            "weight": 1.5641617139994244,
+            "count": 1
+          }
+        ],
+        "emptySourceSentinel": false
+      },
+      "positiveControlMatchesMain": null,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 4.444978786957275,
+      "saliencyWeightedDeltaE2000": 4.575461412497077,
+      "regionType": "ground-truth-object-mask",
+      "regionDeltaE2000": 2.5988491995108403,
+      "complementDeltaE2000": 5.681501784174763,
+      "regionSaliencyWeightedDeltaE2000": 3.0829979189395886,
+      "complementSaliencyWeightedDeltaE2000": 5.927380876246528,
+      "roiPriorityWeightedDeltaE2000": 3.9164562373537746,
+      "edgeExactPrecision": 0.17525773195876287,
+      "edgeExactRecall": 0.3731138545953361,
+      "edgeExactF1": 0.2384918895221394,
+      "edgeExactReferenceEdges": 729,
+      "edgeExactPredictedEdges": 1552,
+      "edgeTol1Precision": 0.5425257731958762,
+      "edgeTol1Recall": 1.0,
+      "edgeTol1F1": 0.7034252297410193,
+      "edgeTol1ReferenceEdges": 729,
+      "edgeTol1PredictedEdges": 1552,
+      "componentCount": 143,
+      "tinyComponents": 133,
+      "tinyCells": 156,
+      "nonempty": 4096,
+      "speckleRatio": 0.0380859375,
+      "speckleBelow005": false,
+      "referenceSalientTinyCells": 57,
+      "nonExemptTinyCells": 99,
+      "nonExemptSpeckleRatio": 0.024169921875,
+      "compactnessMean": 1.3894984860817308,
+      "compactnessAreaWeighted": 5.782500078381269,
+      "rowTransitions": 290,
+      "markersTotal": 2,
+      "markersPreserved": 2,
+      "markerDetails": [
+        {
+          "name": "eye-1-beads",
+          "preserved": true,
+          "contrastRetention": 0.9775933738580433,
+          "directionalRetention": 1.0268369261838335,
+          "targetDeltaE2000": 7.410586037986823
+        },
+        {
+          "name": "eye-2-beads",
+          "preserved": true,
+          "contrastRetention": 0.9775933738580433,
+          "directionalRetention": 1.0268369261838335,
+          "targetDeltaE2000": 7.410586037986823
+        }
+      ]
+    },
+    {
+      "fixture": "held-defocus",
+      "split": "heldout",
+      "kind": "synthetic",
+      "method": "full",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 64,
+      "usedColors": 18,
+      "timesMs": [
+        249.6916999999994,
+        250.3092000000006,
+        252.51659999999902
+      ],
+      "medianMs": 250.3092000000006,
+      "prepTimesMs": [
+        59.655799999999545,
+        58.0014000000001,
+        57.199499999999716
+      ],
+      "paletteSelectionTimesMs": [
+        0,
+        0,
+        0
+      ],
+      "optimizationTimesMs": [
+        190.03589999999986,
+        192.3078000000005,
+        195.3170999999993
+      ],
+      "stageMediansMs": {
+        "preprocessing": 58.0014000000001,
+        "topKSelection": 0,
+        "optimizer": 192.3078000000005
+      },
+      "sourceImageHash": "c08ede722ef2c3447c5cf5ed33fcf99df33c5babdddb363a205047cf5c6d9cc3",
+      "commonInputHash": "0a36500f130df476c683e4cb605205ea922760d882a19f465f9afc863be6aaad",
+      "candidatePaletteAudit": null,
+      "positiveControlMatchesMain": true,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 5.253204794936538,
+      "saliencyWeightedDeltaE2000": 5.047137876898456,
+      "regionType": "ground-truth-object-mask",
+      "regionDeltaE2000": 3.648430122169211,
+      "complementDeltaE2000": 5.7804953377562915,
+      "regionSaliencyWeightedDeltaE2000": 3.808932498688101,
+      "complementSaliencyWeightedDeltaE2000": 5.69198511381828,
+      "roiPriorityWeightedDeltaE2000": 4.935014005444797,
+      "edgeExactPrecision": 0.22423802612481858,
+      "edgeExactRecall": 0.38242574257425743,
+      "edgeExactF1": 0.28270814272644096,
+      "edgeExactReferenceEdges": 808,
+      "edgeExactPredictedEdges": 1378,
+      "edgeTol1Precision": 0.8214804063860668,
+      "edgeTol1Recall": 1.0,
+      "edgeTol1F1": 0.90199203187251,
+      "edgeTol1ReferenceEdges": 808,
+      "edgeTol1PredictedEdges": 1378,
+      "componentCount": 86,
+      "tinyComponents": 55,
+      "tinyCells": 77,
+      "nonempty": 4096,
+      "speckleRatio": 0.018798828125,
+      "speckleBelow005": false,
+      "referenceSalientTinyCells": 56,
+      "nonExemptTinyCells": 21,
+      "nonExemptSpeckleRatio": 0.005126953125,
+      "compactnessMean": 1.5920007731568058,
+      "compactnessAreaWeighted": 2.53839700251644,
+      "rowTransitions": 311,
+      "markersTotal": 0,
+      "markersPreserved": 0,
+      "markerDetails": []
+    },
+    {
+      "fixture": "held-defocus",
+      "split": "heldout",
+      "kind": "synthetic",
+      "method": "frequencyPalette",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 64,
+      "usedColors": 18,
+      "timesMs": [
+        246.22559999999885,
+        237.22250000000076,
+        238.84220000000005
+      ],
+      "medianMs": 238.84220000000005,
+      "prepTimesMs": [
+        59.655799999999545,
+        58.0014000000001,
+        57.199499999999716
+      ],
+      "paletteSelectionTimesMs": [
+        132.4372999999996,
+        126.1210000000001,
+        126.17579999999998
+      ],
+      "optimizationTimesMs": [
+        54.13249999999971,
+        53.100100000000566,
+        55.46690000000035
+      ],
+      "stageMediansMs": {
+        "preprocessing": 58.0014000000001,
+        "topKSelection": 126.17579999999998,
+        "optimizer": 54.13249999999971
+      },
+      "sourceImageHash": "c08ede722ef2c3447c5cf5ed33fcf99df33c5babdddb363a205047cf5c6d9cc3",
+      "commonInputHash": "0a36500f130df476c683e4cb605205ea922760d882a19f465f9afc863be6aaad",
+      "candidatePaletteAudit": {
+        "selection": "exact-DE00-nearest-full-catalogue-weighted-frequency",
+        "selectedCodes": [
+          "G17",
+          "ZG04",
+          "C22",
+          "H23",
+          "H04",
+          "H20",
+          "M06",
+          "ZG05",
+          "M07",
+          "H15",
+          "C26",
+          "M02",
+          "C15",
+          "G11",
+          "G03",
+          "G14",
+          "G21",
+          "E21"
+        ],
+        "sourceNearestColors": 28,
+        "weightSum": 4491.438359180082,
+        "weightedHistogram": [
+          {
+            "code": "G17",
+            "weight": 986.4409326651581,
+            "count": 881
+          },
+          {
+            "code": "ZG04",
+            "weight": 817.4961648015703,
+            "count": 778
+          },
+          {
+            "code": "C22",
+            "weight": 692.88344589633,
+            "count": 666
+          },
+          {
+            "code": "H23",
+            "weight": 317.46320408752246,
+            "count": 303
+          },
+          {
+            "code": "H04",
+            "weight": 273.2621972558646,
+            "count": 239
+          },
+          {
+            "code": "H20",
+            "weight": 212.4162157883428,
+            "count": 200
+          },
+          {
+            "code": "M06",
+            "weight": 186.00755147712783,
+            "count": 182
+          },
+          {
+            "code": "ZG05",
+            "weight": 176.8801185817358,
+            "count": 173
+          },
+          {
+            "code": "M07",
+            "weight": 176.5563976590877,
+            "count": 172
+          },
+          {
+            "code": "H15",
+            "weight": 115.40705508595255,
+            "count": 107
+          },
+          {
+            "code": "C26",
+            "weight": 98.1057804436095,
+            "count": 96
+          },
+          {
+            "code": "M02",
+            "weight": 74.8550569758366,
+            "count": 53
+          },
+          {
+            "code": "C15",
+            "weight": 59.05733530132764,
+            "count": 58
+          },
+          {
+            "code": "G11",
+            "weight": 50.090299988947656,
+            "count": 39
+          },
+          {
+            "code": "G03",
+            "weight": 37.91224976591705,
+            "count": 14
+          },
+          {
+            "code": "G14",
+            "weight": 35.4589342115517,
+            "count": 18
+          },
+          {
+            "code": "G21",
+            "weight": 29.44315467157941,
+            "count": 13
+          },
+          {
+            "code": "E21",
+            "weight": 28.688700421349075,
+            "count": 28
+          },
+          {
+            "code": "ZG03",
+            "weight": 28.5096587502689,
+            "count": 28
+          },
+          {
+            "code": "ZG02",
+            "weight": 22.57663228147385,
+            "count": 9
+          },
+          {
+            "code": "E23",
+            "weight": 16.34489024108636,
+            "count": 9
+          },
+          {
+            "code": "M15",
+            "weight": 15.735292926600513,
+            "count": 8
+          },
+          {
+            "code": "M14",
+            "weight": 12.776658785983031,
+            "count": 6
+          },
+          {
+            "code": "M13",
+            "weight": 9.06549781260212,
+            "count": 4
+          },
+          {
+            "code": "G04",
+            "weight": 6.599503006011483,
+            "count": 3
+          },
+          {
+            "code": "B10",
+            "weight": 6.0946146764355715,
+            "count": 6
+          },
+          {
+            "code": "G13",
+            "weight": 4.285246675099485,
+            "count": 2
+          },
+          {
+            "code": "M08",
+            "weight": 1.0255689456637196,
+            "count": 1
+          }
+        ],
+        "emptySourceSentinel": false
+      },
+      "positiveControlMatchesMain": null,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 5.256771955998632,
+      "saliencyWeightedDeltaE2000": 5.063145989781914,
+      "regionType": "ground-truth-object-mask",
+      "regionDeltaE2000": 3.7006553515856013,
+      "complementDeltaE2000": 5.768074622320526,
+      "regionSaliencyWeightedDeltaE2000": 3.8764646407924825,
+      "complementSaliencyWeightedDeltaE2000": 5.681159933564124,
+      "roiPriorityWeightedDeltaE2000": 4.9482289690598185,
+      "edgeExactPrecision": 0.22575976845151954,
+      "edgeExactRecall": 0.38613861386138615,
+      "edgeExactF1": 0.28493150684931506,
+      "edgeExactReferenceEdges": 808,
+      "edgeExactPredictedEdges": 1382,
+      "edgeTol1Precision": 0.8219971056439942,
+      "edgeTol1Recall": 1.0,
+      "edgeTol1F1": 0.9023034154090549,
+      "edgeTol1ReferenceEdges": 808,
+      "edgeTol1PredictedEdges": 1382,
+      "componentCount": 77,
+      "tinyComponents": 43,
+      "tinyCells": 64,
+      "nonempty": 4096,
+      "speckleRatio": 0.015625,
+      "speckleBelow005": false,
+      "referenceSalientTinyCells": 47,
+      "nonExemptTinyCells": 17,
+      "nonExemptSpeckleRatio": 0.004150390625,
+      "compactnessMean": 1.6531116345064003,
+      "compactnessAreaWeighted": 2.4711757985249903,
+      "rowTransitions": 302,
+      "markersTotal": 0,
+      "markersPreserved": 0,
+      "markerDetails": []
+    },
+    {
+      "fixture": "held-low-contrast",
+      "split": "heldout",
+      "kind": "synthetic",
+      "method": "full",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 64,
+      "usedColors": 3,
+      "timesMs": [
+        56.01289999999972,
+        55.88749999999982,
+        55.40759999999864
+      ],
+      "medianMs": 55.88749999999982,
+      "prepTimesMs": [
+        50.58399999999983,
+        49.80630000000019,
+        50.24299999999948
+      ],
+      "paletteSelectionTimesMs": [
+        0,
+        0,
+        0
+      ],
+      "optimizationTimesMs": [
+        5.428899999999885,
+        6.081199999999626,
+        5.1645999999991545
+      ],
+      "stageMediansMs": {
+        "preprocessing": 50.24299999999948,
+        "topKSelection": 0,
+        "optimizer": 5.428899999999885
+      },
+      "sourceImageHash": "b0b14e6ae4e4b9e5dde4107b92f2b507b22cf3c8c1122745940f38eb1ddf19be",
+      "commonInputHash": "1da2f18abbeb03ab86f894a1ad5c03a97e85b1527be3a73fec4753e04dc451c8",
+      "candidatePaletteAudit": null,
+      "positiveControlMatchesMain": true,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 3.2742854565108095,
+      "saliencyWeightedDeltaE2000": 3.281331797805715,
+      "regionType": "ground-truth-feature-mask",
+      "regionDeltaE2000": 6.398161744586337,
+      "complementDeltaE2000": 3.269702752909721,
+      "regionSaliencyWeightedDeltaE2000": 6.398161744586337,
+      "complementSaliencyWeightedDeltaE2000": 3.269702752909721,
+      "roiPriorityWeightedDeltaE2000": 3.2788547538605055,
+      "edgeExactPrecision": 0.0,
+      "edgeExactRecall": 0.0,
+      "edgeExactF1": 0.0,
+      "edgeExactReferenceEdges": 0,
+      "edgeExactPredictedEdges": 64,
+      "edgeTol1Precision": 0.0,
+      "edgeTol1Recall": 0.0,
+      "edgeTol1F1": 0.0,
+      "edgeTol1ReferenceEdges": 0,
+      "edgeTol1PredictedEdges": 64,
+      "componentCount": 5,
+      "tinyComponents": 4,
+      "tinyCells": 6,
+      "nonempty": 4096,
+      "speckleRatio": 0.00146484375,
+      "speckleBelow005": true,
+      "referenceSalientTinyCells": 6,
+      "nonExemptTinyCells": 0,
+      "nonExemptSpeckleRatio": 0.0,
+      "compactnessMean": 1.3786787217038179,
+      "compactnessAreaWeighted": 1.4819749827941622,
+      "rowTransitions": 8,
+      "markersTotal": 4,
+      "markersPreserved": 4,
+      "markerDetails": [
+        {
+          "name": "desired-2-bead-detail-0",
+          "preserved": true,
+          "contrastRetention": 2.782891899842393,
+          "directionalRetention": 2.5612448963028327,
+          "targetDeltaE2000": 6.282343452083702
+        },
+        {
+          "name": "desired-1-bead-detail-1",
+          "preserved": true,
+          "contrastRetention": 2.348767813234388,
+          "directionalRetention": 1.813196009672212,
+          "targetDeltaE2000": 6.6297983295916065
+        },
+        {
+          "name": "desired-1-bead-detail-2",
+          "preserved": true,
+          "contrastRetention": 2.348767813234388,
+          "directionalRetention": 1.813196009672212,
+          "targetDeltaE2000": 6.6297983295916065
+        },
+        {
+          "name": "desired-2-bead-detail-3",
+          "preserved": true,
+          "contrastRetention": 2.782891899842393,
+          "directionalRetention": 2.5612448963028327,
+          "targetDeltaE2000": 6.282343452083702
+        }
+      ]
+    },
+    {
+      "fixture": "held-low-contrast",
+      "split": "heldout",
+      "kind": "synthetic",
+      "method": "frequencyPalette",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 64,
+      "usedColors": 3,
+      "timesMs": [
+        57.75280000000021,
+        56.894499999999425,
+        57.29329999999936
+      ],
+      "medianMs": 57.29329999999936,
+      "prepTimesMs": [
+        50.58399999999983,
+        49.80630000000019,
+        50.24299999999948
+      ],
+      "paletteSelectionTimesMs": [
+        2.079099999999926,
+        2.039199999999255,
+        2.0559999999995853
+      ],
+      "optimizationTimesMs": [
+        5.089700000000448,
+        5.048999999999978,
+        4.994300000000294
+      ],
+      "stageMediansMs": {
+        "preprocessing": 50.24299999999948,
+        "topKSelection": 2.0559999999995853,
+        "optimizer": 5.048999999999978
+      },
+      "sourceImageHash": "b0b14e6ae4e4b9e5dde4107b92f2b507b22cf3c8c1122745940f38eb1ddf19be",
+      "commonInputHash": "1da2f18abbeb03ab86f894a1ad5c03a97e85b1527be3a73fec4753e04dc451c8",
+      "candidatePaletteAudit": {
+        "selection": "exact-DE00-nearest-full-catalogue-weighted-frequency",
+        "selectedCodes": [
+          "M01",
+          "M02",
+          "H15"
+        ],
+        "sourceNearestColors": 3,
+        "weightSum": 4106.033822786933,
+        "weightedHistogram": [
+          {
+            "code": "M01",
+            "weight": 4096.3653420719365,
+            "count": 4090
+          },
+          {
+            "code": "M02",
+            "weight": 6.293127157696897,
+            "count": 4
+          },
+          {
+            "code": "H15",
+            "weight": 3.375353557304664,
+            "count": 2
+          }
+        ],
+        "emptySourceSentinel": false
+      },
+      "positiveControlMatchesMain": null,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 3.2742854565108095,
+      "saliencyWeightedDeltaE2000": 3.281331797805715,
+      "regionType": "ground-truth-feature-mask",
+      "regionDeltaE2000": 6.398161744586337,
+      "complementDeltaE2000": 3.269702752909721,
+      "regionSaliencyWeightedDeltaE2000": 6.398161744586337,
+      "complementSaliencyWeightedDeltaE2000": 3.269702752909721,
+      "roiPriorityWeightedDeltaE2000": 3.2788547538605055,
+      "edgeExactPrecision": 0.0,
+      "edgeExactRecall": 0.0,
+      "edgeExactF1": 0.0,
+      "edgeExactReferenceEdges": 0,
+      "edgeExactPredictedEdges": 64,
+      "edgeTol1Precision": 0.0,
+      "edgeTol1Recall": 0.0,
+      "edgeTol1F1": 0.0,
+      "edgeTol1ReferenceEdges": 0,
+      "edgeTol1PredictedEdges": 64,
+      "componentCount": 5,
+      "tinyComponents": 4,
+      "tinyCells": 6,
+      "nonempty": 4096,
+      "speckleRatio": 0.00146484375,
+      "speckleBelow005": true,
+      "referenceSalientTinyCells": 6,
+      "nonExemptTinyCells": 0,
+      "nonExemptSpeckleRatio": 0.0,
+      "compactnessMean": 1.3786787217038179,
+      "compactnessAreaWeighted": 1.4819749827941622,
+      "rowTransitions": 8,
+      "markersTotal": 4,
+      "markersPreserved": 4,
+      "markerDetails": [
+        {
+          "name": "desired-2-bead-detail-0",
+          "preserved": true,
+          "contrastRetention": 2.782891899842393,
+          "directionalRetention": 2.5612448963028327,
+          "targetDeltaE2000": 6.282343452083702
+        },
+        {
+          "name": "desired-1-bead-detail-1",
+          "preserved": true,
+          "contrastRetention": 2.348767813234388,
+          "directionalRetention": 1.813196009672212,
+          "targetDeltaE2000": 6.6297983295916065
+        },
+        {
+          "name": "desired-1-bead-detail-2",
+          "preserved": true,
+          "contrastRetention": 2.348767813234388,
+          "directionalRetention": 1.813196009672212,
+          "targetDeltaE2000": 6.6297983295916065
+        },
+        {
+          "name": "desired-2-bead-detail-3",
+          "preserved": true,
+          "contrastRetention": 2.782891899842393,
+          "directionalRetention": 2.5612448963028327,
+          "targetDeltaE2000": 6.282343452083702
+        }
+      ]
+    },
+    {
+      "fixture": "held-highlights",
+      "split": "heldout",
+      "kind": "synthetic",
+      "method": "full",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 64,
+      "usedColors": 2,
+      "timesMs": [
+        54.20390000000043,
+        55.40519999999924,
+        55.00879999999961
+      ],
+      "medianMs": 55.00879999999961,
+      "prepTimesMs": [
+        49.580700000000434,
+        50.234699999999066,
+        50.268599999999424
+      ],
+      "paletteSelectionTimesMs": [
+        0,
+        0,
+        0
+      ],
+      "optimizationTimesMs": [
+        4.623199999999997,
+        5.170500000000175,
+        4.740200000000186
+      ],
+      "stageMediansMs": {
+        "preprocessing": 50.234699999999066,
+        "topKSelection": 0,
+        "optimizer": 4.740200000000186
+      },
+      "sourceImageHash": "a1ad2f9d3ce03b09ce5e3b90e943419c2437c0694b07fe1320678835321a735a",
+      "commonInputHash": "eb0dba4e05f3f974d54503a8fb9d93a600acc7a7a891846977a8e3628ebd430e",
+      "candidatePaletteAudit": null,
+      "positiveControlMatchesMain": true,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 6.8397633999790415,
+      "saliencyWeightedDeltaE2000": 6.828997089619261,
+      "regionType": "ground-truth-feature-mask",
+      "regionDeltaE2000": 2.0667017165623434,
+      "complementDeltaE2000": 6.846765446458381,
+      "regionSaliencyWeightedDeltaE2000": 2.0667017165623434,
+      "complementSaliencyWeightedDeltaE2000": 6.846765446458383,
+      "roiPriorityWeightedDeltaE2000": 6.832781837302176,
+      "edgeExactPrecision": 1.0,
+      "edgeExactRecall": 1.0,
+      "edgeExactF1": 1.0,
+      "edgeExactReferenceEdges": 64,
+      "edgeExactPredictedEdges": 64,
+      "edgeTol1Precision": 1.0,
+      "edgeTol1Recall": 1.0,
+      "edgeTol1F1": 1.0,
+      "edgeTol1ReferenceEdges": 64,
+      "edgeTol1PredictedEdges": 64,
+      "componentCount": 5,
+      "tinyComponents": 4,
+      "tinyCells": 6,
+      "nonempty": 4096,
+      "speckleRatio": 0.00146484375,
+      "speckleBelow005": true,
+      "referenceSalientTinyCells": 6,
+      "nonExemptTinyCells": 0,
+      "nonExemptSpeckleRatio": 0.0,
+      "compactnessMean": 1.3786787217038179,
+      "compactnessAreaWeighted": 1.4819749827941622,
+      "rowTransitions": 8,
+      "markersTotal": 4,
+      "markersPreserved": 4,
+      "markerDetails": [
+        {
+          "name": "desired-2-bead-detail-0",
+          "preserved": true,
+          "contrastRetention": 1.1112778509303143,
+          "directionalRetention": 1.1298130705371923,
+          "targetDeltaE2000": 2.0667017165623434
+        },
+        {
+          "name": "desired-1-bead-detail-1",
+          "preserved": true,
+          "contrastRetention": 1.1112778509303143,
+          "directionalRetention": 1.1298130705371923,
+          "targetDeltaE2000": 2.0667017165623434
+        },
+        {
+          "name": "desired-1-bead-detail-2",
+          "preserved": true,
+          "contrastRetention": 1.1112778509303143,
+          "directionalRetention": 1.1298130705371923,
+          "targetDeltaE2000": 2.0667017165623434
+        },
+        {
+          "name": "desired-2-bead-detail-3",
+          "preserved": true,
+          "contrastRetention": 1.1112778509303143,
+          "directionalRetention": 1.1298130705371923,
+          "targetDeltaE2000": 2.0667017165623434
+        }
+      ]
+    },
+    {
+      "fixture": "held-highlights",
+      "split": "heldout",
+      "kind": "synthetic",
+      "method": "frequencyPalette",
+      "maxColors": 18,
+      "removeBackground": false,
+      "width": 64,
+      "height": 64,
+      "usedColors": 2,
+      "timesMs": [
+        56.89549999999872,
+        56.78570000000036,
+        56.83269999999902
+      ],
+      "medianMs": 56.83269999999902,
+      "prepTimesMs": [
+        49.580700000000434,
+        50.234699999999066,
+        50.268599999999424
+      ],
+      "paletteSelectionTimesMs": [
+        2.1312999999991007,
+        2.1476000000002387,
+        2.126299999999901
+      ],
+      "optimizationTimesMs": [
+        5.183499999999185,
+        4.4034000000010565,
+        4.437799999999697
+      ],
+      "stageMediansMs": {
+        "preprocessing": 50.234699999999066,
+        "topKSelection": 2.1312999999991007,
+        "optimizer": 4.437799999999697
+      },
+      "sourceImageHash": "a1ad2f9d3ce03b09ce5e3b90e943419c2437c0694b07fe1320678835321a735a",
+      "commonInputHash": "eb0dba4e05f3f974d54503a8fb9d93a600acc7a7a891846977a8e3628ebd430e",
+      "candidatePaletteAudit": {
+        "selection": "exact-DE00-nearest-full-catalogue-weighted-frequency",
+        "selectedCodes": [
+          "R07",
+          "G15"
+        ],
+        "sourceNearestColors": 2,
+        "weightSum": 4128.044561234034,
+        "weightedHistogram": [
+          {
+            "code": "R07",
+            "weight": 4108.892372166594,
+            "count": 4090
+          },
+          {
+            "code": "G15",
+            "weight": 19.152189067446287,
+            "count": 6
+          }
+        ],
+        "emptySourceSentinel": false
+      },
+      "positiveControlMatchesMain": null,
+      "occupancyMismatchVsFull": 0,
+      "occupancyMismatch": 0,
+      "meanDeltaE2000": 6.8397633999790415,
+      "saliencyWeightedDeltaE2000": 6.828997089619261,
+      "regionType": "ground-truth-feature-mask",
+      "regionDeltaE2000": 2.0667017165623434,
+      "complementDeltaE2000": 6.846765446458381,
+      "regionSaliencyWeightedDeltaE2000": 2.0667017165623434,
+      "complementSaliencyWeightedDeltaE2000": 6.846765446458383,
+      "roiPriorityWeightedDeltaE2000": 6.832781837302176,
+      "edgeExactPrecision": 1.0,
+      "edgeExactRecall": 1.0,
+      "edgeExactF1": 1.0,
+      "edgeExactReferenceEdges": 64,
+      "edgeExactPredictedEdges": 64,
+      "edgeTol1Precision": 1.0,
+      "edgeTol1Recall": 1.0,
+      "edgeTol1F1": 1.0,
+      "edgeTol1ReferenceEdges": 64,
+      "edgeTol1PredictedEdges": 64,
+      "componentCount": 5,
+      "tinyComponents": 4,
+      "tinyCells": 6,
+      "nonempty": 4096,
+      "speckleRatio": 0.00146484375,
+      "speckleBelow005": true,
+      "referenceSalientTinyCells": 6,
+      "nonExemptTinyCells": 0,
+      "nonExemptSpeckleRatio": 0.0,
+      "compactnessMean": 1.3786787217038179,
+      "compactnessAreaWeighted": 1.4819749827941622,
+      "rowTransitions": 8,
+      "markersTotal": 4,
+      "markersPreserved": 4,
+      "markerDetails": [
+        {
+          "name": "desired-2-bead-detail-0",
+          "preserved": true,
+          "contrastRetention": 1.1112778509303143,
+          "directionalRetention": 1.1298130705371923,
+          "targetDeltaE2000": 2.0667017165623434
+        },
+        {
+          "name": "desired-1-bead-detail-1",
+          "preserved": true,
+          "contrastRetention": 1.1112778509303143,
+          "directionalRetention": 1.1298130705371923,
+          "targetDeltaE2000": 2.0667017165623434
+        },
+        {
+          "name": "desired-1-bead-detail-2",
+          "preserved": true,
+          "contrastRetention": 1.1112778509303143,
+          "directionalRetention": 1.1298130705371923,
+          "targetDeltaE2000": 2.0667017165623434
+        },
+        {
+          "name": "desired-2-bead-detail-3",
+          "preserved": true,
+          "contrastRetention": 1.1112778509303143,
+          "directionalRetention": 1.1298130705371923,
+          "targetDeltaE2000": 2.0667017165623434
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,610 @@
+{
+  "criteria": [
+    "min meanDeltaE2000",
+    "min raw speckleRatio",
+    "max edgeTol1F1"
+  ],
+  "note": "Per input only, among v3/full K12/18/24; no cross-image dominance or global-optimum claim.",
+  "fixtures": [
+    {
+      "fixture": "photo-astronaut",
+      "frontier": [
+        {
+          "method": "v3",
+          "K": 12,
+          "meanDeltaE2000": 7.400763229466235,
+          "speckleRatio": 0.092041015625,
+          "edgeTol1F1": 0.8775234793031307
+        },
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 6.6704658212904615,
+          "speckleRatio": 0.09912109375,
+          "edgeTol1F1": 0.8867332071103031
+        },
+        {
+          "method": "full",
+          "K": 18,
+          "meanDeltaE2000": 5.745049007977494,
+          "speckleRatio": 0.10498046875,
+          "edgeTol1F1": 0.886280393442623
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 5.343782535941218,
+          "speckleRatio": 0.121826171875,
+          "edgeTol1F1": 0.9187469565992685
+        }
+      ]
+    },
+    {
+      "fixture": "photo-chelsea",
+      "frontier": [
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 5.6484667872169405,
+          "speckleRatio": 0.04433139534883721,
+          "edgeTol1F1": 0.859661354086377
+        },
+        {
+          "method": "full",
+          "K": 18,
+          "meanDeltaE2000": 5.547240620853986,
+          "speckleRatio": 0.04505813953488372,
+          "edgeTol1F1": 0.863387034226801
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 5.511600897913007,
+          "speckleRatio": 0.0501453488372093,
+          "edgeTol1F1": 0.8626992960808868
+        }
+      ]
+    },
+    {
+      "fixture": "photo-rocket",
+      "frontier": [
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 5.8093374853311195,
+          "speckleRatio": 0.027252906976744186,
+          "edgeTol1F1": 0.693158202597784
+        },
+        {
+          "method": "v3",
+          "K": 24,
+          "meanDeltaE2000": 6.345646512389928,
+          "speckleRatio": 0.041787790697674417,
+          "edgeTol1F1": 0.6953953270721623
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 5.704069699536086,
+          "speckleRatio": 0.03379360465116279,
+          "edgeTol1F1": 0.6948186826339086
+        }
+      ]
+    },
+    {
+      "fixture": "photo-coffee",
+      "frontier": [
+        {
+          "method": "v3",
+          "K": 12,
+          "meanDeltaE2000": 6.423612855241374,
+          "speckleRatio": 0.09484011627906977,
+          "edgeTol1F1": 0.8403289934920876
+        },
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 5.576494424605476,
+          "speckleRatio": 0.08975290697674419,
+          "edgeTol1F1": 0.8226119973213998
+        },
+        {
+          "method": "full",
+          "K": 18,
+          "meanDeltaE2000": 5.4498481130486685,
+          "speckleRatio": 0.09265988372093023,
+          "edgeTol1F1": 0.8357058676504193
+        },
+        {
+          "method": "v3",
+          "K": 24,
+          "meanDeltaE2000": 6.234858761560945,
+          "speckleRatio": 0.13263081395348839,
+          "edgeTol1F1": 0.8439071198162359
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 5.429430182291623,
+          "speckleRatio": 0.10101744186046512,
+          "edgeTol1F1": 0.8374965074072164
+        }
+      ]
+    },
+    {
+      "fixture": "photo-hubble_deep_field",
+      "frontier": [
+        {
+          "method": "v3",
+          "K": 12,
+          "meanDeltaE2000": 3.372021149478414,
+          "speckleRatio": 0.10407366071428571,
+          "edgeTol1F1": 0.8582086004524356
+        },
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 3.341011084678441,
+          "speckleRatio": 0.10518973214285714,
+          "edgeTol1F1": 0.8790788565428602
+        },
+        {
+          "method": "full",
+          "K": 18,
+          "meanDeltaE2000": 3.318959000909177,
+          "speckleRatio": 0.10714285714285714,
+          "edgeTol1F1": 0.8790734311341833
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 3.3070815473450588,
+          "speckleRatio": 0.10797991071428571,
+          "edgeTol1F1": 0.8764556362492851
+        }
+      ]
+    },
+    {
+      "fixture": "photo-retina",
+      "frontier": [
+        {
+          "method": "v3",
+          "K": 12,
+          "meanDeltaE2000": 4.915233759899072,
+          "speckleRatio": 0.03564453125,
+          "edgeTol1F1": 0.6893502442414913
+        },
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 4.128171053323996,
+          "speckleRatio": 0.029541015625,
+          "edgeTol1F1": 0.6307102502716938
+        },
+        {
+          "method": "v3",
+          "K": 18,
+          "meanDeltaE2000": 4.890916070271487,
+          "speckleRatio": 0.041015625,
+          "edgeTol1F1": 0.7033382454387319
+        },
+        {
+          "method": "full",
+          "K": 18,
+          "meanDeltaE2000": 4.109486906769661,
+          "speckleRatio": 0.032958984375,
+          "edgeTol1F1": 0.6257098290765054
+        },
+        {
+          "method": "v3",
+          "K": 24,
+          "meanDeltaE2000": 4.880818760323491,
+          "speckleRatio": 0.044921875,
+          "edgeTol1F1": 0.7041843192332268
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 4.1000122190802575,
+          "speckleRatio": 0.034423828125,
+          "edgeTol1F1": 0.6264972240749496
+        }
+      ]
+    },
+    {
+      "fixture": "photo-grass",
+      "frontier": [
+        {
+          "method": "v3",
+          "K": 12,
+          "meanDeltaE2000": 4.792593549226902,
+          "speckleRatio": 0.1923828125,
+          "edgeTol1F1": 0.900691180536356
+        },
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 4.623419395349344,
+          "speckleRatio": 0.20849609375,
+          "edgeTol1F1": 0.9409508589692369
+        },
+        {
+          "method": "v3",
+          "K": 18,
+          "meanDeltaE2000": 4.792593549226902,
+          "speckleRatio": 0.1923828125,
+          "edgeTol1F1": 0.900691180536356
+        },
+        {
+          "method": "full",
+          "K": 18,
+          "meanDeltaE2000": 4.623419395349344,
+          "speckleRatio": 0.20849609375,
+          "edgeTol1F1": 0.9409508589692369
+        },
+        {
+          "method": "v3",
+          "K": 24,
+          "meanDeltaE2000": 4.792593549226902,
+          "speckleRatio": 0.1923828125,
+          "edgeTol1F1": 0.900691180536356
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 4.623419395349344,
+          "speckleRatio": 0.20849609375,
+          "edgeTol1F1": 0.9409508589692369
+        }
+      ]
+    },
+    {
+      "fixture": "dev-eyes-lines",
+      "frontier": [
+        {
+          "method": "v3",
+          "K": 12,
+          "meanDeltaE2000": 4.406780822119192,
+          "speckleRatio": 0.041015625,
+          "edgeTol1F1": 0.6753564154786151
+        },
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 4.442731616799957,
+          "speckleRatio": 0.037353515625,
+          "edgeTol1F1": 0.7023907666941468
+        },
+        {
+          "method": "v3",
+          "K": 18,
+          "meanDeltaE2000": 4.388303450054518,
+          "speckleRatio": 0.0439453125,
+          "edgeTol1F1": 0.6543408360128616
+        },
+        {
+          "method": "v3",
+          "K": 24,
+          "meanDeltaE2000": 4.383929129082025,
+          "speckleRatio": 0.04443359375,
+          "edgeTol1F1": 0.6685808039376538
+        }
+      ]
+    },
+    {
+      "fixture": "dev-defocus",
+      "frontier": [
+        {
+          "method": "v3",
+          "K": 12,
+          "meanDeltaE2000": 5.397535575938612,
+          "speckleRatio": 0.010986328125,
+          "edgeTol1F1": 0.9040874140024281
+        },
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 5.308551215748093,
+          "speckleRatio": 0.01513671875,
+          "edgeTol1F1": 0.9041315683914961
+        },
+        {
+          "method": "v3",
+          "K": 18,
+          "meanDeltaE2000": 5.390732681902594,
+          "speckleRatio": 0.0146484375,
+          "edgeTol1F1": 0.8383645395491021
+        },
+        {
+          "method": "full",
+          "K": 18,
+          "meanDeltaE2000": 5.249097534517716,
+          "speckleRatio": 0.01806640625,
+          "edgeTol1F1": 0.9058260175578612
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 5.229200350945483,
+          "speckleRatio": 0.022705078125,
+          "edgeTol1F1": 0.9057507987220447
+        }
+      ]
+    },
+    {
+      "fixture": "dev-low-contrast",
+      "frontier": [
+        {
+          "method": "v3",
+          "K": 12,
+          "meanDeltaE2000": 3.275292583394593,
+          "speckleRatio": 0.0009765625,
+          "edgeTol1F1": 0.0
+        },
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 3.2742854565108095,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 0.0
+        },
+        {
+          "method": "v3",
+          "K": 18,
+          "meanDeltaE2000": 3.275292583394593,
+          "speckleRatio": 0.0009765625,
+          "edgeTol1F1": 0.0
+        },
+        {
+          "method": "full",
+          "K": 18,
+          "meanDeltaE2000": 3.2742854565108095,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 0.0
+        },
+        {
+          "method": "v3",
+          "K": 24,
+          "meanDeltaE2000": 3.275292583394593,
+          "speckleRatio": 0.0009765625,
+          "edgeTol1F1": 0.0
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 3.2742854565108095,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 0.0
+        }
+      ]
+    },
+    {
+      "fixture": "dev-highlights",
+      "frontier": [
+        {
+          "method": "v3",
+          "K": 12,
+          "meanDeltaE2000": 6.8397633999790415,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 1.0
+        },
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 6.8397633999790415,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 1.0
+        },
+        {
+          "method": "v3",
+          "K": 18,
+          "meanDeltaE2000": 6.8397633999790415,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 1.0
+        },
+        {
+          "method": "full",
+          "K": 18,
+          "meanDeltaE2000": 6.8397633999790415,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 1.0
+        },
+        {
+          "method": "v3",
+          "K": 24,
+          "meanDeltaE2000": 6.8397633999790415,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 1.0
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 6.8397633999790415,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 1.0
+        }
+      ]
+    },
+    {
+      "fixture": "held-eyes-lines",
+      "frontier": [
+        {
+          "method": "v3",
+          "K": 12,
+          "meanDeltaE2000": 4.402364186994063,
+          "speckleRatio": 0.04150390625,
+          "edgeTol1F1": 0.6787732041969331
+        },
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 4.437056807049818,
+          "speckleRatio": 0.037841796875,
+          "edgeTol1F1": 0.7001223990208079
+        },
+        {
+          "method": "v3",
+          "K": 18,
+          "meanDeltaE2000": 4.384523051357977,
+          "speckleRatio": 0.044677734375,
+          "edgeTol1F1": 0.6726021853500607
+        },
+        {
+          "method": "full",
+          "K": 18,
+          "meanDeltaE2000": 4.44355700539367,
+          "speckleRatio": 0.0390625,
+          "edgeTol1F1": 0.7055417700578991
+        },
+        {
+          "method": "v3",
+          "K": 24,
+          "meanDeltaE2000": 4.377810489950497,
+          "speckleRatio": 0.045166015625,
+          "edgeTol1F1": 0.6731313131313131
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 4.441586795285434,
+          "speckleRatio": 0.0390625,
+          "edgeTol1F1": 0.7051016175860638
+        }
+      ]
+    },
+    {
+      "fixture": "held-defocus",
+      "frontier": [
+        {
+          "method": "v3",
+          "K": 12,
+          "meanDeltaE2000": 5.402295546940716,
+          "speckleRatio": 0.0107421875,
+          "edgeTol1F1": 0.8627754155392346
+        },
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 5.306653313044299,
+          "speckleRatio": 0.015869140625,
+          "edgeTol1F1": 0.9069767441860465
+        },
+        {
+          "method": "v3",
+          "K": 18,
+          "meanDeltaE2000": 5.394812446652452,
+          "speckleRatio": 0.0146484375,
+          "edgeTol1F1": 0.7919221060223585
+        },
+        {
+          "method": "full",
+          "K": 18,
+          "meanDeltaE2000": 5.253204794936538,
+          "speckleRatio": 0.018798828125,
+          "edgeTol1F1": 0.90199203187251
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 5.233258456556046,
+          "speckleRatio": 0.02197265625,
+          "edgeTol1F1": 0.9026898734177216
+        }
+      ]
+    },
+    {
+      "fixture": "held-low-contrast",
+      "frontier": [
+        {
+          "method": "v3",
+          "K": 12,
+          "meanDeltaE2000": 3.275292583394593,
+          "speckleRatio": 0.0009765625,
+          "edgeTol1F1": 0.0
+        },
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 3.2742854565108095,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 0.0
+        },
+        {
+          "method": "v3",
+          "K": 18,
+          "meanDeltaE2000": 3.275292583394593,
+          "speckleRatio": 0.0009765625,
+          "edgeTol1F1": 0.0
+        },
+        {
+          "method": "full",
+          "K": 18,
+          "meanDeltaE2000": 3.2742854565108095,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 0.0
+        },
+        {
+          "method": "v3",
+          "K": 24,
+          "meanDeltaE2000": 3.275292583394593,
+          "speckleRatio": 0.0009765625,
+          "edgeTol1F1": 0.0
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 3.2742854565108095,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 0.0
+        }
+      ]
+    },
+    {
+      "fixture": "held-highlights",
+      "frontier": [
+        {
+          "method": "v3",
+          "K": 12,
+          "meanDeltaE2000": 6.8397633999790415,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 1.0
+        },
+        {
+          "method": "full",
+          "K": 12,
+          "meanDeltaE2000": 6.8397633999790415,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 1.0
+        },
+        {
+          "method": "v3",
+          "K": 18,
+          "meanDeltaE2000": 6.8397633999790415,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 1.0
+        },
+        {
+          "method": "full",
+          "K": 18,
+          "meanDeltaE2000": 6.8397633999790415,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 1.0
+        },
+        {
+          "method": "v3",
+          "K": 24,
+          "meanDeltaE2000": 6.8397633999790415,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 1.0
+        },
+        {
+          "method": "full",
+          "K": 24,
+          "meanDeltaE2000": 6.8397633999790415,
+          "speckleRatio": 0.00146484375,
+          "edgeTol1F1": 1.0
+        }
+      ]
+    }
+  ]
+}
